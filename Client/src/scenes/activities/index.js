@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {FlatList, View, Text} from 'react-native';
+import {FlatList, View, Text, StyleSheet} from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import {Header, ListItem} from '_atoms';
 
@@ -126,23 +126,23 @@ const ActivitiesScreen = () => {
     return (
         <SafeAreaView>
             <Header title={totalPoints}/>
-            <View>
-                <Text onPress={() => setItems(physicalActs)}>
+            <View style={styles.buttons}>
+                <Text style={styles.text} onPress={() => setItems(physicalActs)}>
                     Physical
                 </Text>
-                <Text onPress={() => setItems(emotionalActs)}>
+                <Text style={styles.text} onPress={() => setItems(emotionalActs)}>
                     Emotional
                 </Text>
-                <Text onPress={() => setItems(intellectualActs)}>
+                <Text style={styles.text} onPress={() => setItems(intellectualActs)}>
                     Intellectual
                 </Text>
-                <Text onPress={() => setItems(occupationalActs)}>
+                <Text style={styles.text} onPress={() => setItems(occupationalActs)}>
                     Occupational
                 </Text>
-                <Text onPress={() => setItems(spiritualActs)}>
+                <Text style={styles.text} onPress={() => setItems(spiritualActs)}>
                     Spiritual
                 </Text>
-                <Text onPress={() => setItems(socialActs)}>
+                <Text style={styles.text} onPress={() => setItems(socialActs)}>
                     Social
                 </Text>
             </View>
@@ -158,5 +158,16 @@ const ActivitiesScreen = () => {
         </SafeAreaView>
     );
 };
+
+const styles = StyleSheet.create({
+    buttons: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        backgroundColor: 'steelblue',
+    },
+    text: {
+        color: 'white'
+    }
+});
 
 export default ActivitiesScreen;
