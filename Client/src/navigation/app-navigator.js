@@ -2,13 +2,19 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Icon from "react-native-vector-icons/FontAwesome";
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import AddScreen from '_scenes/addScreen/addScreen';
 import Compete from '_scenes/compete/compete';
 import Home from '_scenes/home/home';
 import Settings from '_scenes/settings/settings';
 
+
+
+
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
+
 
 const styles = StyleSheet.create({
     // Top Level Of Tab Bar <></>
@@ -23,7 +29,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingBottom: 10
+        paddingBottom: 5
     },
 
     //Tab Content Text
@@ -44,12 +50,41 @@ const styles = StyleSheet.create({
 
 })
 
-const routeConfig = [
-    { title: 'Home', image: '😁' },
-    { title: 'Add', image: '👍' },
-    { title: 'Compete', image: '✌🏽' },
-    { title: 'Settings', image: '🍎' }
-]
+const routeConfig = {
+    Home: {
+        iconName: 'home'
+    },
+    Add: {
+        iconName: 'plus-circle'
+    },
+    Compete: {
+        iconName: 'leaderboard'
+    },
+    Settings: {
+        iconName: 'settings'
+    }
+}
+
+const getIcon = (routeName, style) => {
+    if (routeName === 'Compete' || routeName === 'Settings') {
+        return <MaterialIcon
+            name={routeConfig[routeName].iconName}
+            style={style}
+            size={windowWidth / 12
+            }
+        />
+    } else {
+        return (
+            <Icon
+                name={routeConfig[routeName].iconName}
+                style={style}
+                size={windowWidth / 12}
+            />
+        )
+    }
+}
+
+
 
 function CustomTabBar({ state, descriptors, navigation }) {
     return (
@@ -84,14 +119,13 @@ function CustomTabBar({ state, descriptors, navigation }) {
 
                     return (
                         <TouchableOpacity
-                            style={{ ...styles.tabItem, width: (windowWidth / routeConfig.length) }}
+                            key={route.name + idx}
+                            style={{ ...styles.tabItem, width: (windowWidth / state.routes.length) }}
                             onPress={handleOnPress}
                         >
                             <View style={styles.tabItem}>
-
-                                <Text>😁</Text>
+                                {getIcon(label, selectStyle(idx))}
                                 <Text style={{ ...styles.tabContentText, ...selectStyle(idx) }}>{label}</Text>
-
                             </View>
                         </TouchableOpacity>
                     )

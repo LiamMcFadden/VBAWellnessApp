@@ -13,6 +13,7 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		86447A5E972E8770C988DC67 /* libPods-VBAWellnessApp-VBAWellnessAppTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 37A979D7955803AD8B8C276F /* libPods-VBAWellnessApp-VBAWellnessAppTests.a */; };
+		B289658527E6C8F600D96DD1 /* fonts in Resources */ = {isa = PBXBuildFile; fileRef = B289658427E6C8F600D96DD1 /* fonts */; };
 		E86812E4BDAA02511C40298E /* libPods-VBAWellnessApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F4C446BD5133A1876310189 /* libPods-VBAWellnessApp.a */; };
 /* End PBXBuildFile section */
 
@@ -42,6 +43,7 @@
 		79F55BD44EA1F7498E3CAB72 /* Pods-VBAWellnessApp-VBAWellnessAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VBAWellnessApp-VBAWellnessAppTests.release.xcconfig"; path = "Target Support Files/Pods-VBAWellnessApp-VBAWellnessAppTests/Pods-VBAWellnessApp-VBAWellnessAppTests.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = VBAWellnessApp/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		AC0B25E60A6A62709D574018 /* Pods-VBAWellnessApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VBAWellnessApp.release.xcconfig"; path = "Target Support Files/Pods-VBAWellnessApp/Pods-VBAWellnessApp.release.xcconfig"; sourceTree = "<group>"; };
+		B289658427E6C8F600D96DD1 /* fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = fonts; sourceTree = "<group>"; };
 		DF11F328BF6DAC7DABEE19D4 /* Pods-VBAWellnessApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VBAWellnessApp.debug.xcconfig"; path = "Target Support Files/Pods-VBAWellnessApp/Pods-VBAWellnessApp.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -116,6 +118,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				B289658427E6C8F600D96DD1 /* fonts */,
 				13B07FAE1A68108700A75B9A /* VBAWellnessApp */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* VBAWellnessAppTests */,
@@ -145,7 +148,6 @@
 				2FCD9FBC0E94839C6DD7A270 /* Pods-VBAWellnessApp-VBAWellnessAppTests.debug.xcconfig */,
 				79F55BD44EA1F7498E3CAB72 /* Pods-VBAWellnessApp-VBAWellnessAppTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -243,6 +245,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B289658527E6C8F600D96DD1 /* fonts in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
