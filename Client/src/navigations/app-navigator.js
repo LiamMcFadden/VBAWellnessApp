@@ -1,19 +1,35 @@
-import {createBottomTabNavigator} from 'react-navigation-tabs';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
+import AddScreen from '_scenes/addScreen/addScreen';
+import Compete from '_scenes/compete/compete';
+import Home from '_scenes/home/home';
+import Settings from '_scenes/settings/settings';
 
-import ActivitiesScreen from '_scenes/activities';
+
+
+
 
 const TabNavigatorConfig = {
-  initialRouteName: 'Activities',
+  initialRouteName: 'Home',
   header: null,
   headerMode: 'none',
 };
 
 const RouteConfigs = {
-  Activities:{
-    screen:ActivitiesScreen,
+  Home: {
+    screen: Home,
+    tabBarLabel: 'pp'
   },
+  Compete: {
+    screen: Compete
+  },
+  Add: {
+    screen: AddScreen
+  },
+  Settings: {
+    screen: Settings
+  }
 };
 
-const AppNavigator = createBottomTabNavigator(RouteConfigs, TabNavigatorConfig);
 
-export default AppNavigator;
+export default AppNavigator =
+  createBottomTabNavigator(RouteConfigs, TabNavigatorConfig);

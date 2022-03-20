@@ -1,8 +1,9 @@
 import React from 'react';
-import Navigator from '_navigations';
+// import Navigator from '_navigations';
+import BottomTabs from './navigation/app-navigator';
 
 const App = () => (
-    <Navigator />
+    <BottomTabs />
 );
 
 export default App;
