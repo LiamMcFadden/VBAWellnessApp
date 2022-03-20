@@ -1,123 +1,57 @@
-import React, {useState} from 'react';
-import {FlatList, View, Text, StyleSheet} from 'react-native';
+import React, { useState } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import {Header, ListItem} from '_atoms';
+import { Header, ListItem } from '_atoms';
+//activity lists for each wellness category
+//once database is setup, these will be pulled from there
+import {
+    emotionalActs,
+    intellectualActs,
+    occupationalActs,
+    physicalActs,
+    socialActs,
+    spiritualActs
+} from '../home/data';
+
+
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
+const styles = StyleSheet.create({
+    buttons: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        backgroundColor: 'steelblue',
+    },
+    text: {
+        color: 'white'
+    },
+
+    //Profile Card
+    profileCard: {
+        width: (0.95 * windowWidth),
+        height: (0.2 * windowHeight),
+        flex: 1,
+        marginTop: 10,
+        marginBottom: 10,
+        backgroundColor: "red"
+    }
+
+});
+
+
+const ProfileCard = () => {
+    <View style={styles.profileCard}>
+        <Text>Hello</Text>
+    </View>
+
+}
 
 const ActivitiesScreen = () => {
-    //activity lists for each wellness category
-    //once database is setup, these will be pulled from there
-    const physicalActs = [
-        {
-            text: 'Run a Mile',
-            points: 10,
-        },
-        {
-            text: 'Walk to Work',
-            points: 5,
-        },
-        {
-            text: 'Go for a Swim',
-            points: 15,
-        },
-        {
-            text: 'Workout at the Gym',
-            points: 10,
-        },
-    ];
-    const emotionalActs = [
-        {
-            text: 'Emotional Filler 1',
-            points: 5,
-        },
-        {
-            text: 'Emotional Filler 2',
-            points: 10,
-        },
-        {
-            text: 'Emotional Filler 3',
-            points: 10,
-        },
-        {
-            text: 'Emotional Filler 4',
-            points: 15,
-        },
-    ];
-    const intellectualActs = [
-        {
-            text: 'Intellectual Filler 1',
-            points: 12,
-        },
-        {
-            text: 'Intellectual Filler 2',
-            points: 13,
-        },
-        {
-            text: 'Intellectual Filler 3',
-            points: 19,
-        },
-        {
-            text: 'Intellectual Filler 4',
-            points: 4,
-        },
-    ];
-    const occupationalActs = [
-        {
-            text: 'Occupational Filler 1',
-            points: 10,
-        },
-        {
-            text: 'Occupational Filler 2',
-            points: 5,
-        },
-        {
-            text: 'Occupational Filler 3',
-            points: 8,
-        },
-        {
-            text: 'Occupational Filler 4',
-            points: 3,
-        },
-    ];
-    const spiritualActs = [
-        {
-            text: 'Spiritual Filler 1',
-            points: 15,
-        },
-        {
-            text: 'Spiritual Filler 2',
-            points: 30,
-        },
-        {
-            text: 'Spiritual Filler 3',
-            points: 5,
-        },
-        {
-            text: 'Spiritual Filler 4',
-            points: 25,
-        },
-    ];
-    const socialActs = [
-        {
-            text: 'Social Filler 1',
-            points: 7,
-        },
-        {
-            text: 'Social Filler 2',
-            points: 20,
-        },
-        {
-            text: 'Social Filler 3',
-            points: 10,
-        },
-        {
-            text: 'Social Filler 4',
-            points: 10,
-        },
-    ];
-
     const [items, setItems] = useState(physicalActs);
 
     const addPoints = points => {
+        console.log('adding')
         setTotalPoints(totalPoints + points);
     };
 
@@ -125,7 +59,8 @@ const ActivitiesScreen = () => {
 
     return (
         <SafeAreaView>
-            <Header title={totalPoints}/>
+            <ProfileCard />
+            <Header title={totalPoints} />
             <View style={styles.buttons}>
                 <Text style={styles.text} onPress={() => setItems(physicalActs)}>
                     Physical
@@ -148,26 +83,16 @@ const ActivitiesScreen = () => {
             </View>
             <FlatList
                 data={items}
-                renderItem={({item}) => (
-                <ListItem
-                    item={item}
-                    addPoints={addPoints}
-                />
+                renderItem={({ item }) => (
+                    <ListItem
+                        item={item}
+                        addPoints={addPoints}
+                    />
                 )}
             />
         </SafeAreaView>
     );
 };
 
-const styles = StyleSheet.create({
-    buttons: {
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        backgroundColor: 'steelblue',
-    },
-    text: {
-        color: 'white'
-    }
-});
 
 export default ActivitiesScreen;

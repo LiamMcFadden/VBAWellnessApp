@@ -1,120 +1,112 @@
-import React, {useState} from 'react';
-import {FlatList, View, Text, StyleSheet} from 'react-native';
+import React, { useState } from 'react';
+import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-navigation';
-import {Header, ListItem} from '_atoms';
+import { Header, ListItem } from '_atoms';
+//activity lists for each wellness category
+//once database is setup, these will be pulled from there
+import {
+    emotionalActs,
+    intellectualActs,
+    occupationalActs,
+    physicalActs,
+    socialActs,
+    spiritualActs
+} from '../home/data';
+
+
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
+const styles = StyleSheet.create({
+    buttons: {
+        width: (0.95 * windowWidth),
+        alignSelf: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        backgroundColor: 'steelblue',
+    },
+    text: {
+        color: 'white'
+    },
+    //Profile Card
+    profileCard: {
+        width: (0.95 * windowWidth),
+        height: (windowHeight / 5),
+        alignSelf: 'center',
+        backgroundColor: "#0155A4",
+        borderRadius: 5,
+        marginTop: 20,
+        marginBottom: 10
+    },
+
+    nameText: {
+        margin: 7,
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 24
+    },
+
+    bodyText: {
+        marginLeft: 7,
+        color: 'white',
+        fontSize: 14
+    },
+
+    profileButton: {
+        width: (windowWidth / 4),
+        height: 25,
+        marginLeft: 7,
+        marginTop: 15,
+        borderRadius: 3,
+        flexDirection: 'row',
+        backgroundColor: "#fff",
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingLeft: 5,
+        paddingRight: 10
+
+
+    },
+
+    profileButtonText: {
+        color: '#0155A4',
+        fontSize: 18
+    }
+
+    // End Profile Cdard
+});
+
+/**
+ * Shows the users profile with a button that will link to
+ * the users full profile
+ * 
+ * // TODO This will need to be moved into its own file later
+ * // TODO Check Styles for responsiveness --> this might not be good Right now
+ */
+const ProfileCard = () => {
+    return (
+        <View style={styles.profileCard}>
+            <Text style={styles.nameText}>John Smith</Text>
+            <Text style={styles.bodyText}>Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit. Nunc molestie posuere congue.
+                Donec hendrerit, diam eget viverra pretium, lacus ligula scelerisque felis, eu
+                finibus neque massa eget justo.
+            </Text>
+            <TouchableOpacity
+                style={styles.profileButton}
+            >
+                <Ionicons name="person-circle-outline" size={20} color={'#0155A4'} />
+                <Text style={styles.profileButtonText}>
+                    Profile
+                </Text>
+            </TouchableOpacity>
+        </View>
+    )
+
+}
 
 const Home = () => {
-    //activity lists for each wellness category
-    //once database is setup, these will be pulled from there
-    const physicalActs = [
-        {
-            text: 'Run a Mile',
-            points: 10,
-        },
-        {
-            text: 'Walk to Work',
-            points: 5,
-        },
-        {
-            text: 'Go for a Swim',
-            points: 15,
-        },
-        {
-            text: 'Workout at the Gym',
-            points: 10,
-        },
-    ];
-    const emotionalActs = [
-        {
-            text: 'Emotional Filler 1',
-            points: 5,
-        },
-        {
-            text: 'Emotional Filler 2',
-            points: 10,
-        },
-        {
-            text: 'Emotional Filler 3',
-            points: 10,
-        },
-        {
-            text: 'Emotional Filler 4',
-            points: 15,
-        },
-    ];
-    const intellectualActs = [
-        {
-            text: 'Intellectual Filler 1',
-            points: 12,
-        },
-        {
-            text: 'Intellectual Filler 2',
-            points: 13,
-        },
-        {
-            text: 'Intellectual Filler 3',
-            points: 19,
-        },
-        {
-            text: 'Intellectual Filler 4',
-            points: 4,
-        },
-    ];
-    const occupationalActs = [
-        {
-            text: 'Occupational Filler 1',
-            points: 10,
-        },
-        {
-            text: 'Occupational Filler 2',
-            points: 5,
-        },
-        {
-            text: 'Occupational Filler 3',
-            points: 8,
-        },
-        {
-            text: 'Occupational Filler 4',
-            points: 3,
-        },
-    ];
-    const spiritualActs = [
-        {
-            text: 'Spiritual Filler 1',
-            points: 15,
-        },
-        {
-            text: 'Spiritual Filler 2',
-            points: 30,
-        },
-        {
-            text: 'Spiritual Filler 3',
-            points: 5,
-        },
-        {
-            text: 'Spiritual Filler 4',
-            points: 25,
-        },
-    ];
-    const socialActs = [
-        {
-            text: 'Social Filler 1',
-            points: 7,
-        },
-        {
-            text: 'Social Filler 2',
-            points: 20,
-        },
-        {
-            text: 'Social Filler 3',
-            points: 10,
-        },
-        {
-            text: 'Social Filler 4',
-            points: 10,
-        },
-    ];
-
     const [items, setItems] = useState(physicalActs);
 
     const addPoints = points => {
@@ -125,7 +117,8 @@ const Home = () => {
 
     return (
         <SafeAreaView>
-            <Header title={totalPoints}/>
+            <ProfileCard />
+            <Header title={totalPoints} width={0.95 * windowWidth} />
             <View style={styles.buttons}>
                 <Text style={styles.text} onPress={() => setItems(physicalActs)}>
                     Physical
@@ -146,28 +139,19 @@ const Home = () => {
                     Social
                 </Text>
             </View>
+
             <FlatList
                 data={items}
-                renderItem={({item}) => (
-                <ListItem
-                    item={item}
-                    addPoints={addPoints}
-                />
+                renderItem={({ item }) => (
+                    <ListItem
+                        item={item}
+                        addPoints={addPoints}
+                    />
                 )}
             />
         </SafeAreaView>
     );
 };
 
-const styles = StyleSheet.create({
-    buttons: {
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        backgroundColor: 'steelblue',
-    },
-    text: {
-        color: 'white'
-    }
-});
 
 export default Home;
