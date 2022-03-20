@@ -1,12 +1,12 @@
 import React from 'react';
-import {SafeAreaView, View, Text, StyleSheet, TouchableHighlight} from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 
-const LoginScreen = ({navigation}) => (
+const LoginScreen = ({ navigation }) => (
     <SafeAreaView style={styles.view}>
         <Text style={styles.text}>Screen: Login</Text>
-        
+
         <View style={styles.btnView}>
-            <TouchableHighlight style={styles.btn} underlayColor="skyblue" onPress={() => navigation.navigate('Activities')}>
+            <TouchableHighlight style={styles.btn} underlayColor="skyblue" onPress={() => navigation.navigate('Home')}>
                 <Text style={styles.text}>Go to activities</Text>
             </TouchableHighlight>
         </View>
