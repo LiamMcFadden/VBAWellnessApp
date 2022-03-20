@@ -142,17 +142,18 @@ const TabBar = createBottomTabNavigator()
 
 export default function BottomTabs() {
     return (
-        <NavigationContainer>
+        <NavigationContainer >
             <TabBar.Navigator
                 tabBar={(props) => <CustomTabBar {...props} />}
             >
                 <TabBar.Screen
                     name='Home'
                     component={Home}
+                    options={{ headerShown: false }}
                 />
-                <TabBar.Screen name='Compete' component={Compete} />
-                <TabBar.Screen name='Add' component={AddScreen} />
-                <TabBar.Screen name='Settings' component={Settings} />
+                <TabBar.Screen name='Compete' component={Compete} options={{ headerShown: false }} />
+                <TabBar.Screen name='Add' component={AddScreen} options={{ headerShown: false }} />
+                <TabBar.Screen name='Settings' component={Settings} options={{ headerShown: false }} />
             </TabBar.Navigator>
         </NavigationContainer>
     )
