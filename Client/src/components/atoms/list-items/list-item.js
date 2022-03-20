@@ -1,22 +1,29 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+const windowWidth = Dimensions.get('window').width;
 
 const ListItem = ({
-  item,
-  addPoints,
+    item,
+    addPoints,
 }) => (
     <TouchableOpacity style={styles.listItem} onPress={() => addPoints(item.points)}>
         <View style={styles.listItemView}>
-            <Text style={styles.listItemText}>
-                {item.text}
-            </Text>
+
+            <View style={{
+                flexDirection: 'column',
+                justifyContent: 'space-between'
+            }}>
+                <Text style={styles.listItemTitleText}>
+                    {item.title ?? "Activity"}
+                </Text>
+                <Text style={styles.listItemText}>
+                    {item.text}
+                </Text>
+            </View>
+
             <View style={styles.iconView}>
-                <Text>{item.points} pts</Text>
+                <Text style={{ color: '#0155A4' }}>{item.points} pts</Text>
             </View>
         </View>
     </TouchableOpacity>
@@ -35,8 +42,21 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         alignItems: 'center',
     },
-    listItemText: {
+
+    listItemTextContainer: {
+        height: '100%',
+        flexDirection: 'column',
+        justifyContent: 'space-between'
+    },
+    listItemTitleText: {
         fontSize: 18,
+        maxWidth: (windowWidth / 1.5),
+        color: '#0155A4'
+    },
+    listItemText: {
+        fontSize: 12,
+        maxWidth: (windowWidth / 1.5),
+        color: '#0155A4'
     },
     iconView: {
         flexDirection: 'row',

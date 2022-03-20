@@ -15,6 +15,8 @@ import {
 } from '../home/data';
 
 
+
+
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
@@ -24,7 +26,9 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         flexDirection: 'row',
         justifyContent: 'space-evenly',
-        backgroundColor: 'steelblue',
+        backgroundColor: '#0155A4',
+        borderTopColor: '#fefefe',
+        borderTopWidth: 1
     },
     text: {
         color: 'white'
