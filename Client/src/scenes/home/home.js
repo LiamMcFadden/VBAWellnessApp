@@ -36,11 +36,11 @@ const styles = StyleSheet.create({
     //Profile Card
     profileCard: {
         width: (0.95 * windowWidth),
-        height: (windowHeight / 5),
+        height: (windowHeight / 4),
         alignSelf: 'center',
         backgroundColor: "#0155A4",
         borderRadius: 5,
-        marginTop: 20,
+        marginTop: 30,
         marginBottom: 10
     },
 
@@ -68,9 +68,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingLeft: 5,
-        paddingRight: 10
-
-
+        paddingRight: 10,
     },
 
     profileButtonText: {
