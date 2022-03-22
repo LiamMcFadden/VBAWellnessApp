@@ -1,9 +1,6 @@
 import React, { createContext, useEffect, useMemo, useReducer } from 'react';
 
-export const AuthContext = createContext({
-    isLoading: false,
-    isAuthenticated: false
-});
+export const AuthContext = createContext();
 
 // Auth State
 // Will likely need to update later to include

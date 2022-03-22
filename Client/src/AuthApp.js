@@ -12,7 +12,7 @@ const LoadingScreen = () => (
         <Text>Loading...</Text>
     </View>
 )
-export const AuthApp = () => {
+export const AppRouter = () => {
     const { authData } = useContext(AuthContext)
 
     return (authData?.isLoading)
