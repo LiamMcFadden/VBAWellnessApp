@@ -5,7 +5,6 @@ import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import Icon from "react-native-vector-icons/FontAwesome";
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { AuthContext } from '_components/Authentication/auth';
-// import { AuthContext } from '_components';
 import AddScreen from '_scenes/addScreen/addScreen';
 import Compete from '_scenes/compete/compete';
 import Home from '_scenes/home/home';
@@ -109,7 +108,8 @@ function CustomTabBar({ state, descriptors, navigation }) {
                         });
                         console.log('event', event)
 
-                        // Check index and commit navigation
+                        // Check index and commit navigation if
+                        // Not already committed
                         if (state.index !== idx && !event.defaultPrevented) {
                             navigation.navigate(route.name);
                         }
@@ -142,10 +142,9 @@ function CustomTabBar({ state, descriptors, navigation }) {
 
 const TabBar = createBottomTabNavigator()
 
-export default function BottomTabs() {
 
+export default function BottomTabs() {
     const context = useContext(AuthContext);
-    console.log(context)
     return (
         <NavigationContainer >
             <TabBar.Navigator

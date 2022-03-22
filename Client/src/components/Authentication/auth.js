@@ -17,8 +17,6 @@ export const AuthProvider = ({ children }) => {
 
     const [state, dispatch] = useReducer(
         (prev, action) => {
-            console.log('👈 prev: ', prev)
-            console.log('🧚 next: ', action)
             if (action.type === 'SIGNIN') {
                 return ({
                     isLoading: false,
@@ -90,7 +88,6 @@ export const AuthProvider = ({ children }) => {
     }), [])
 
     return (
-
         <AuthContext.Provider value={{ functions: authContextProvider, authData: state }}>
             {children}
         </AuthContext.Provider>
