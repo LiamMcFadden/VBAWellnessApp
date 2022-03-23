@@ -2,7 +2,7 @@
 
 import React, { useContext, useState } from "react";
 import {
-    Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions,
+    Alert, Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions,
     View
 } from "react-native";
 import { AuthContext } from "../components/Authentication/auth";
@@ -115,7 +115,11 @@ const Background = () =>
 </View>)
 
 
-
+const alert = (title, msg) => {
+    return (
+        Alert.alert(title, msg)
+    )
+}
 
 const Login = () => {
     const { height, width } = useWindowDimensions();
@@ -125,6 +129,17 @@ const Login = () => {
 
     const { signIn } = useContext(AuthContext)?.functions;
 
+    const validate = () => {
+        if (!username.trim() || !password.trim()) {
+            alert('Username and Pasword Required',
+                'Please fill out both your username and password to continue'
+            )
+        } else if (!(username.match(/^[A-Za-z0-9]+$/))) {
+            alert('Invalid Username', 'Please enter a valid username to continue')
+        } else {
+            signIn(username, password)
+        }
+    }
 
     return (
         <>
@@ -139,16 +154,26 @@ const Login = () => {
                             placeholder="Username"
                             textContentType="username"
                             style={styles.textInput}
+                            maxLength={100}
+                            onChangeText={(e) => setUsername(e)}
+                            blurOnSubmit={true}
+                            onSubmitEditing={(e) => submitEditing(e)}
                         />
                         <TextInput
                             placeholder="Password"
                             textContentType="password"
-                            style={styles.textInput} />
+                            style={styles.textInput}
+                            maxLength={100}
+                            secureTextEntry={true}
+                            onChangeText={(e) => setPassword(e)}
+                            blurOnSubmit={true}
+                        />
+
                     </View>
 
                     <TouchableOpacity
                         style={styles.signInBtn}
-                        onPress={() => signIn(username, password)}
+                        onPress={validate}
                     >
                         <Text style={styles.signInBtnText}>Login</Text>
                     </TouchableOpacity>
@@ -157,7 +182,7 @@ const Login = () => {
                     <Text style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: 10 }}>OR...</Text>
                     <TouchableOpacity
                         style={styles.createAccBtn}
-                        onPress={() => signIn(username, password)}
+                        onPress={validate}
                     >
                         <Text style={styles.createAccBtnText}>Sign Up</Text>
                     </TouchableOpacity>
