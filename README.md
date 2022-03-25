@@ -23,3 +23,10 @@ The IOS instructions assumes you have XCODE, XCODE Command Line Tools, and the X
 If simulator keeps refreshing at this point try rerunning Metro with `react-native start --reset-cache`
 
 #### Android
+
+Follow the instructions [here](https://reactnative.dev/docs/environment-setup).
+Note: If no device is found, you may also have to follow the instructions [here](https://android-developers.googleblog.com/2018/07/android-emulator-amd-processor-hyper-v.html).
+
+Once setup is complete do the following:
+1. Navigate to the `Client` directory and run `npm install`
+2. Run `npm run android`. This will start metro, build the app, and launch it on your device. 
