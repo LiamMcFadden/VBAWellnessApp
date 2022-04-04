@@ -2,13 +2,11 @@
 
 ## Introduction
 
----
 
 The VBA Wellness Application creates a competitive environment that encourages young lawyers to maintain a healthier lifestyle through healthy competitions.
 
 ## Client Application
 
----
 
 ### Installation and Build Instructions
 
