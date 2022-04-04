@@ -1,51 +1,57 @@
 import React from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import SwitchSelector from 'react-native-switch-selector';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
+let pointsOrBadges = "points";
 
 const styles = StyleSheet.create({
-    view: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center"
+    header: {
+        textAlign: "center",
+        fontSize: 25,
+        fontWeight: 'bold',
+        color: "#0155A4",
+        marginBottom: 10
     },
-    pointsOrBadges: {
-        borderRadius: 5,
-        marginTop: 15,
-        width: 0.95*windowWidth,
-        alignSelf: 'center',
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 20,
-        flexDirection: "row",
-        backgroundColor: '#0155A4'
+    pointsorbadges: {
+        marginTop: 20
     },
-    points: {
-        color: "white",
-        marginRight: (.95*windowWidth)*.3
-    },
-    badges: {
-        color: "white",
-        marginLeft: (.95*windowWidth)*.3
+    selector: {
+        width: (windowWidth*.75),
+        marginLeft: (windowWidth*.25/2)
     }
-
 });
 
-const PointsOrBadges = () => {
+const PointsorBadges = () => {
+    const options = [
+        { label: 'Points', value: 'points' },
+        { label: 'Badges', value: 'badges' },
+    ];
+
     return (
-        <View style={styles.pointsOrBadges}>
-            <Text style={styles.points}> Points </Text>
-            <Text style={styles.badges}> Badges </Text>
+        <View style={styles.pointsorbadges}>
+            <Text style={styles.header}>Leaderboard</Text>
+            <SwitchSelector 
+                style={styles.selector}
+                options={options} 
+                initial={0} 
+                onPress={value => pointsOrBadges=value} 
+                backgroundColor={"#A9A9A9"}
+                buttonColor={"white"}
+                textColor={"#0155A4"} 
+                selectedColor={"#0155A4"} 
+            />
         </View>
     );
-};
+}
 
-export default PointsOrBadges;
+const Compete = () => {
+    return (
+        <PointsorBadges/>
+    );
+}
 
-//export default Compete = () => (
-//    <View style={styles.view}>
-//        <Text>Compete</Text>
-//    </View>
-//)
+export default Compete;
+
 
