@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import { Text, View, TextInput, KeyboardAvoidingView, Alert, UIManager, SafeAreaView, LayoutAnimation, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { Text, View, Button, TextInput, KeyboardAvoidingView, Alert, UIManager, SafeAreaView, LayoutAnimation, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import Modal from "react-native-modal";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {Picker} from '@react-native-picker/picker';
@@ -468,7 +468,12 @@ const ActivityItem = ({
 const AdminMainScreen = ({navigation}) => {
     return (
         <SafeAreaView style={{backgroundColor: '#0155A4', flex: 1, alignItems: "center"}}>
-            <Text style={{fontSize: 30, fontWeight: "800", padding: 5, color: 'white'}}>Admin Page</Text>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                <TouchableOpacity style={{borderRadius: 5, margin: 15, alignSelf: 'flex-start', width: 75}} onPress={() => navigation.navigate('SettingsScreen')}>
+                    <Text style={{color: 'white', fontWeight: '600', fontSize: 18}}>Settings</Text>
+                </TouchableOpacity>
+                <Text style={{fontSize: 30, fontWeight: "800", padding: 5, paddingRight: 125, color: 'white'}}>Admin Page</Text>
+            </View>
             <View style={styles.compPage}>
                 {competitionStatus()}
             </View>
@@ -504,7 +509,7 @@ const AdminMainScreen = ({navigation}) => {
     )
 }
 
-const Admin = () => {
+const Admin = ({navigation}) => {
     return (
         <Stack.Navigator screenOptions={{headerShown: false}}>
             <Stack.Screen
