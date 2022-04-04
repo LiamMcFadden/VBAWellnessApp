@@ -24,7 +24,6 @@ _The IOS instructions assume you have XCODE, XCODE Command Line Tools, and the X
 If simulator keeps refreshing at this point try rerunning Metro with `react-native start --reset-cache`
 
 #### Android
-
 _The Android instructions assume you have an Android Virtual Device installed and setup, instructions for this can be found [here](https://reactnative.dev/docs/environment-setup)_
 
 1. Clone the repository
