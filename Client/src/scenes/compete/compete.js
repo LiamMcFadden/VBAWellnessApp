@@ -1,5 +1,5 @@
-import React from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import React, {useState} from 'react';
+import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
 import SwitchSelector from 'react-native-switch-selector';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -45,6 +45,45 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'space-evenly',
         textAlign: 'center'
+    },
+    playerCard: {
+        flexDirection: 'row',
+        marginTop: 10,
+        marginBottom: 10,
+        alignSelf: 'center',
+        backgroundColor: 'white',
+        borderRadius: 30,
+        width: (windowWidth*.75),
+        padding: 10,
+        paddingLeft: 15,
+        paddingRight: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,  
+        elevation: 5
+    },
+    cardIcon: {
+        /* nothing here for now */
+    },
+    playerRank: {
+        alignSelf: 'center',
+        fontSize: 25,
+        marginRight: 10,
+        color: 'black',
+        fontWeight: 'bold'
+    },
+    playerName: {
+        fontSize: 16,
+        marginLeft: 10,
+        alignSelf: 'center',
+        color: "#0155A4"
+    },
+    playerPoints: {
+        alignSelf: 'center',
+        marginLeft: 'auto',
+        fontWeight: '500',
+        color: 'black'
     }
 });
 
@@ -103,24 +142,49 @@ const SecondAndThird = () => {
 /*
  * Displays a users name, rank, pfp/icon, and score/badges
  */
-const PlayerCard = () => {
+const PlayerCard = (props) => {
+    let backgroundColor = 'white';
+
+    switch (props.props.rank) {
+        case 1:
+            backgroundColor = 'gold';
+            break;
+        case 2:
+            backgroundColor = 'silver';
+            break;
+        case 3:
+            backgroundColor = '#CD7F32';
+            break;
+    }
+
     return (
-        <View style={styles.playerCard}>
+        <View style={[styles.playerCard, {backgroundColor: backgroundColor}]}>
+            <Text style={styles.playerRank}> {props.props.rank} </Text>
+            <Ionicons style={styles.cardIcon} name="person-circle-outline" size={40} color={'#0155A4'} />
+            <Text style={styles.playerName}>{props.props.name}</Text>
+            <Text style={styles.playerPoints}>{props.props.points} pts</Text>
         </View>
     );
 }
 
 const Compete = () => {
     return (
-        <View>
+        <View style={{flex:1}}>
             <PointsorBadges/>
             <First/>
             <SecondAndThird/>
-            <PlayerCard/>
+            <View style={{flex:1}}>
+                <FlatList
+                    data={top10}
+                    renderItem={({item}) => (
+                        <PlayerCard
+                            props={item}
+                        />
+                    )}
+                />
+            </View>
         </View>
     );
 }
 
 export default Compete;
-
-
