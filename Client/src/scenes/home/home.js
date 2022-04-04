@@ -13,18 +13,18 @@ import {Header, ListItem} from '_atoms';
 //activity lists for each wellness category
 //once database is setup, these will be pulled from there
 //import {getName, getPoints, setPoints} from './data';
-import {
-  physicalActs,
-  emotionalActs,
-  intellectualActs,
-  occupationalActs,
-  spiritualActs,
-  socialActs,
-} from '../home/testActs';
+// import {
+//   physicalActs,
+//   emotionalActs,
+//   intellectualActs,
+//   occupationalActs,
+//   spiritualActs,
+//   socialActs,
+// } from '../home/testActs';
 
 import {
   getCurrentUser,
-  getActivities,
+  getActivitiesByCategory,
   updateCurrentUserFields,
 } from '_api/firebase-db';
 
@@ -115,7 +115,7 @@ const ProfileCard = () => {
   );
 };
 const Home = () => {
-  const [items, setItems] = useState(physicalActs);
+  const [items, setItems] = useState(getActivitiesByCategory('Physical'));
 
   const [totalPoints, setTotalPoints] = useState(getCurrentUser().points);
 
@@ -133,26 +133,37 @@ const Home = () => {
       <ProfileCard />
       <Header title={totalPoints} width={0.95 * windowWidth} />
       <View style={styles.buttons}>
-        <Text style={styles.text} onPress={() => setItems(physicalActs)}>
+        <Text
+          style={styles.text}
+          onPress={() => setItems(getActivitiesByCategory('Physical'))}>
           Physical
         </Text>
-        <Text style={styles.text} onPress={() => setItems(emotionalActs)}>
+        <Text
+          style={styles.text}
+          onPress={() => setItems(getActivitiesByCategory('Emotional'))}>
           Emotional
         </Text>
-        <Text style={styles.text} onPress={() => setItems(intellectualActs)}>
+        <Text
+          style={styles.text}
+          onPress={() => setItems(getActivitiesByCategory('Intellectual'))}>
           Intellectual
         </Text>
-        <Text style={styles.text} onPress={() => setItems(occupationalActs)}>
+        <Text
+          style={styles.text}
+          onPress={() => setItems(getActivitiesByCategory('Occupational'))}>
           Occupational
         </Text>
-        <Text style={styles.text} onPress={() => setItems(spiritualActs)}>
+        <Text
+          style={styles.text}
+          onPress={() => setItems(getActivitiesByCategory('Spiritual'))}>
           Spiritual
         </Text>
-        <Text style={styles.text} onPress={() => setItems(socialActs)}>
+        <Text
+          style={styles.text}
+          onPress={() => setItems(getActivitiesByCategory('Social'))}>
           Social
         </Text>
       </View>
-
       <FlatList
         data={items}
         renderItem={({item}) => <ListItem item={item} addPoints={addPoints} />}

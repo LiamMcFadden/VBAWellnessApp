@@ -1,9 +1,17 @@
 import firestore from '@react-native-firebase/firestore';
 import {currentUser as curUser} from '_api/firebase-auth';
+import uuid from 'react-native-uuid';
 const COMPETITIONS_COLLECTION = 'Competitions';
 const USERS_COLLECTION = 'Users';
 const ACTIVITIES_DOC = 'Activities';
-
+const CATEGORIES = [
+  'Physical',
+  'Emotional',
+  'Intellectual',
+  'Occupational',
+  'Spiritual',
+  'Social',
+];
 //Filled in with test data for now until we have suitable database entries for every type of document
 let dummyUser = {
   _id: 'testuser',
@@ -34,6 +42,7 @@ let dummyActivity = [
     category: 'physical',
     activities: [
       {
+        uid: 'activity1uid',
         title: 'Stairmaster',
         description: 'Take the stairs at work',
         points: 10,
@@ -45,6 +54,7 @@ let dummyActivity = [
     category: 'emotional',
     activities: [
       {
+        uid: 'activity2uid',
         title: 'E',
         description: 'Take the stairs at work',
         points: 10,
@@ -56,6 +66,7 @@ let dummyActivity = [
     category: 'intellectual',
     activities: [
       {
+        uid: 'activity3uid',
         title: 'I',
         description: 'Take the stairs at work',
         points: 10,
@@ -67,6 +78,7 @@ let dummyActivity = [
     category: 'occupational',
     activities: [
       {
+        uid: 'activity4uid',
         title: 'O',
         description: 'Take the stairs at work',
         points: 10,
@@ -78,6 +90,7 @@ let dummyActivity = [
     category: 'spiritual',
     activities: [
       {
+        uid: 'activity5uid',
         title: 'Sp',
         description: 'Take the stairs at work',
         points: 10,
@@ -89,6 +102,7 @@ let dummyActivity = [
     category: 'social',
     activities: [
       {
+        uid: 'activity6uid',
         title: 'So',
         description: 'Take the stairs at work',
         points: 10,
@@ -147,6 +161,9 @@ const getCurrentCompetition = () => {
 const getActivities = () => {
   return activities;
 };
+const getActivitiesByCategory = category => {
+  return activities[CATEGORIES.indexOf(category)]['activities'];
+};
 // const getUserActivityData = async userId => {
 //   let user = userId === currentUser._id ? currentUser : getUserById(userId);
 // };
@@ -173,17 +190,6 @@ const updateCurrentUserFields = fields => {
     .doc(curUser().uid)
     .update(fields);
 };
-/*
- * Returns a promise from the firestore api
- * fields  json object with the keys and new values for all fields to update in the same format as the database
- */
-const updateActivities = fields => {
-  for (const [key, value] of Object.entries(fields)) activities[key] = value;
-  return firestore()
-    .collection(USERS_COLLECTION)
-    .doc(ACTIVITIES_DOC)
-    .update({categories: fields});
-};
 
 const generateUserDoc = (uid, email, firstName, lastName, competitionId) => {
   const userObj = {
@@ -196,15 +202,87 @@ const generateUserDoc = (uid, email, firstName, lastName, competitionId) => {
   };
   return firestore().collection(USERS_COLLECTION).doc(uid).set(userObj);
 };
+
+/*
+ * Returns a promise from the firestore api
+ * fields  json object with the keys and new values for all fields to update in the same format as the database
+ */
+const updateActivity = updated => {
+  if (!updated.uid) return null;
+  activities.forEach(category => {
+    activities[CATEGORIES.indexOf(category.category)].activities =
+      category.activities.filter(act => act.uid != updated.uid);
+  });
+  const categoryIndex = CATEGORIES.indexOf(updated.category);
+  delete updated.category;
+  activities[categoryIndex].activities.push(updated);
+
+  return firestore()
+    .collection(COMPETITIONS_COLLECTION)
+    .doc(ACTIVITIES_DOC)
+    .set({categories: activities});
+};
+
+/**
+ * {title, description, points, available, category}
+ */
+const addActivity = newActivity => {
+  newActivity.uid = uuid.v4();
+  const categoryIndex = CATEGORIES.indexOf(newActivity.category);
+  delete newActivity.category;
+  activities[categoryIndex].activities.push(newActivity);
+
+  return firestore()
+    .collection(COMPETITIONS_COLLECTION)
+    .doc(ACTIVITIES_DOC)
+    .set({
+      categories: activities,
+    });
+};
+
+const deleteActivity = uid => {
+  activities.forEach(category => {
+    activities[CATEGORIES.indexOf(category.category)].activities =
+      category.activities.filter(act => act.uid != uid);
+  });
+  return firestore()
+    .collection(COMPETITIONS_COLLECTION)
+    .doc(ACTIVITIES_DOC)
+    .set({
+      categories: activities,
+    });
+};
+//Sample calls to both of the above functions
+// addActivity({
+//   title: 'Test Act',
+//   description: 'this is a test activity',
+//   points: 50,
+//   available: true,
+//   category: 'Physical',
+// });
+// updateActivity({
+//   uid: 'e0a759de-37b8-4085-b0d0-f2e13afaa35b',
+//   title: 'Change Test Act Title',
+//   points: 25,
+//   description: 'desc changed',
+//   available: true,
+//   category: 'Physical',
+// });
+
 export {
   getCurrentUser,
   getCurrentCompetition,
-  getActivities,
   getUserById,
   getCompetitionById,
   getAllUsers,
   updateCurrentUserFields,
-  updateActivities,
   generateUserDoc,
+};
+export {
+  getActivities,
+  getActivitiesByCategory,
+  updateActivity,
+  addActivity,
+  deleteActivity,
 };
 export {fetch, clear};
