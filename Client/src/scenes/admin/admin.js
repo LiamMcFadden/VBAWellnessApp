@@ -1,8 +1,11 @@
 import React, {useState} from "react";
-import { Text, View, UIManager, SafeAreaView, LayoutAnimation, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { Text, View, TextInput, KeyboardAvoidingView, Alert, UIManager, SafeAreaView, LayoutAnimation, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import Modal from "react-native-modal";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {Picker} from '@react-native-picker/picker';
+import CheckBox from '@react-native-community/checkbox';
 
-const startDate = new Date(2022, 2, 30);
+const startDate = new Date(2022, 1, 30);
 const endDate = new Date(2022, 2, 30);
 
 const totalActivities = [
@@ -13,43 +16,43 @@ const totalActivities = [
                 title: 'Track Star',
                 text: 'Run 1 mile this week and earn 10 points',
                 points: 10,
-                available: 1
+                available: true
             },
             {
                 title: 'Work Ready',
                 text: 'Walk to work 3 days this week and earn 5 points',
                 points: 5,
-                available: 0
+                available: false
             },
             {
                 title: 'The Swimmer',
                 text: 'Swim for a total of 10 minutes today and earn 15 points',
                 points: 15,
-                available: 0
+                available: false
             },
             {
                 title: 'Always Working',
                 text: 'Go to the gym and workout for at least 15 minutes to earn 10 points',
                 points: 10,
-                available: 0
+                available: false
             },
             {
                 title: 'The Cruiser',
                 text: 'Ride your bike for 5 minutes today and earn 5 points',
                 points: 5,
-                available: 1
+                available: true
             },
             {
                 title: 'Stair Master',
                 text: 'Take the stairs at work today and earn 2 points',
                 points: 2,
-                available: 1
+                available: true
             },
             {
                 title: 'Track Star',
                 text: 'Run 1 mile this week and earn 10 points',
                 points: 10,
-                available: 0
+                available: false
             },
         ]
     },
@@ -60,19 +63,19 @@ const totalActivities = [
                 title: 'Work Ready',
                 text: 'Walk to work 3 days this week and earn 5 points',
                 points: 5,
-                available: 1
+                available: true
             },
             {
                 title: 'The Swimmer',
                 text: 'Swim for a total of 10 minutes today and earn 15 points',
                 points: 15,
-                available: 0
+                available: false
             },
             {
                 title: 'Always Working',
                 text: 'Go to the gym and workout for at least 15 minutes to earn 10 points',
                 points: 10,
-                available: 1
+                available: true
             },
         ]
     },
@@ -83,25 +86,25 @@ const totalActivities = [
                 title: 'The Swimmer',
                 text: 'Swim for a total of 10 minutes today and earn 15 points',
                 points: 15,
-                available: 1
+                available: true
             },
             {
                 title: 'Always Working',
                 text: 'Go to the gym and workout for at least 15 minutes to earn 10 points',
                 points: 10,
-                available: 1
+                available: true
             },
             {
                 title: 'The Cruiser',
                 text: 'Ride your bike for 5 minutes today and earn 5 points',
                 points: 5,
-                available: 1
+                available: true
             },
             {
                 title: 'Stair Master',
                 text: 'Take the stairs at work today and earn 2 points',
                 points: 2,
-                available: 1
+                available: true
             }
         ]
     },
@@ -112,31 +115,31 @@ const totalActivities = [
                 title: 'The Swimmer',
                 text: 'Swim for a total of 10 minutes today and earn 15 points',
                 points: 15,
-                available: 0
+                available: false
             },
             {
                 title: 'Always Working',
                 text: 'Go to the gym and workout for at least 15 minutes to earn 10 points',
                 points: 10,
-                available: 0
+                available: false
             },
             {
                 title: 'The Cruiser',
                 text: 'Ride your bike for 5 minutes today and earn 5 points',
                 points: 5,
-                available: 1
+                available: true
             },
             {
                 title: 'Stair Master',
                 text: 'Take the stairs at work today and earn 2 points',
                 points: 2,
-                available: 1
+                available: true
             },
             {
                 title: 'Track Star',
                 text: 'Run 1 mile this week and earn 10 points',
                 points: 10,
-                available: 0
+                available: false
             },
         ]
     },
@@ -147,19 +150,19 @@ const totalActivities = [
                 title: 'The Cruiser',
                 text: 'Ride your bike for 5 minutes today and earn 5 points',
                 points: 5,
-                available: 1
+                available: true
             },
             {
                 title: 'Stair Master',
                 text: 'Take the stairs at work today and earn 2 points',
                 points: 2,
-                available: 0
+                available: false
             },
             {
                 title: 'Track Star',
                 text: 'Run 1 mile this week and earn 10 points',
                 points: 10,
-                available: 1
+                available: true
             },
         ]
     },
@@ -170,7 +173,7 @@ const totalActivities = [
                 title: 'Work Ready',
                 text: 'Walk to work 3 days this week and earn 5 points',
                 points: 5,
-                available: 1
+                available: true
             },
         ]
     },
@@ -180,7 +183,9 @@ if (Platform.OS === 'android') {
     if (UIManager.setLayoutAnimationEnabledExperimental) {
       UIManager.setLayoutAnimationEnabledExperimental(true);
     }
-  }
+}
+
+const Stack = createNativeStackNavigator();
 
 const competitionStatus = () => {
     const date = new Date();
@@ -214,7 +219,7 @@ const competitionStatus = () => {
     );
 }
 
-const activitiesRender = () => {
+const AdminActivitiesScreen = ({navigation}) => {
 
     const [isModalVisible, setModalVisible] = useState(false);
 
@@ -222,41 +227,166 @@ const activitiesRender = () => {
         setModalVisible(!isModalVisible);
     };
 
+    const [refresh, setRefresh] = useState(false);
+
+    const refreshFlatList = () => {
+        setRefresh(!refresh);
+    }
+
     return (
-        <View style={{padding: 5, width: "80%"}}>
-            <TouchableOpacity style={styles.btn} onPress={toggleModal}>
-                <Text style={styles.btnFont}>Edit Activities</Text>
-            </TouchableOpacity>
-            <Modal isVisible={isModalVisible}>
-                <View style={{flex: 1, backgroundColor: 'white', borderRadius: 10}}>
-                    <View style={{flexDirection: "row",  borderBottomWidth: 2, borderColor: 'grey'}}>
-                        <View style={{paddingTop: 5, paddingLeft: 10}}>
-                            <TouchableOpacity style={{height: 35, borderRadius: 5, alignSelf: 'flex-start', width: 45}} onPress={toggleModal}>
-                                <Text style={{color: '#0155A4', fontWeight: '600', fontSize: 18}}>Back</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <Text style={{flex: 1, paddingTop: 5, height: 35, fontWeight: '600', fontSize: 22, paddingRight: 55, textAlign: 'center'}}>Edit Activities</Text>
+        <View style={{flex: 1, backgroundColor: 'white'}}>
+            <View style={{flexDirection: "row",  borderBottomWidth: 2, borderColor: 'grey'}}>
+                <View style={{paddingTop: 7, paddingLeft: 10}}>
+                    <TouchableOpacity style={{borderRadius: 5, alignSelf: 'flex-start', width: 45}} onPress={() => navigation.navigate('Main')}>
+                        <Text style={{color: '#0155A4', fontWeight: '600', fontSize: 18}}>Back</Text>
+                    </TouchableOpacity>
+                </View>
+                <Text style={{flex: 1, paddingTop: 5, height: 35, fontWeight: '600', fontSize: 22, paddingRight: 15, textAlign: 'center'}}>Edit Activities</Text>
+                <View style={{paddingRight: 10}}>
+                    <TouchableOpacity style={{height: 40, borderRadius: 5, alignSelf: 'flex-end', width: 30}} onPress={toggleModal}>
+                        <Text style={{color: 'green', fontWeight: '600', fontSize: 30, alignSelf: 'center'}}>+</Text>
+                    </TouchableOpacity>
+                    <Modal isVisible={isModalVisible} propagateSwipe={true} statusBarTranslucent={true} style={{marginTop: 100, marginBottom: 100}}>
+                        <ActivityModal wellnessCategory={null} activity={null} toggleModal={() => toggleModal()} />
+                    </Modal>
+                </View>
+            </View>
+            <View style={{flex: 1}}>
+                <FlatList 
+                    data={totalActivities}
+                    extraData={refresh}
+                    renderItem={({ item }) => (
+                        <CategoryHeader
+                            category={item.category}
+                            activities={item.activities}
+                            refresh={refreshFlatList}
+                        />
+                    )}
+                />
+            </View>
+        </View>
+    );
+}
+
+const ActivityModal = ({
+    wellnessCategory,
+    activity,
+    toggleModal,
+}) => {
+
+    const [title, onChangeTitle] = useState(activity != null ? activity.title : '');
+    const [category, setCategory] = useState(activity != null ? wellnessCategory : 'Physical');
+    const [description, onChangeDescription] = useState(activity != null ? activity.text : '');
+    const [points, onChangePoints] = useState(activity != null ? activity.points : 0);
+    const [available, onChangeAvailability] = useState(activity != null ? activity.available : true);
+
+    const saveActivity = () => {
+        if(title == '' || points == 0) {
+            Alert.alert(
+                "Whoops!",
+                "Make sure to include a title and points value for this activity before saving.",
+                [
+                    {
+                        text: 'OK'
+                    }
+                ]
+            );
+            return;
+        }
+
+        const newActivity = {
+            title: title,
+            text: description,
+            points: points,
+            available: available,
+        }
+
+        if(activity != null) {
+            // remove old activity (in case of category change - good chance we will have to alter this)
+            totalActivities.find((section) => section['category'] == category)['activities'] = totalActivities.find((section) => section['category'] == category)['activities'].filter(curActivity => curActivity != activity);
+        }
+
+        // add new activity back to activities list
+        totalActivities.find((section) => section['category'] == category)['activities'].push(newActivity);
+        
+        toggleModal();
+    }
+
+    return (
+        <KeyboardAvoidingView behavior='padding' style={{backgroundColor: 'white', borderRadius: 10, flex: 1}}>
+            <View style={{margin: 20, justifyContent: 'space-between'}}>
+                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <View style={{width: '50%'}}>
+                        <Text style={{color: '#0155A4', fontSize: 18, fontWeight: '600'}}>Wellness Category</Text>
+                        <Picker 
+                            mode='dropdown'
+                            selectedValue={category}
+                            style={{ height: 50, width: '100%' , borderWidth: 1, bordercolor: 'grey', borderRadius: 5}}
+                            onValueChange={(itemValue, itemIndex) => setCategory(itemValue)}
+                        >
+                            <Picker.Item style={{fontSize: 14}} label='Physical' value='Physical' />
+                            <Picker.Item style={{fontSize: 14}} label='Emotional' value='Emotional' />
+                            <Picker.Item style={{fontSize: 14}} label='Intellectual' value='Intellectual' />
+                            <Picker.Item style={{fontSize: 14}} label='Occupational' value='Occupational' />
+                            <Picker.Item style={{fontSize: 14}} label='Spiritual' value='Spiritual' />
+                            <Picker.Item style={{fontSize: 14}} label='Social' value='Social' />
+                        </Picker>
                     </View>
-                    <View style={{flex: 1}}>
-                        <FlatList 
-                            data={totalActivities}
-                            renderItem={({ item }) => (
-                                <CategoryHeader
-                                    category={item.category}
-                                    activities={item.activities}
-                                />
-                            )}
+                    <View style={{alignItems: 'center', width: '50%'}}>
+                        <Text style={{color: '#0155A4', fontSize: 18, fontWeight: '600'}}>
+                            {available ? 'Enabled' : 'Disabled'}
+                        </Text>
+                        <CheckBox
+                            value={available}
+                            onChange={() => onChangeAvailability(!available)}
+                            style={{ color: '#0155A4', transform: [{ scaleX: 1.25 }, { scaleY: 1.25 }] }}
                         />
                     </View>
                 </View>
-            </Modal>
-        </View>
-    );
+                <View>
+                    <Text style={{color: '#0155A4', fontSize: 18, fontWeight: '600'}}>Title</Text>
+                    <TextInput 
+                        value={title}
+                        onChangeText={text => onChangeTitle(text)}
+                        style={{fontSize: 16, borderWidth: 1, borderRadius: 5, borderColor: 'grey'}}
+                    />
+                </View>
+                <View>
+                    <Text style={{color: '#0155A4', fontSize: 18, fontWeight: '600'}}>Points</Text>
+                    <TextInput 
+                        value={points.toString()}
+                        onChangeText={text => onChangePoints(text)}
+                        keyboardType="numeric"
+                        style={{fontSize: 16, borderWidth: 1, borderRadius: 5, borderColor: 'grey'}}
+                    />
+                </View>
+                <View>
+                    <Text style={{color: '#0155A4', fontSize: 18, fontWeight: '600'}}>Description</Text>
+                    <TextInput 
+                        value={description}
+                        onChangeText={text => onChangeDescription(text)}
+                        multiline={true}
+                        numberOfLines={5}
+                        style={{fontSize: 16, borderWidth: 1, borderRadius: 5, borderColor: 'grey'}}
+                    />
+                </View>
+                <View style={{marginTop: 10, flexDirection: 'row', justifyContent: 'space-around'}}>
+                    <TouchableOpacity onPress={() => toggleModal()} style={{borderRadius: 5, margin: 20, width: '30%', backgroundColor: 'grey'}}>
+                        <Text style={{alignSelf: 'center', fontSize: 20, padding: 5, color: 'white', fontWeight: '600'}}>Cancel</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={saveActivity} style={{borderRadius: 5, margin: 20, width: '30%', backgroundColor: '#0155A4'}}>
+                        <Text style={{alignSelf: 'center', fontSize: 20, padding: 5, color: 'white', fontWeight: '600'}}>Save</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </KeyboardAvoidingView>
+    )
 }
 
 const CategoryHeader = ({
     category,
     activities,
+    refresh,
 }) => {
 
     const [open, setOpen] = useState(false);
@@ -279,7 +409,9 @@ const CategoryHeader = ({
                     data={activities}
                     renderItem={({ item }) => (
                         <ActivityItem
+                            category={category}
                             activity={item}
+                            refresh={refresh}
                         />
                     )}
                 />
@@ -289,44 +421,51 @@ const CategoryHeader = ({
 }
 
 const ActivityItem = ({
+    category,
     activity,
+    refresh,
 }) => {
-    initialState = (activity.available == 1) ? true : false;
-    const [isAvailable, setAvailable] = useState(initialState);
 
-    const updateAvailability = () => {
-        setAvailable(!isAvailable);
-        checkActivity(isAvailable);
-    }
+    const [isModalVisible, setModalVisible] = useState(false);
+
+    const toggleModal = () => {
+        setModalVisible(!isModalVisible);
+        refresh();
+    };
 
     return (
-        <TouchableOpacity style={{padding: 15, backgroundColor: activity.available ? 'white' : 'lightgrey', borderBottomWidth: 2, borderColor: 'grey',}}>
-            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <View style={{
-                    flexDirection: 'column',
-                    justifyContent: 'space-between'
-                }}>
-                    <Text style={{
-                        fontSize: 18,
-                        color: '#0155A4'}}>
-                        {activity.title ?? "Activity"}
-                    </Text>
-                    <Text>
-                        {activity.points} pts
-                    </Text>
+        <View>
+            <TouchableOpacity onPress={() => toggleModal()} style={{padding: 15, backgroundColor: activity.available ? 'white' : 'lightgrey', borderBottomWidth: 2, borderColor: 'grey',}}>
+                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <View style={{
+                        flexDirection: 'column',
+                        justifyContent: 'space-between'
+                    }}>
+                        <Text style={{
+                            fontSize: 18,
+                            color: '#0155A4'}}>
+                            {activity.title ?? "Activity"}
+                        </Text>
+                        <Text>
+                            {activity.points} pts
+                        </Text>
+                    </View>
+                    <View>
+                        <Text>
+                            {activity.available ? 'enabled': 'disabled'}
+                        </Text>
+                    </View>
                 </View>
-                <View>
-                    {activity.available 
-                        ? <Text>enabled</Text>
-                        : <Text>disabled</Text>
-                    }
-                </View>
-            </View>
-        </TouchableOpacity>
+            </TouchableOpacity>
+            <Modal isVisible={isModalVisible} propagateSwipe={true} statusBarTranslucent={true} style={{marginTop: 100, marginBottom: 100}}>
+                <ActivityModal wellnessCategory={category} activity={activity} toggleModal={toggleModal} />
+            </Modal>
+        </View>
+        
     );
 };
 
-const Admin = () => {
+const AdminMainScreen = ({navigation}) => {
     return (
         <SafeAreaView style={{backgroundColor: '#0155A4', flex: 1, alignItems: "center"}}>
             <Text style={{fontSize: 30, fontWeight: "800", padding: 5, color: 'white'}}>Admin Page</Text>
@@ -337,8 +476,8 @@ const Admin = () => {
             <View style={styles.btnPage}>
                     <View style={{padding: 5, width: "80%"}}>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between', padding: 5}}>
-                            <Text>Start Date: {startDate.toLocaleDateString()}</Text>
-                            <Text>End Date: {endDate.toLocaleDateString()}</Text>
+                            <Text>Start Date: {startDate != null ? startDate.toLocaleDateString() : 'No date set'}</Text>
+                            <Text>End Date: {endDate != null ? endDate.toLocaleDateString() : 'No date set'}</Text>
                         </View>
                         <TouchableOpacity style={styles.btn}>
                             <Text style={styles.btnFont}>Set Competition Dates</Text>
@@ -354,10 +493,30 @@ const Admin = () => {
                             <Text style={styles.btnFont}>Edit Milestones</Text>
                         </TouchableOpacity>
                     </View>
-                    {activitiesRender()}
+                    <View style={{padding: 5, width: "80%"}}>
+                        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Activities')}>
+                            <Text style={styles.btnFont}>Edit Activities</Text>
+                        </TouchableOpacity>
+                    </View>
             </View>
             <View style={{padding: 5}}/>
         </SafeAreaView>
+    )
+}
+
+const Admin = () => {
+    return (
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+            <Stack.Screen
+                name='Main'
+                component={AdminMainScreen}
+            />
+            <Stack.Screen
+                name='Activities'
+                component={AdminActivitiesScreen}
+            />
+        </Stack.Navigator>
+        
     );
 }
 
