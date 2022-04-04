@@ -12,17 +12,21 @@ import {SafeAreaView} from 'react-navigation';
 import {Header, ListItem} from '_atoms';
 //activity lists for each wellness category
 //once database is setup, these will be pulled from there
+//import {getName, getPoints, setPoints} from './data';
 import {
+  physicalActs,
   emotionalActs,
   intellectualActs,
   occupationalActs,
-  physicalActs,
-  socialActs,
   spiritualActs,
-} from '../home/data';
+  socialActs,
+} from '../home/testActs';
 
-import {firebase} from '../../db/firebaseDb';
-const TEST_USERNAME = 'testuser';
+import {
+  getCurrentUser,
+  getActivities,
+  updateCurrentUserFields,
+} from '_api/firebase-db';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -94,15 +98,7 @@ const styles = StyleSheet.create({
  * // TODO Check Styles for responsiveness --> this might not be good Right now
  */
 const ProfileCard = () => {
-  const [name, setName] = useState('');
-  const fetchData = async () => {
-    const userdata = await getUserDB();
-    setName(userdata.username);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const name = getCurrentUser().firstName + ' ' + getCurrentUser().lastName;
   return (
     <View style={styles.profileCard}>
       <Text style={styles.nameText}>{name}</Text>
@@ -118,57 +114,20 @@ const ProfileCard = () => {
     </View>
   );
 };
-const addPointsDB = async totalPoints => {
-  console.log('adding');
-  await firebase
-    .firestore()
-    .collection('Users')
-    .doc(TEST_USERNAME)
-    .update({points: totalPoints})
-    .then(() => {
-      console.log('User updated!');
-    })
-    .catch(err => {
-      console.log(err);
-    });
-};
-const getUserDB = async () => {
-  console.log('getting');
-  return await firebase
-    .firestore()
-    .collection('Users')
-    .doc(TEST_USERNAME)
-    .get()
-    .then(documentSnapshot => {
-      if (documentSnapshot.exists) {
-        const data = documentSnapshot.data();
-        console.log('found data');
-        return data;
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      return null;
-    });
-};
 const Home = () => {
   const [items, setItems] = useState(physicalActs);
 
-  const [totalPoints, setTotalPoints] = useState(0);
+  const [totalPoints, setTotalPoints] = useState(getCurrentUser().points);
 
   const addPoints = points => {
-    addPointsDB(totalPoints + points);
-    setTotalPoints(totalPoints + points);
+    let newTotal = totalPoints + points;
+    setTotalPoints(newTotal);
+    updateCurrentUserFields({points: newTotal}).catch(err => {
+      setTotalPoints(newTotal - points);
+      console.error(err);
+      //TODO: Alert connection error
+    });
   };
-
-  const fetchData = async () => {
-    const userdata = await getUserDB();
-    setTotalPoints(userdata.points);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
   return (
     <SafeAreaView>
       <ProfileCard />
