@@ -9,7 +9,7 @@ import * as functions from "firebase-functions";
 // });
 
 
-export const test = functions.https.onRequest((req: functions.Request, res: functions.Response) => {
+export const test = functions.https.onRequest((req: functions.Request, res: functions.Response): void => {
     functions.logger.info("test: ", { hello: "world" })
     res.send({ hello: "world" })
 })
