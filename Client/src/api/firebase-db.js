@@ -12,109 +12,10 @@ const CATEGORIES = [
   'Spiritual',
   'Social',
 ];
-//Filled in with test data for now until we have suitable database entries for every type of document
-let dummyUser = {
-  _id: 'testuser',
-  email: 'user@test.com',
-  firstName: 'Test',
-  lastName: 'User',
-  competition: 'T3ST1',
-  points: 310,
-  private: false,
-  activityStats: [
-    {
-      title: 'Stairmaster',
-      lastCompleted: new Date().toISOString(),
-      timesCompleted: 2,
-    },
-  ],
-};
 
-let dummyCompetition = {
-  competitionId: 'T3ST1',
-  startTime: new Date().toISOString(),
-  endTime: new Date(2023, 4, 4).toISOString(),
-  name: 'Test Challenge',
-};
-
-let dummyActivity = [
-  {
-    category: 'physical',
-    activities: [
-      {
-        uid: 'activity1uid',
-        title: 'Stairmaster',
-        description: 'Take the stairs at work',
-        points: 10,
-        available: true,
-      },
-    ],
-  },
-  {
-    category: 'emotional',
-    activities: [
-      {
-        uid: 'activity2uid',
-        title: 'E',
-        description: 'Take the stairs at work',
-        points: 10,
-        available: true,
-      },
-    ],
-  },
-  {
-    category: 'intellectual',
-    activities: [
-      {
-        uid: 'activity3uid',
-        title: 'I',
-        description: 'Take the stairs at work',
-        points: 10,
-        available: true,
-      },
-    ],
-  },
-  {
-    category: 'occupational',
-    activities: [
-      {
-        uid: 'activity4uid',
-        title: 'O',
-        description: 'Take the stairs at work',
-        points: 10,
-        available: true,
-      },
-    ],
-  },
-  {
-    category: 'spiritual',
-    activities: [
-      {
-        uid: 'activity5uid',
-        title: 'Sp',
-        description: 'Take the stairs at work',
-        points: 10,
-        available: true,
-      },
-    ],
-  },
-  {
-    category: 'social',
-    activities: [
-      {
-        uid: 'activity6uid',
-        title: 'So',
-        description: 'Take the stairs at work',
-        points: 10,
-        available: true,
-      },
-    ],
-  },
-];
-
-let currentUser = dummyUser;
-let competition = dummyCompetition;
-let activities = dummyActivity;
+let currentUser;
+let competition;
+let activities;
 
 const fetch = async userId => {
   let userAndCompetitionPromise = firestore()
@@ -161,24 +62,63 @@ const getCurrentCompetition = () => {
 const getActivities = () => {
   return activities;
 };
+const getActivityById = activityUid => {
+  activities.forEach(category => {
+    let found = category.find((activity) => {
+      activity.uid == activityUid
+    });
+    if(found) {
+      return found;
+    }
+  });
+  return null;
+};
 const getActivitiesByCategory = category => {
   return activities[CATEGORIES.indexOf(category)]['activities'];
 };
-// const getUserActivityData = async userId => {
-//   let user = userId === currentUser._id ? currentUser : getUserById(userId);
-// };
+
+const getCurrentUserActivityStats = activityUid => {
+  return currentUser['activityStats'].find((activity) => activity.uid == activityUid) || {};
+};
+
+const getActivitiesAndCurrentUserStats = () => {
+  let catList = [];
+  activities.forEach(cat=> {
+    catList.push({
+      category: cat.category,
+      activities: cat.activities.map(activity => {
+        let stats = getCurrentUserActivityStats(activity.uid);
+        return {
+          title: activity.title,
+          description: activity.description,
+          points: activity.points,
+          uid: activity.uid,
+          dailyLimit: activity.dailyLimit,
+          timesToday: stats.timesToday,
+          timesTotal: stats.timesTotal,
+          lastCompleted: stats.lastCompleted,
+        }
+      })
+    });
+  });
+  return catList;
+}
+
 const getUserById = async userId => {
   await firestore().collection(USERS_COLLECTION).doc(userId).get();
 };
+
 const getCompetitionById = async competitionId => {
   await firestore()
     .collection(COMPETITIONS_COLLECTION)
     .doc(competitionId)
     .get();
 };
+
 const getAllUsers = async () => {
-  await firestore().collection(USERS_COLLECTION).doc(userId).get();
+  await firestore().collection(USERS_COLLECTION).get();
 };
+
 /*
  * Returns a promise from the firestore api
  * fields  json object with the keys and new values for all fields to update in the same format as the database
@@ -190,6 +130,27 @@ const updateCurrentUserFields = fields => {
     .doc(curUser().uid)
     .update(fields);
 };
+
+const completeActivityForCurrentUser = activityUid => {
+  let activity = getActivityById(activityUid);
+  let stats = getCurrentUserActivityStats(activityUid);
+
+  currentUser.points = currentUser.points + activity.points;
+  let userUpdate = {
+    points: currentUser.points
+  };
+
+  stats.timesToday = stats.timesToday ? stats.timesToday + 1 : 1;
+  stats.timesTotal = stats.timesTotal ? stats.timesTotal + 1 : 1;
+  stats.lastCompleted = new Date();
+  
+  userUpdate[`activityStats.${activityUid}`] = stats;
+
+  return firestore()
+    .collection(USERS_COLLECTION)
+    .doc(curUser().uid)
+    .update(userUpdate);
+}
 
 const generateUserDoc = (uid, email, firstName, lastName, competitionId) => {
   const userObj = {
@@ -209,6 +170,7 @@ const generateUserDoc = (uid, email, firstName, lastName, competitionId) => {
  */
 const updateActivity = updated => {
   if (!updated.uid) return null;
+
   activities.forEach(category => {
     activities[CATEGORIES.indexOf(category.category)].activities =
       category.activities.filter(act => act.uid != updated.uid);
@@ -223,9 +185,6 @@ const updateActivity = updated => {
     .set({categories: activities});
 };
 
-/**
- * {title, description, points, available, category}
- */
 const addActivity = newActivity => {
   newActivity.uid = uuid.v4();
   const categoryIndex = CATEGORIES.indexOf(newActivity.category);
@@ -252,22 +211,6 @@ const deleteActivity = uid => {
       categories: activities,
     });
 };
-//Sample calls to both of the above functions
-// addActivity({
-//   title: 'Test Act',
-//   description: 'this is a test activity',
-//   points: 50,
-//   available: true,
-//   category: 'Physical',
-// });
-// updateActivity({
-//   uid: 'e0a759de-37b8-4085-b0d0-f2e13afaa35b',
-//   title: 'Change Test Act Title',
-//   points: 25,
-//   description: 'desc changed',
-//   available: true,
-//   category: 'Physical',
-// });
 
 export {
   getCurrentUser,
@@ -275,11 +218,15 @@ export {
   getUserById,
   getCompetitionById,
   getAllUsers,
+  getCurrentUserActivityStats,
+  getActivitiesAndCurrentUserStats,
+  completeActivityForCurrentUser,
   updateCurrentUserFields,
   generateUserDoc,
 };
 export {
   getActivities,
+  getActivityById,
   getActivitiesByCategory,
   updateActivity,
   addActivity,
