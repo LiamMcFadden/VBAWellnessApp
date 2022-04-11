@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   Dimensions,
   FlatList,
@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SafeAreaView} from 'react-navigation';
-import {Header, ListItem} from '_atoms';
 //activity lists for each wellness category
 //once database is setup, these will be pulled from there
 //import {getName, getPoints, setPoints} from './data';
@@ -21,13 +20,13 @@ import {Header, ListItem} from '_atoms';
 //   spiritualActs,
 //   socialActs,
 // } from '../home/testActs';
-
 import {
-  getCurrentUser,
   getActivitiesByCategory,
+  getCurrentUser,
   updateCurrentUserFields,
 } from '_api/firebase-db';
-
+import {Header, ListItem} from '_atoms';
+import Card from './card';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
@@ -47,10 +46,10 @@ const styles = StyleSheet.create({
   //Profile Card
   profileCard: {
     width: 0.95 * windowWidth,
-    height: windowHeight / 4,
+    height: (0.95 * windowWidth) / 1.5,
     alignSelf: 'center',
     backgroundColor: '#0155A4',
-    borderRadius: 5,
+    borderRadius: 10,
     marginTop: 30,
     marginBottom: 10,
   },
@@ -87,8 +86,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 
+  pcardContainer: {},
   // End Profile Cdard
 });
+
+const pcard = {
+  width: 0.95 * windowWidth,
+  height: (0.95 * windowWidth) / 2,
+};
+
+const ActivityItem = ({activity, addPoints}) => (
+  <TouchableOpacity onPress={() => addPoints()} />
+);
+
+const PCard = ({name, description, navigation}) => {};
 
 /**
  * Shows the users profile with a button that will link to
@@ -97,7 +108,7 @@ const styles = StyleSheet.create({
  * // TODO This will need to be moved into its own file later
  * // TODO Check Styles for responsiveness --> this might not be good Right now
  */
-const ProfileCard = () => {
+const ProfileCard = ({navigation}) => {
   const name = getCurrentUser().firstName + ' ' + getCurrentUser().lastName;
   return (
     <View style={styles.profileCard}>
@@ -107,30 +118,32 @@ const ProfileCard = () => {
         posuere congue. Donec hendrerit, diam eget viverra pretium, lacus ligula
         scelerisque felis, eu finibus neque massa eget justo.
       </Text>
-      <TouchableOpacity style={styles.profileButton}>
+			<TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate("Profile")}>
         <Ionicons name="person-circle-outline" size={20} color={'#0155A4'} />
         <Text style={styles.profileButtonText}>Profile</Text>
       </TouchableOpacity>
     </View>
   );
 };
-const Home = () => {
+const Home = ({navigation}) => {
   const [items, setItems] = useState(getActivitiesByCategory('Physical'));
 
   const [totalPoints, setTotalPoints] = useState(getCurrentUser().points);
 
   const addPoints = points => {
-    let newTotal = totalPoints + points;
-    setTotalPoints(newTotal);
-    updateCurrentUserFields({points: newTotal}).catch(err => {
-      setTotalPoints(newTotal - points);
-      console.error(err);
-      //TODO: Alert connection error
-    });
-  };
+			
+			 let newTotal = totalPoints + points;
+			 setTotalPoints(newTotal);
+			 updateCurrentUserFields({points: newTotal}).catch(err => {
+			   setTotalPoints(newTotal - points);
+			   console.error(err);
+				 //TODO: Alert connection error
+			 });
+			 
+	};
   return (
-    <SafeAreaView>
-      <ProfileCard />
+    <SafeAreaView style={{backgroundColor: '#F3F4F7', height: '100%'}}>
+      <ProfileCard navigation={navigation} />
       <Header title={totalPoints} width={0.95 * windowWidth} />
       <View style={styles.buttons}>
         <Text
@@ -164,6 +177,9 @@ const Home = () => {
           Social
         </Text>
       </View>
+
+      <Card />
+
       <FlatList
         data={items}
         renderItem={({item}) => <ListItem item={item} addPoints={addPoints} />}

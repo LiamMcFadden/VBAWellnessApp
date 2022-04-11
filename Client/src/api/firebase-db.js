@@ -1,6 +1,6 @@
 import firestore from '@react-native-firebase/firestore';
-import {currentUser as curUser} from '_api/firebase-auth';
 import uuid from 'react-native-uuid';
+import { currentUser as curUser } from '_api/firebase-auth';
 const COMPETITIONS_COLLECTION = 'Competitions';
 const USERS_COLLECTION = 'Users';
 const ACTIVITIES_DOC = 'Activities';
@@ -220,7 +220,7 @@ const updateActivity = updated => {
   return firestore()
     .collection(COMPETITIONS_COLLECTION)
     .doc(ACTIVITIES_DOC)
-    .set({categories: activities});
+    .set({ categories: activities });
 };
 
 /**
@@ -285,4 +285,4 @@ export {
   addActivity,
   deleteActivity,
 };
-export {fetch, clear};
+export { fetch, clear };

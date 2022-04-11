@@ -1,12 +1,13 @@
-import React, {useState} from 'react';
+import React from 'react';
 import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import SwitchSelector from 'react-native-switch-selector';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
 // TODO: replace this with db query of some sort
 import {
     top10
 } from '../compete/data';
+
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -24,8 +25,8 @@ const styles = StyleSheet.create({
         marginTop: 20
     },
     selector: {
-        width: (windowWidth*.75),
-        marginLeft: (windowWidth*.25/2)
+        width: (windowWidth * .75),
+        marginLeft: (windowWidth * .25 / 2)
     },
     secondandthird: {
         alignItems: 'center',
@@ -53,14 +54,14 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         backgroundColor: 'white',
         borderRadius: 30,
-        width: (windowWidth*.75),
+        width: (windowWidth * .75),
         padding: 10,
         paddingLeft: 15,
         paddingRight: 15,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.8,
-        shadowRadius: 2,  
+        shadowRadius: 2,
         elevation: 5
     },
     cardIcon: {
@@ -98,19 +99,19 @@ const PointsorBadges = () => {
     ];
 
     return (
-        <View style={styles.pointsorbadges}>
+        <SafeAreaView style={styles.pointsorbadges}>
             <Text style={styles.header}>Leaderboard</Text>
-            <SwitchSelector 
+            <SwitchSelector
                 style={styles.selector}
-                options={options} 
-                initial={0} 
-                onPress={value => pointsOrBadges=value} 
+                options={options}
+                initial={0}
+                onPress={value => pointsOrBadges = value}
                 backgroundColor={"#A9A9A9"}
                 buttonColor={"white"}
-                textColor={"#0155A4"} 
-                selectedColor={"#0155A4"} 
+                textColor={"#0155A4"}
+                selectedColor={"#0155A4"}
             />
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -133,7 +134,7 @@ const First = () => {
 const SecondAndThird = () => {
     return (
         <View style={styles.secondandthird}>
-            <Ionicons style={styles.second} label="hi" name="person-circle-outline" size={50} color={'#0155A4'}/>
+            <Ionicons style={styles.second} label="hi" name="person-circle-outline" size={50} color={'#0155A4'} />
             <Ionicons style={styles.third} name="person-circle-outline" size={50} color={'#0155A4'} />
         </View>
     );
@@ -158,7 +159,7 @@ const PlayerCard = (props) => {
     }
 
     return (
-        <View style={[styles.playerCard, {backgroundColor: backgroundColor}]}>
+        <View style={[styles.playerCard, { backgroundColor: backgroundColor }]}>
             <Text style={styles.playerRank}> {props.props.rank} </Text>
             <Ionicons style={styles.cardIcon} name="person-circle-outline" size={40} color={'#0155A4'} />
             <Text style={styles.playerName}>{props.props.name}</Text>
@@ -169,14 +170,14 @@ const PlayerCard = (props) => {
 
 const Compete = () => {
     return (
-        <View style={{flex:1}}>
-            <PointsorBadges/>
-            <First/>
-            <SecondAndThird/>
-            <View style={{flex:1}}>
+        <View style={{ flex: 1 }}>
+            <PointsorBadges />
+            <First />
+            <SecondAndThird />
+            <View style={{ flex: 1 }}>
                 <FlatList
                     data={top10}
-                    renderItem={({item}) => (
+                    renderItem={({ item }) => (
                         <PlayerCard
                             props={item}
                         />
