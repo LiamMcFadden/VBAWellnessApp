@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     },
     first: {
         marginTop: 20,
-        alignSelf: 'center'
+        alignSelf: 'center',
     },
     playerCard: {
         flexDirection: 'row',
@@ -76,10 +76,13 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         color: 'black'
     },
-    pfp: {
-        width: 50,
-        height: 50,
-        borderRadius: 25
+    pfpName: {
+        alignSelf: 'center',
+        marginTop: 5,
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: "#0155A4",
+        marginBottom: 10
     }
 });
 
@@ -120,12 +123,20 @@ const First = () => {
     let pfp = require('./test.png')
     return (
         <View style={styles.first}>
-            <ProfilePicture
+            <ProfilePicture 
                 isPicture={true}
                 requirePicture={pfp}
                 shape='circle'
             />
         </View>
+    );
+}
+
+const FirstLabel = () => {
+    // TODO: replace with query to db
+    let name = "Chicken Joe";
+    return (
+        <Text style={styles.pfpName}>{name}</Text>
     );
 }
 
@@ -150,6 +161,18 @@ const SecondAndThird = () => {
                 requirePicture={pfpThird}
                 shape='circle'
             />
+        </View>
+    );
+}
+
+const SecondAndThirdLabels = () => {
+    // TODO: replace with query to db
+    let nameFirst = "Chicken Joe Jr."
+    let nameSecond = "Chicken Joe Jr. Jr."
+    return (
+        <View style={styles.secondandthird}>
+            <Text style={styles.pfpName}>{nameFirst}</Text>
+            <Text style={styles.pfpName}>{nameSecond}</Text>
         </View>
     );
 }
@@ -193,7 +216,9 @@ const Compete = () => {
         <View style={{flex:1}}>
             <PointsorBadges/>
             <First/>
+            <FirstLabel/>
             <SecondAndThird/>
+            <SecondAndThirdLabels/>
             <View style={{flex:1}}>
                 <FlatList
                     data={top10}
