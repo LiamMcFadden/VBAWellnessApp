@@ -4,8 +4,14 @@
       "module-resolver",
       {
         "cwd": "babelrc",
-        "root": ["./src"],
-        "extensions": [".js", ".ios.js", ".android.js"],
+        "root": [
+          "./src"
+        ],
+        "extensions": [
+          ".js",
+          ".ios.js",
+          ".android.js"
+        ],
         "alias": {
           "_api": "./src/api",
           "_assets": "./src/assets",
@@ -20,6 +26,7 @@
           "_utils": "./src/utils"
         }
       }
-    ]
+    ],
+    "react-native-reanimated/plugin"
   ]
 }

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SafeAreaView} from 'react-navigation';
+<<<<<<< HEAD
 //activity lists for each wellness category
 //once database is setup, these will be pulled from there
 //import {getName, getPoints, setPoints} from './data';
@@ -20,10 +21,15 @@ import {SafeAreaView} from 'react-navigation';
 //   spiritualActs,
 //   socialActs,
 // } from '../home/testActs';
+=======
+import {Header, ListItem} from '_atoms';
+
+>>>>>>> cb7eeebd5901a419ee72751d5c4952e247cfa0bf
 import {
   getActivitiesByCategory,
   getCurrentUser,
   updateCurrentUserFields,
+  completeActivityForCurrentUser
 } from '_api/firebase-db';
 import {Header, ListItem} from '_atoms';
 import Card from './card';
@@ -130,6 +136,7 @@ const Home = ({navigation}) => {
 
   const [totalPoints, setTotalPoints] = useState(getCurrentUser().points);
 
+<<<<<<< HEAD
   const addPoints = points => {
 			
 			 let newTotal = totalPoints + points;
@@ -141,6 +148,18 @@ const Home = ({navigation}) => {
 			 });
 			 
 	};
+=======
+  const action = item => {
+    const newTotal = totalPoints + item.points;
+
+    setTotalPoints(newTotal);
+    completeActivityForCurrentUser(item.uid).catch(err => {
+      setTotalPoints(newTotal - points);
+      console.error(err);
+      //TODO: Alert connection error
+    });
+  };
+>>>>>>> cb7eeebd5901a419ee72751d5c4952e247cfa0bf
   return (
     <SafeAreaView style={{backgroundColor: '#F3F4F7', height: '100%'}}>
       <ProfileCard navigation={navigation} />
@@ -182,7 +201,7 @@ const Home = ({navigation}) => {
 
       <FlatList
         data={items}
-        renderItem={({item}) => <ListItem item={item} addPoints={addPoints} />}
+        renderItem={({item}) => <ListItem item={item} action={action} />}
       />
     </SafeAreaView>
   );
