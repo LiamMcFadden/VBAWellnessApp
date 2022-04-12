@@ -14,9 +14,10 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import {AuthContext} from '_components/Authentication/auth';
 import AddScreen from '_scenes/addScreen/addScreen';
 import Compete from '_scenes/compete/compete';
-import Profile from '../scenes/profile/profile'
-import Home from '_scenes/home/home'
-import Settings from '_scenes/settings/settings'
+import Profile from '../scenes/profile/profile';
+import Home from '_scenes/home/home';
+import Settings from '_scenes/settings/settings';
+import {COLORS, FONTWEIGHT, TYPESCALE} from '../globals/styles';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -120,12 +121,14 @@ function CustomTabBar({state, descriptors, navigation}) {
         };
 
         return (
-          <TouchableOpacity key={route.name + idx}
+          <TouchableOpacity
+            key={route.name + idx}
             style={{
               ...styles.tabItem,
               width: windowWidth / state.routes.length,
             }}
-            onPress={handleOnPress}>
+            onPress={handleOnPress}
+          >
             <View style={styles.tabItem}>
               {getIcon(label, selectStyle(idx))}
               <Text style={{...styles.tabContentText, ...selectStyle(idx)}}>
@@ -141,38 +144,75 @@ function CustomTabBar({state, descriptors, navigation}) {
 const HomeStack = createNativeStackNavigator();
 const HomeStackComponent = () => (
   <HomeStack.Navigator>
-    <HomeStack.Screen name="HomeScreen" component={Home} options={{headerShown: false}} />
-		<HomeStack.Screen name="Profile" component={Profile} options={{headerShown: false}} />
+    <HomeStack.Screen
+      name="HomeScreen"
+      component={Home}
+      options={{headerShown: false}}
+    />
+    <HomeStack.Screen
+      name="Profile"
+      component={Profile}
+      options={{
+        headerShown: true,
+        headerStyle: {
+          backgroundColor: COLORS.primary,
+        },
+      }}
+    />
   </HomeStack.Navigator>
 );
 const TabBar = createBottomTabNavigator();
+
+const TabBarContainer = () => (
+  <TabBar.Navigator tabBar={props => <CustomTabBar {...props} />}>
+    <TabBar.Screen
+      name="Home"
+      options={{headerShown: false}}
+      component={Home}
+    />
+    <TabBar.Screen
+      name="Compete"
+      component={Compete}
+      options={{headerShown: false}}
+    />
+    <TabBar.Screen
+      name="Add"
+      component={AddScreen}
+      options={{headerShown: false}}
+    />
+    <TabBar.Screen
+      name="Settings"
+      component={Settings}
+      options={{headerShown: false}}
+    />
+  </TabBar.Navigator>
+);
+
+const Stack = createNativeStackNavigator();
 
 export default function BottomTabs() {
   const context = useContext(AuthContext);
   return (
     <NavigationContainer>
-      <TabBar.Navigator tabBar={props => <CustomTabBar {...props} />}>
-        <TabBar.Screen name="Home" options={{headerShown: false}}>
-          {() => (
-						<HomeStackComponent />				
-					)}
-        </TabBar.Screen>
-        <TabBar.Screen
-          name="Compete"
-          component={Compete}
+      <Stack.Navigator>
+        <Stack.Screen
+          name={'TabStack'}
+          component={TabBarContainer}
           options={{headerShown: false}}
         />
-        <TabBar.Screen
-          name="Add"
-          component={AddScreen}
-          options={{headerShown: false}}
+        <Stack.Screen
+          name={'Profile'}
+          component={Profile}
+          options={{
+            headerStyle: {
+              backgroundColor: COLORS.primary,
+            },
+            headerTintColor: '#fefe',
+            title: 'Profile',
+            headerBackTitle: 'Home',
+          }}
         />
-        <TabBar.Screen
-          name="Settings"
-          component={Settings}
-          options={{headerShown: false}}
-        />
-      </TabBar.Navigator>
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }

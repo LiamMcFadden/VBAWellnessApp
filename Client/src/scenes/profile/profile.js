@@ -1,29 +1,49 @@
 import * as React from 'react';
 import {
-  Button,
   View,
   Text,
   SafeAreaView,
   StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  TouchableHighlight,
   useWindowDimensions,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {COLORS, TYPESCALE, BUTTONSTYLE} from '../../globals/styles';
+import {COLORS, TYPESCALE} from '../../globals/styles';
 
 import {OutlinedButton, ContainedButton} from '../../globals/styledcomponents';
 
-import AnimatedProgressWheel from 'react-native-progress-wheel';
+import ProgressBar from './progressbar';
 
-const {height: windowHeight, width: windowWidth} = Dimensions;
 const user = {
   firstname: 'John',
   lastname: 'Smith',
   username: 'johnnysmith123',
   points: 79,
   milestone: 100,
+};
+
+//const Graph = ({totalPoints, categories}) => {};
+
+const ProgressB = ({milestone, points, width}) => {
+  const percentComplete = points / milestone;
+  return (
+    <View
+      style={{
+        backgroundColor: COLORS.secondary,
+        width: width,
+        borderRadius: 24,
+        height: 10,
+      }}
+    >
+      <View
+        style={{
+          backgroundColor: COLORS.primary,
+          width: percentComplete * width,
+          height: 10,
+          borderRadius: 24,
+        }}
+      />
+    </View>
+  );
 };
 
 const Background = () => (
@@ -33,28 +53,6 @@ const Background = () => (
   </View>
 );
 
-const ProgressBar = ({points, milestone}) => {
-  const {progressContainer, progressBackground} = ProgressStyles(90);
-  return (
-    <View style={{justifyContent: 'center', alignItems: 'center', margin: 20}}>
-      <View>
-        <AnimatedProgressWheel
-          size={100}
-          width={10}
-          color={COLORS.secondary}
-          progress={(points / milestone) * 100}
-          backgroundColor={'#F8F8FF'}
-          animateFromValue={0}
-          duration={1500}
-        />
-      </View>
-      <Text style={{margin: 10, color: 'white'}}>
-        {points}/{milestone} Points Until Next Milestone
-      </Text>
-    </View>
-  );
-};
-
 export default function Profile({navigation}) {
   const {height: wheight, width: wwidth} = useWindowDimensions();
   return (
@@ -62,59 +60,85 @@ export default function Profile({navigation}) {
       <Background />
       <SafeAreaView style={styles.profileContainer}>
         <View style={styles.heading}>
-          <Ionicons name="person-circle-outline" size={100} color={'#fff'} />
-          <View>
+          <View style={{alignItems: 'center'}}>
+            <Ionicons
+              name="person-circle-outline"
+              size={100}
+              color={COLORS.tintPrimary(0.1)}
+            />
             <Text
               style={{
                 ...TYPESCALE.h6,
-                color: 'white',
                 textAlign: 'center',
               }}
             >{`${user.firstname} ${user.lastname}`}</Text>
             <Text
               style={{
                 ...TYPESCALE.subtitle,
-                color: 'white',
                 margin: 5,
                 textAlign: 'center',
               }}
             >{`@${user.username}`}</Text>
           </View>
-          <ProgressBar points={user.points} milestone={user.milestone} />
+
+          <View style={{alignItems: 'center', marginTop: 15}}>
+            <Text style={[TYPESCALE.subtitle]}>Level. 7</Text>
+            <ProgressB
+              points={user.points}
+              milestone={user.milestone}
+              width={wwidth / 1.5}
+            />
+          </View>
         </View>
-        <ContainedButton
-          width={wwidth / 3}
-          height={50}
-          onPress={() => navigation.navigate('HomeScreen')}
+
+        <View
+          style={{
+            position: 'absolute',
+            top: 0.3 * wheight,
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            height: 0.5 * wheight,
+            width: wwidth,
+          }}
         >
-          BACKFIRE
-        </ContainedButton>
+          {/*
+            *<ProgressBar
+            *  points={user.points}
+            *  milestone={user.milestone}
+            *  size={100}
+            >
+            */}
+          <Text
+            style={[
+              TYPESCALE.h6,
+              {
+                alignSelf: 'flex-start',
+                marginLeft: Math.abs(wwidth * 1.1 - wwidth),
+              },
+            ]}
+          >
+            Your Top Categories
+          </Text>
+          <View
+            style={{
+              backgroundColor: 'white',
+              width: wwidth * 0.9,
+              height: 0.35 * wheight,
+              borderRadius: 6,
+              shadowOffset: {
+                width: 1,
+                height: 1,
+              },
+              shadowOpacity: 0.1,
+              shadowRadius: 1,
+              elevation: 8,
+            }}
+          ></View>
+        </View>
       </SafeAreaView>
     </>
   );
 }
-
-const ProgressStyles = size => {
-  var circum = (size / 2 - 5) * 2 * Math.PI;
-
-  return StyleSheet.create({
-    progressContainer: {
-      width: size,
-      height: size,
-      borderRadius: size / 2, //Circle
-      backgroundColor: 'white',
-    },
-    progressBackground: {
-      width: size,
-      height: size,
-      borderRadius: size / 2,
-      borderWidth: 5,
-      borderColor: 'green',
-    },
-    progressBackgroundBar: {},
-    progressForegroundBar: {},
-  });
-};
 
 const styles = StyleSheet.create({
   backgroundContainer: {
@@ -126,11 +150,11 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   backgroundTop: {
-    height: '50%',
-    backgroundColor: COLORS.primary,
+    height: '35%',
+    backgroundColor: '#f8f8f8',
   },
   backgroundBottom: {
-    backgroundColor: '#fefefe',
+    backgroundColor: '#ebeef1',
     height: '100%',
     overflow: 'hidden',
   },
@@ -158,7 +182,7 @@ const styles = StyleSheet.create({
     marginTop: 25,
   },
   heading: {
-    height: 200,
+    height: 100,
     justifyContent: 'space-between',
     alignItems: 'center',
   },
