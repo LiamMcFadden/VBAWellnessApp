@@ -54,9 +54,6 @@ const styles = StyleSheet.create({
         shadowRadius: 2,  
         elevation: 5
     },
-    cardIcon: {
-        /* nothing here for now */
-    },
     playerRank: {
         alignSelf: 'center',
         fontSize: 25,
@@ -115,19 +112,33 @@ const PointsorBadges = () => {
 
 /*
  * Displays the pfp/icon for first place user
- * TODO: 
- *  - add labels to icons
  */
 const First = () => {
     // TODO: replace with query to db
     let pfp = require('./test.png')
-    return (
-        <View style={styles.first}>
+
+    // use default icon if no pfp is found
+    if (pfp === null) {
+        pfp = 
+            <Ionicons 
+                style={styles.cardIcon} 
+                name="person-circle-outline" 
+                size={50} 
+                color={'#0155A4'} 
+            />;
+    }
+    else {
+        pfp = 
             <ProfilePicture 
                 isPicture={true}
                 requirePicture={pfp}
                 shape='circle'
             />
+    }
+
+    return (
+        <View style={styles.first}>
+            {pfp}
         </View>
     );
 }
@@ -142,25 +153,54 @@ const FirstLabel = () => {
 
 /*
  * Displays the pfp/icon for second and third place user
- * TODO: 
- *  - add labels to icons
  */
 const SecondAndThird = () => {
     // TODO: replace with query to db
     let pfpSecond = require('./test.png');
-    let pfpThird = require('./test.png');
-    return (
-        <View style={styles.secondandthird}>
-            <ProfilePicture
+
+    // use default icon if no pfp is found
+    if (pfpSecond === null) {
+        pfpSecond = 
+            <Ionicons 
+                style={styles.cardIcon} 
+                name="person-circle-outline" 
+                size={50} 
+                color={'#0155A4'} 
+            />;
+    }
+    else {
+        pfpSecond = 
+            <ProfilePicture 
                 isPicture={true}
                 requirePicture={pfpSecond}
                 shape='circle'
             />
-            <ProfilePicture
+    }
+
+    let pfpThird = require('./test.png');
+
+    // use default icon if no pfp is found
+    if (pfpThird === null) {
+        pfpThird = <Ionicons 
+                style={styles.cardIcon} 
+                name="person-circle-outline" 
+                size={50} 
+                color={'#0155A4'} 
+            />;
+    }
+    else {
+        pfpThird = 
+            <ProfilePicture 
                 isPicture={true}
                 requirePicture={pfpThird}
                 shape='circle'
             />
+    }
+
+    return (
+        <View style={styles.secondandthird}>
+            {pfpSecond}
+            {pfpThird}
         </View>
     );
 }
@@ -182,8 +222,27 @@ const SecondAndThirdLabels = () => {
  */
 const PlayerCard = (props) => {
     let backgroundColor = 'white';
+
     // TODO: replace with DB query
     let pfp = require('./test.png');
+    // use default icon if no pfp is found
+    if (pfp === null) {
+        pfp = 
+            <Ionicons 
+                style={styles.cardIcon} 
+                name="person-circle-outline" 
+                size={50} 
+                color={'#0155A4'} 
+            />;
+    }
+    else {
+        pfp = 
+            <ProfilePicture 
+                isPicture={true}
+                requirePicture={pfp}
+                shape='circle'
+            />
+    }
 
     switch (props.props.rank) {
         case 1:
@@ -200,11 +259,7 @@ const PlayerCard = (props) => {
     return (
         <View style={[styles.playerCard, {backgroundColor: backgroundColor}]}>
             <Text style={styles.playerRank}> {props.props.rank} </Text>
-            <ProfilePicture
-                isPicture={true}
-                requirePicture={pfp}
-                shape='circle'
-            />
+            {pfp}
             <Text style={styles.playerName}>{props.props.name}</Text>
             <Text style={styles.playerPoints}>{props.props.points} pts</Text>
         </View>
