@@ -6,13 +6,18 @@ import {
   SafeAreaView,
   StyleSheet,
   Dimensions,
+  TouchableOpacity,
+  TouchableHighlight,
+  useWindowDimensions,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {COLORS, TYPESCALE} from '../../globals/styles';
+import {COLORS, TYPESCALE, BUTTONSTYLE} from '../../globals/styles';
+
+import {OutlinedButton, ContainedButton} from '../../globals/styledcomponents';
+
 import AnimatedProgressWheel from 'react-native-progress-wheel';
 
-const {width: windowWidth, height: windowHeight} = Dimensions;
-
+const {height: windowHeight, width: windowWidth} = Dimensions;
 const user = {
   firstname: 'John',
   lastname: 'Smith',
@@ -50,29 +55,8 @@ const ProgressBar = ({points, milestone}) => {
   );
 };
 
-const ProgressStyles = size => {
-  var circum = (size / 2 - 5) * 2 * Math.PI;
-
-  return StyleSheet.create({
-    progressContainer: {
-      width: size,
-      height: size,
-      borderRadius: size / 2, //Circle
-      backgroundColor: 'white',
-    },
-    progressBackground: {
-      width: size,
-      height: size,
-      borderRadius: size / 2,
-      borderWidth: 5,
-      borderColor: 'green',
-    },
-    progressBackgroundBar: {},
-    progressForegroundBar: {},
-  });
-};
-
 export default function Profile({navigation}) {
+  const {height: wheight, width: wwidth} = useWindowDimensions();
   return (
     <>
       <Background />
@@ -98,15 +82,39 @@ export default function Profile({navigation}) {
           </View>
           <ProgressBar points={user.points} milestone={user.milestone} />
         </View>
-        <Button
-          title="GO BACK!!!"
-          color="red"
+        <ContainedButton
+          width={wwidth / 3}
+          height={50}
           onPress={() => navigation.navigate('HomeScreen')}
-        />
+        >
+          BACKFIRE
+        </ContainedButton>
       </SafeAreaView>
     </>
   );
 }
+
+const ProgressStyles = size => {
+  var circum = (size / 2 - 5) * 2 * Math.PI;
+
+  return StyleSheet.create({
+    progressContainer: {
+      width: size,
+      height: size,
+      borderRadius: size / 2, //Circle
+      backgroundColor: 'white',
+    },
+    progressBackground: {
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+      borderWidth: 5,
+      borderColor: 'green',
+    },
+    progressBackgroundBar: {},
+    progressForegroundBar: {},
+  });
+};
 
 const styles = StyleSheet.create({
   backgroundContainer: {
