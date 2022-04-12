@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React from 'react';
 import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
 import SwitchSelector from 'react-native-switch-selector';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import ProfilePicture from 'react-native-profile-picture';
 
 // TODO: replace this with db query of some sort
 import {
@@ -30,21 +31,11 @@ const styles = StyleSheet.create({
     secondandthird: {
         alignItems: 'center',
         flexDirection: 'row',
-        justifyContent: 'center'
+        justifyContent: 'space-around'
     },
     first: {
         marginTop: 20,
-        alignSelf: 'center'
-    },
-    second: {
-        flex: 1,
-        flexDirection: 'row',
-        textAlign: 'center'
-    },
-    third: {
-        flex: 1,
-        justifyContent: 'space-evenly',
-        textAlign: 'center'
+        alignSelf: 'center',
     },
     playerCard: {
         flexDirection: 'row',
@@ -62,9 +53,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.8,
         shadowRadius: 2,  
         elevation: 5
-    },
-    cardIcon: {
-        /* nothing here for now */
     },
     playerRank: {
         alignSelf: 'center',
@@ -84,6 +72,14 @@ const styles = StyleSheet.create({
         marginLeft: 'auto',
         fontWeight: '500',
         color: 'black'
+    },
+    pfpName: {
+        alignSelf: 'center',
+        marginTop: 5,
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: "#0155A4",
+        marginBottom: 10
     }
 });
 
@@ -116,25 +112,107 @@ const PointsorBadges = () => {
 
 /*
  * Displays the pfp/icon for first place user
- * TODO: add labels to icons
  */
 const First = () => {
+    // TODO: replace with query to db
+    let pfp = require('./test.png')
+
+    // use default icon if no pfp is found
+    if (pfp === null) {
+        pfp = 
+            <Ionicons 
+                style={styles.cardIcon} 
+                name="person-circle-outline" 
+                size={50} 
+                color={'#0155A4'} 
+            />;
+    }
+    else {
+        pfp = 
+            <ProfilePicture 
+                isPicture={true}
+                requirePicture={pfp}
+                shape='circle'
+            />
+    }
+
     return (
-        <View>
-            <Ionicons style={styles.first} name="person-circle-outline" size={50} color={'#0155A4'} />
+        <View style={styles.first}>
+            {pfp}
         </View>
+    );
+}
+
+const FirstLabel = () => {
+    // TODO: replace with query to db
+    let name = "Chicken Joe";
+    return (
+        <Text style={styles.pfpName}>{name}</Text>
     );
 }
 
 /*
  * Displays the pfp/icon for second and third place user
- * TODO: add labels to icons
  */
 const SecondAndThird = () => {
+    // TODO: replace with query to db
+    let pfpSecond = require('./test.png');
+
+    // use default icon if no pfp is found
+    if (pfpSecond === null) {
+        pfpSecond = 
+            <Ionicons 
+                style={styles.cardIcon} 
+                name="person-circle-outline" 
+                size={50} 
+                color={'#0155A4'} 
+            />;
+    }
+    else {
+        pfpSecond = 
+            <ProfilePicture 
+                isPicture={true}
+                requirePicture={pfpSecond}
+                shape='circle'
+            />
+    }
+
+    let pfpThird = require('./test.png');
+
+    // use default icon if no pfp is found
+    if (pfpThird === null) {
+        pfpThird = <Ionicons 
+                style={styles.cardIcon} 
+                name="person-circle-outline" 
+                size={50} 
+                color={'#0155A4'} 
+            />;
+    }
+    else {
+        pfpThird = 
+            <ProfilePicture 
+                isPicture={true}
+                requirePicture={pfpThird}
+                shape='circle'
+            />
+    }
+
     return (
         <View style={styles.secondandthird}>
-            <Ionicons style={styles.second} label="hi" name="person-circle-outline" size={50} color={'#0155A4'}/>
-            <Ionicons style={styles.third} name="person-circle-outline" size={50} color={'#0155A4'} />
+            {pfpSecond}
+            {pfpThird}
+        </View>
+    );
+}
+
+const SecondAndThirdLabels = () => {
+    // TODO: replace with query to db
+    let nameFirst = "Chicken Joe Jr."
+    let nameSecond = "Chicken Joe Jr. Jr."
+    return (
+        <View style={styles.secondandthird}>
+            <Text style={styles.pfpName}>{nameFirst}</Text>
+            <Text style={styles.pfpName}>{nameSecond}</Text>
         </View>
     );
 }
@@ -144,6 +222,27 @@ const SecondAndThird = () => {
  */
 const PlayerCard = (props) => {
     let backgroundColor = 'white';
+
+    // TODO: replace with DB query
+    let pfp = require('./test.png');
+    // use default icon if no pfp is found
+    if (pfp === null) {
+        pfp = 
+            <Ionicons 
+                style={styles.cardIcon} 
+                name="person-circle-outline" 
+                size={50} 
+                color={'#0155A4'} 
+            />;
+    }
+    else {
+        pfp = 
+            <ProfilePicture 
+                isPicture={true}
+                requirePicture={pfp}
+                shape='circle'
+            />
+    }
 
     switch (props.props.rank) {
         case 1:
@@ -160,7 +259,7 @@ const PlayerCard = (props) => {
     return (
         <View style={[styles.playerCard, {backgroundColor: backgroundColor}]}>
             <Text style={styles.playerRank}> {props.props.rank} </Text>
-            <Ionicons style={styles.cardIcon} name="person-circle-outline" size={40} color={'#0155A4'} />
+            {pfp}
             <Text style={styles.playerName}>{props.props.name}</Text>
             <Text style={styles.playerPoints}>{props.props.points} pts</Text>
         </View>
@@ -172,7 +271,9 @@ const Compete = () => {
         <View style={{flex:1}}>
             <PointsorBadges/>
             <First/>
+            <FirstLabel/>
             <SecondAndThird/>
+            <SecondAndThirdLabels/>
             <View style={{flex:1}}>
                 <FlatList
                     data={top10}
