@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React from 'react';
 import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
 import SwitchSelector from 'react-native-switch-selector';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import ProfilePicture from 'react-native-profile-picture';
 
 // TODO: replace this with db query of some sort
 import {
@@ -30,21 +31,11 @@ const styles = StyleSheet.create({
     secondandthird: {
         alignItems: 'center',
         flexDirection: 'row',
-        justifyContent: 'center'
+        justifyContent: 'space-around'
     },
     first: {
         marginTop: 20,
         alignSelf: 'center'
-    },
-    second: {
-        flex: 1,
-        flexDirection: 'row',
-        textAlign: 'center'
-    },
-    third: {
-        flex: 1,
-        justifyContent: 'space-evenly',
-        textAlign: 'center'
     },
     playerCard: {
         flexDirection: 'row',
@@ -84,6 +75,11 @@ const styles = StyleSheet.create({
         marginLeft: 'auto',
         fontWeight: '500',
         color: 'black'
+    },
+    pfp: {
+        width: 50,
+        height: 50,
+        borderRadius: 25
     }
 });
 
@@ -116,25 +112,44 @@ const PointsorBadges = () => {
 
 /*
  * Displays the pfp/icon for first place user
- * TODO: add labels to icons
+ * TODO: 
+ *  - add labels to icons
  */
 const First = () => {
+    // TODO: replace with query to db
+    let pfp = require('./test.png')
     return (
-        <View>
-            <Ionicons style={styles.first} name="person-circle-outline" size={50} color={'#0155A4'} />
+        <View style={styles.first}>
+            <ProfilePicture
+                isPicture={true}
+                requirePicture={pfp}
+                shape='circle'
+            />
         </View>
     );
 }
 
 /*
  * Displays the pfp/icon for second and third place user
- * TODO: add labels to icons
+ * TODO: 
+ *  - add labels to icons
  */
 const SecondAndThird = () => {
+    // TODO: replace with query to db
+    let pfpSecond = require('./test.png');
+    let pfpThird = require('./test.png');
     return (
         <View style={styles.secondandthird}>
-            <Ionicons style={styles.second} label="hi" name="person-circle-outline" size={50} color={'#0155A4'}/>
-            <Ionicons style={styles.third} name="person-circle-outline" size={50} color={'#0155A4'} />
+            <ProfilePicture
+                isPicture={true}
+                requirePicture={pfpSecond}
+                shape='circle'
+            />
+            <ProfilePicture
+                isPicture={true}
+                requirePicture={pfpThird}
+                shape='circle'
+            />
         </View>
     );
 }
@@ -144,6 +159,8 @@ const SecondAndThird = () => {
  */
 const PlayerCard = (props) => {
     let backgroundColor = 'white';
+    // TODO: replace with DB query
+    let pfp = require('./test.png');
 
     switch (props.props.rank) {
         case 1:
@@ -160,7 +177,11 @@ const PlayerCard = (props) => {
     return (
         <View style={[styles.playerCard, {backgroundColor: backgroundColor}]}>
             <Text style={styles.playerRank}> {props.props.rank} </Text>
-            <Ionicons style={styles.cardIcon} name="person-circle-outline" size={40} color={'#0155A4'} />
+            <ProfilePicture
+                isPicture={true}
+                requirePicture={pfp}
+                shape='circle'
+            />
             <Text style={styles.playerName}>{props.props.name}</Text>
             <Text style={styles.playerPoints}>{props.props.points} pts</Text>
         </View>
