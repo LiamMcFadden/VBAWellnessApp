@@ -4,9 +4,17 @@ import Modal from "react-native-modal";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {Picker} from '@react-native-picker/picker';
 import CheckBox from '@react-native-community/checkbox';
-
-const startDate = new Date(2022, 1, 30);
-const endDate = new Date(2022, 2, 30);
+import {
+    getActivitiesByCategory,
+    getActivities,
+    getCurrentCompetition,
+    deleteActivity,
+    addActivity,
+    updateActivity,
+    getAllUsers,
+  } from '_api/firebase-db';
+// const startDate = new Date(2022, 1, 30);
+// const endDate = new Date(2022, 2, 30);
 
 const totalActivities = [
     {
@@ -189,16 +197,19 @@ const Stack = createNativeStackNavigator();
 
 const competitionStatus = () => {
     const date = new Date();
+    let startDate = getCurrentCompetition()['startTime'];
+    let endDate = getCurrentCompetition()['endTime'];
+    let exists = (startDate != null && endDate != null);
     let compText;
     let compButton = null;
-    if(date > startDate && date < endDate) {
+    if(!exists) {
+        compText = <Text style={styles.font}>No Competition Set</Text>;
+    }
+    else if(date > startDate && date < endDate) {
         compText = <Text style={styles.font}>Competition Currently Active</Text>;
     }
     else if(date < startDate && date < endDate) {
         compText = <Text style={styles.font}>Competition starting soon</Text>;
-    }
-    else if(startDate == null || endDate == null) {
-        compText = <Text style={styles.font}>No Competition Set</Text>;
     }
     else if(date > startDate && date > endDate) {
         compText = <Text style={styles.font}>Previous Competition Ended</Text>;
@@ -253,7 +264,7 @@ const AdminActivitiesScreen = ({navigation}) => {
             </View>
             <View style={{flex: 1}}>
                 <FlatList 
-                    data={totalActivities}
+                    data={getActivities()}
                     extraData={refresh}
                     renderItem={({ item }) => (
                         <CategoryHeader
@@ -276,7 +287,7 @@ const ActivityModal = ({
 
     const [title, onChangeTitle] = useState(activity != null ? activity.title : '');
     const [category, setCategory] = useState(activity != null ? wellnessCategory : 'Physical');
-    const [description, onChangeDescription] = useState(activity != null ? activity.text : '');
+    const [description, onChangeDescription] = useState(activity != null ? activity.description : '');
     const [points, onChangePoints] = useState(activity != null ? activity.points : 0);
     const [available, onChangeAvailability] = useState(activity != null ? activity.available : true);
 
@@ -296,18 +307,18 @@ const ActivityModal = ({
 
         const newActivity = {
             title: title,
-            text: description,
-            points: points,
+            category: category,
+            description: description,
+            points: parseInt(points),
             available: available,
         }
 
         if(activity != null) {
-            // remove old activity (in case of category change - good chance we will have to alter this)
-            totalActivities.find((section) => section['category'] == category)['activities'] = totalActivities.find((section) => section['category'] == category)['activities'].filter(curActivity => curActivity != activity);
+            newActivity.uid = activity.uid;
+            updateActivity(newActivity);
+        } else {
+            addActivity(newActivity);
         }
-
-        // add new activity back to activities list
-        totalActivities.find((section) => section['category'] == category)['activities'].push(newActivity);
         
         toggleModal();
     }
@@ -466,9 +477,16 @@ const ActivityItem = ({
 };
 
 const AdminMainScreen = ({navigation}) => {
+    const startDate = new Date(getCurrentCompetition()['startTime']);
+    const endDate = new Date(getCurrentCompetition()['endTime']);
     return (
         <SafeAreaView style={{backgroundColor: '#0155A4', flex: 1, alignItems: "center"}}>
-            <Text style={{fontSize: 30, fontWeight: "800", padding: 5, color: 'white'}}>Admin Page</Text>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                <TouchableOpacity style={{borderRadius: 5, margin: 15, alignSelf: 'flex-start', width: 75}} onPress={() => navigation.navigate('SettingsScreen')}>
+                    <Text style={{color: 'white', fontWeight: '600', fontSize: 18}}>Settings</Text>
+                </TouchableOpacity>
+                <Text style={{fontSize: 30, fontWeight: "800", padding: 5, paddingRight: 125, color: 'white'}}>Admin Page</Text>
+            </View>
             <View style={styles.compPage}>
                 {competitionStatus()}
             </View>
@@ -504,7 +522,7 @@ const AdminMainScreen = ({navigation}) => {
     )
 }
 
-const Admin = () => {
+const Admin = ({navigation}) => {
     return (
         <Stack.Navigator screenOptions={{headerShown: false}}>
             <Stack.Screen
