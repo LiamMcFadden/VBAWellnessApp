@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, Pressable, Text, View } from 'react-native';
 
-const Activity = ({activity, addPoints, toggleView}) => {
+const Activity = ({activity, action, toggleView}) => {
 
     const completeActivity = () => {
-        addPoints(activity.points);
+        action(activity.points);
         toggleView(false);
     }
 

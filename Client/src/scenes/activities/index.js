@@ -6,13 +6,11 @@ import { Activity } from "_atoms"
 //activity lists for each wellness category
 //once database is setup, these will be pulled from there
 import {
-    emotionalActs,
-    intellectualActs,
-    occupationalActs,
-    physicalActs,
-    socialActs,
-    spiritualActs
-} from '../home/testActs';
+    getCurrentUser,
+    getActivitiesByCategory,
+    updateCurrentUserFields,
+    completeActivityForCurrentUser
+} from '_api/firebase-db';
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -102,14 +100,25 @@ const ListItem = ({activity, openModal}) => {
 )};
 
 const ActivitiesScreen = () => {
-    const [items, setItems] = useState(physicalActs);
+    const [items, setItems] = useState(getActivitiesByCategory('Physical'));
 
     const addPoints = points => {
         console.log('adding')
         setTotalPoints(totalPoints + points);
     };
 
-    const [totalPoints, setTotalPoints] = useState(0);
+    const action = item => {
+        const newTotal = totalPoints + item.points;
+    
+        setTotalPoints(newTotal);
+        completeActivityForCurrentUser(item.uid).catch(err => {
+          setTotalPoints(newTotal - points);
+          console.error(err);
+          //TODO: Alert connection error
+        });
+    }
+
+    const [totalPoints, setTotalPoints] = useState(getCurrentUser().points);
 
     const [isModalVisible, setModalVisible] = useState(false);
     const [modalActivity, setModalActivity] = useState(null);
@@ -156,7 +165,7 @@ const ActivitiesScreen = () => {
                 />
             </View>
             <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)}>
-                <Activity activity={modalActivity} addPoints={addPoints} toggleView={setModalVisible}/>
+                <Activity activity={modalActivity} action={action} toggleView={setModalVisible}/>
             </Modal>
         </SafeAreaView>
     );
