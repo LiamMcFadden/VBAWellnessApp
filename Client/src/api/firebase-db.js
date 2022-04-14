@@ -24,7 +24,6 @@ const fetch = async userId => {
     .get()
     .then(res => {
       currentUser = res.data();
-
       if (
         currentUser.competition != null &&
         currentUser.competition.length > 0
@@ -64,7 +63,7 @@ const getActivities = () => {
 };
 const getActivityById = activityUid => {
   activities.forEach(category => {
-    let found = category.find((activity) => {
+    let found = category.activities.find((activity) => {
       activity.uid == activityUid
     });
     if(found) {
@@ -74,11 +73,11 @@ const getActivityById = activityUid => {
   return null;
 };
 const getActivitiesByCategory = category => {
-  return activities[CATEGORIES.indexOf(category)]['activities'];
+  return activities[CATEGORIES.indexOf(category)].activities; 
 };
 
 const getCurrentUserActivityStats = activityUid => {
-  return currentUser['activityStats'].find((activity) => activity.uid == activityUid) || {};
+  return currentUser['activityStats'][activityUid] || {};
 };
 
 const getActivitiesAndCurrentUserStats = () => {
@@ -106,7 +105,7 @@ const getActivitiesAndCurrentUserStats = () => {
 
 const getUserById = async userId => {
   await firestore().collection(USERS_COLLECTION).doc(userId).get();
-};
+}; 
 
 const getCompetitionById = async competitionId => {
   await firestore()

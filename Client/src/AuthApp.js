@@ -38,9 +38,10 @@ export const AppRouter = () => {
   useEffect(() => {
     if (currentUser() != null) {
       subscriptionCallback(currentUser());
-    }
-    let subscription = subscribeToAuthState(subscriptionCallback);
-    return subscription;
+    } else {
+      let subscription = subscribeToAuthState(subscriptionCallback);
+      return subscription;
+    } 
   }, []);
 
   return isLoading ? (
