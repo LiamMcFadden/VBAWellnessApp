@@ -156,12 +156,15 @@ const ActivitiesScreen = () => {
             <View style={{flex: 1}}>
                 <FlatList
                     data={items}
-                    renderItem={({ item }) => (
-                        <ListItem
-                            activity={item}
-                            openModal={openModal}
-                        />
-                    )}
+                    renderItem={({ item }) => {
+                        if(item.available) {
+                            return (
+                                <ListItem
+                                    activity={item}
+                                    openModal={openModal}
+                                />)
+                        }
+                    }}
                 />
             </View>
             <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)}>
