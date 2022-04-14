@@ -115,7 +115,8 @@ const PointsorBadges = () => {
  */
 const First = () => {
     // TODO: replace with query to db
-    let pfp = require('./test.png')
+    //let pfp = require('./test.png')
+    let pfp = null;
 
     // use default icon if no pfp is found
     if (pfp === null) {
@@ -145,7 +146,7 @@ const First = () => {
 
 const FirstLabel = () => {
     // TODO: replace with query to db
-    let name = "Chicken Joe";
+    let name = "Jim";
     return (
         <Text style={styles.pfpName}>{name}</Text>
     );
@@ -156,7 +157,8 @@ const FirstLabel = () => {
  */
 const SecondAndThird = () => {
     // TODO: replace with query to db
-    let pfpSecond = require('./test.png');
+    //let pfpSecond = require('./test.png');
+    let pfpSecond = null;
 
     // use default icon if no pfp is found
     if (pfpSecond === null) {
@@ -177,7 +179,8 @@ const SecondAndThird = () => {
             />
     }
 
-    let pfpThird = require('./test.png');
+    //let pfpThird = require('./test.png');
+    let pfpThird = null;
 
     // use default icon if no pfp is found
     if (pfpThird === null) {
@@ -207,8 +210,8 @@ const SecondAndThird = () => {
 
 const SecondAndThirdLabels = () => {
     // TODO: replace with query to db
-    let nameFirst = "Chicken Joe Jr."
-    let nameSecond = "Chicken Joe Jr. Jr."
+    let nameFirst = "Bob"
+    let nameSecond = "Sally"
     return (
         <View style={styles.secondandthird}>
             <Text style={styles.pfpName}>{nameFirst}</Text>
@@ -224,7 +227,8 @@ const PlayerCard = (props) => {
     let backgroundColor = 'white';
 
     // TODO: replace with DB query
-    let pfp = require('./test.png');
+    //let pfp = require('./test.png');
+    let pfp = null;
     // use default icon if no pfp is found
     if (pfp === null) {
         pfp = 
