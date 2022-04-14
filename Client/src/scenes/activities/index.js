@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Dimensions, StyleSheet, TouchableOpacity, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import { Header, ListItem } from '_atoms';
+import Modal from "react-native-modal";
+import { Activity } from "_atoms"
 //activity lists for each wellness category
 //once database is setup, these will be pulled from there
 import {
@@ -11,41 +12,94 @@ import {
     physicalActs,
     socialActs,
     spiritualActs
-} from '../home/data';
+} from '../home/testActs';
 
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
+    header: {
+        height: 60,
+        padding: 15,
+        alignSelf: 'center',
+        backgroundColor: '#0155A4',
+        width: '95%',
+        marginTop: 10
+    },
+    headerText: {
+        color: 'white',
+        fontSize: 23,
+        textAlign: 'center',
+    },
     buttons: {
         flexDirection: 'row',
         justifyContent: 'space-evenly',
-        backgroundColor: 'steelblue',
+        backgroundColor: '#0155A4',
+        width: '95%',
+        alignSelf: 'center',
+        marginTop: 1
     },
     text: {
         color: 'white'
     },
-
-    //Profile Card
-    profileCard: {
-        width: (0.95 * windowWidth),
-        height: (0.2 * windowHeight),
-        flex: 1,
-        marginTop: 10,
-        marginBottom: 10,
-        backgroundColor: "red"
-    }
-
+    listItem: {
+        padding: 15,
+        backgroundColor: '#f8f8f8',
+        borderBottomWidth: 1,
+        borderColor: '#eee',
+    },
+    listItemView: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'stretch',
+        alignItems: 'center',
+    },
+    
+    listItemTextContainer: {
+        height: '100%',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+    },
+    listItemTitleText: {
+        fontSize: 18,
+        maxWidth: windowWidth / 1.5,
+        color: '#0155A4',
+    },
+    listItemText: {
+        fontSize: 12,
+        maxWidth: windowWidth / 1.5,
+        color: '#0155A4',
+    },
+    iconView: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        width: 70,
+    },
 });
 
+const ListItem = ({activity, openModal}) => {
 
-const ProfileCard = () => {
-    <View style={styles.profileCard}>
-        <Text>Hello</Text>
-    </View>
-
-}
+    return (
+        <TouchableOpacity
+        style={styles.listItem}
+        onPress={() => openModal(activity)}>
+        <View style={styles.listItemView}>
+            <View
+            style={{
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+            }}>
+                <Text style={styles.listItemTitleText}>{activity.title ?? 'Activity'}</Text>
+                <Text style={styles.listItemText}>{activity.description}</Text>
+            </View>
+    
+            <View style={styles.iconView}>
+                <Text style={{color: '#0155A4'}}>{activity.points} pts</Text>
+            </View>
+        </View>
+        </TouchableOpacity>
+)};
 
 const ActivitiesScreen = () => {
     const [items, setItems] = useState(physicalActs);
@@ -57,10 +111,19 @@ const ActivitiesScreen = () => {
 
     const [totalPoints, setTotalPoints] = useState(0);
 
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [modalActivity, setModalActivity] = useState(null);
+
+    const openModal = (activity) => {
+        setModalActivity(activity);
+        setModalVisible(true);
+    }
+
     return (
-        <SafeAreaView>
-            <ProfileCard />
-            <Header title={totalPoints} />
+        <SafeAreaView style={{flex: 1}}>
+            <View style={styles.header}>
+                <Text style={styles.headerText}>{totalPoints}</Text>
+            </View>
             <View style={styles.buttons}>
                 <Text style={styles.text} onPress={() => setItems(physicalActs)}>
                     Physical
@@ -81,15 +144,20 @@ const ActivitiesScreen = () => {
                     Social
                 </Text>
             </View>
-            <FlatList
-                data={items}
-                renderItem={({ item }) => (
-                    <ListItem
-                        item={item}
-                        addPoints={addPoints}
-                    />
-                )}
-            />
+            <View style={{flex: 1}}>
+                <FlatList
+                    data={items}
+                    renderItem={({ item }) => (
+                        <ListItem
+                            activity={item}
+                            openModal={openModal}
+                        />
+                    )}
+                />
+            </View>
+            <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)}>
+                <Activity activity={modalActivity} addPoints={addPoints} toggleView={setModalVisible}/>
+            </Modal>
         </SafeAreaView>
     );
 };

@@ -5,7 +5,7 @@ import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import Icon from "react-native-vector-icons/FontAwesome";
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { AuthContext } from '_components/Authentication/auth';
-import AddScreen from '_scenes/addScreen/addScreen';
+import ActivitiesScreen from '_scenes/activities';
 import Compete from '_scenes/compete/compete';
 import Home from '_scenes/home/home';
 import Settings from '_scenes/settings/settings';
@@ -55,7 +55,7 @@ const routeConfig = {
     Home: {
         iconName: 'home'
     },
-    Add: {
+    Activities: {
         iconName: 'plus-circle'
     },
     Compete: {
@@ -156,7 +156,7 @@ export default function BottomTabs() {
                     options={{ headerShown: false }}
                 />
                 <TabBar.Screen name='Compete' component={Compete} options={{ headerShown: false }} />
-                <TabBar.Screen name='Add' component={AddScreen} options={{ headerShown: false }} />
+                <TabBar.Screen name='Activities' component={ActivitiesScreen} options={{ headerShown: false }} />
                 <TabBar.Screen name='Settings' component={Settings} options={{ headerShown: false }} />
             </TabBar.Navigator>
         </NavigationContainer>
