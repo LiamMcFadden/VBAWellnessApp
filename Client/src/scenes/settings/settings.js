@@ -14,7 +14,7 @@ const SettingsScreen = ({navigation}) => {
   function signOutValidation() {
     signOut()
       .then(() => {
-        navigation.navigate('Login')
+        //navigation.navigate('Login')
         console.log('signed out');
       })
       .catch(err => {

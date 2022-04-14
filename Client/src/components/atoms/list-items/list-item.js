@@ -20,7 +20,7 @@ const ListItem = ({item, action}) => (
           justifyContent: 'space-between',
         }}>
         <Text style={styles.listItemTitleText}>{item.title ?? 'Activity'}</Text>
-        <Text style={styles.listItemText}>{item.description}</Text>
+        {/* <Text style={styles.listItemText}>{item.description}</Text> */}
       </View>
 
       <View style={styles.iconView}>
