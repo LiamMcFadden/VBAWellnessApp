@@ -9,10 +9,10 @@ import {
 
 const windowWidth = Dimensions.get('window').width;
 
-const ListItem = ({item, addPoints}) => (
+const ListItem = ({item, action}) => (
   <TouchableOpacity
     style={styles.listItem}
-    onPress={() => addPoints(item.points)}>
+    onPress={() => action(item)}>
     <View style={styles.listItemView}>
       <View
         style={{

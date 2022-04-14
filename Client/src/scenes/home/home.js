@@ -10,22 +10,12 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SafeAreaView} from 'react-navigation';
 import {Header, ListItem} from '_atoms';
-//activity lists for each wellness category
-//once database is setup, these will be pulled from there
-//import {getName, getPoints, setPoints} from './data';
-// import {
-//   physicalActs,
-//   emotionalActs,
-//   intellectualActs,
-//   occupationalActs,
-//   spiritualActs,
-//   socialActs,
-// } from '../home/testActs';
 
 import {
   getCurrentUser,
   getActivitiesByCategory,
   updateCurrentUserFields,
+  completeActivityForCurrentUser
 } from '_api/firebase-db';
 
 const windowWidth = Dimensions.get('window').width;
@@ -119,10 +109,11 @@ const Home = () => {
 
   const [totalPoints, setTotalPoints] = useState(getCurrentUser().points);
 
-  const addPoints = points => {
-    let newTotal = totalPoints + points;
+  const action = item => {
+    const newTotal = totalPoints + item.points;
+
     setTotalPoints(newTotal);
-    updateCurrentUserFields({points: newTotal}).catch(err => {
+    completeActivityForCurrentUser(item.uid).catch(err => {
       setTotalPoints(newTotal - points);
       console.error(err);
       //TODO: Alert connection error
@@ -166,7 +157,7 @@ const Home = () => {
       </View>
       <FlatList
         data={items}
-        renderItem={({item}) => <ListItem item={item} addPoints={addPoints} />}
+        renderItem={({item}) => <ListItem item={item} action={action} />}
       />
     </SafeAreaView>
   );
