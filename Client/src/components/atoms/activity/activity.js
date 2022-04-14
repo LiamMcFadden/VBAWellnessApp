@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity, ScrollView, Pressable, Text, View } from 
 const Activity = ({activity, action, toggleView}) => {
 
     const completeActivity = () => {
-        action(activity.points);
+        action(activity);
         toggleView(false);
     }
 
@@ -18,7 +18,7 @@ const Activity = ({activity, action, toggleView}) => {
                 </Text>
             </View>
             <View style={{flexDirection: 'row', flexshrink: 1, justifyContent: 'space-between'}}>
-                <Text style={{margin: 5, marginLeft: 10, color: '#0155A4', fontWeight: '600'}}>Times Completed: 0</Text>
+                <Text style={{margin: 5, marginLeft: 10, color: '#0155A4', fontWeight: '600'}}>Times Completed: {activity.timesTotal}</Text>
                 <View style={{flexDirection: 'row'}}>
                     <View style={{backgroundColor: 'lightgrey', borderRadius: 5, width: 20, height: 20, margin: 5, marginRight: 10}}></View>
                     <View style={{backgroundColor: 'lightgrey', borderRadius: 5, width: 20, height: 20, margin: 5, marginRight: 10}}></View>
