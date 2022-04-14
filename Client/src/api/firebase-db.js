@@ -62,22 +62,23 @@ const getActivities = () => {
   return activities;
 };
 const getActivityById = activityUid => {
+  let activity;
   activities.forEach(category => {
-    let found = category.activities.find((activity) => {
-      activity.uid == activityUid
+    let found = category.activities.find(({uid}) => {
+      return uid === activityUid
     });
     if(found) {
-      return found;
+      activity = found;
     }
   });
-  return null;
+  return activity;
 };
 const getActivitiesByCategory = category => {
   return activities[CATEGORIES.indexOf(category)].activities; 
 };
 
 const getCurrentUserActivityStats = activityUid => {
-  return currentUser['activityStats'][activityUid] || {};
+  return currentUser['activityStats'][activityUid];
 };
 
 const getActivitiesAndCurrentUserStats = () => {
@@ -134,6 +135,11 @@ const completeActivityForCurrentUser = activityUid => {
   let activity = getActivityById(activityUid);
   let stats = getCurrentUserActivityStats(activityUid);
 
+  if(stats == undefined) {
+    stats = {};
+    currentUser['activityStats'][activityUid] = stats;
+  }
+
   currentUser.points = currentUser.points + activity.points;
   let userUpdate = {
     points: currentUser.points
@@ -142,7 +148,7 @@ const completeActivityForCurrentUser = activityUid => {
   stats.timesToday = stats.timesToday ? stats.timesToday + 1 : 1;
   stats.timesTotal = stats.timesTotal ? stats.timesTotal + 1 : 1;
   stats.lastCompleted = new Date();
-  
+
   userUpdate[`activityStats.${activityUid}`] = stats;
 
   return firestore()
