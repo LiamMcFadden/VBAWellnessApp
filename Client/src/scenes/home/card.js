@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {TapGestureHandler} from 'react-native-gesture-handler';
 import Animated, {
+  useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -20,44 +22,56 @@ const styles = StyleSheet.create({
     padding: 10,
     shadowOpacity: 0.1,
   },
+  body: {
+    position: 'absolute',
+    top: 80,
+    height: 250 - 70,
+    backgroundColor: 'green',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
 });
 
-function Card() {
+function Card({onClick, index}) {
   const [pressed, setPressed] = useState(false);
-  const offset = useSharedValue(50);
-  const rotate = useSharedValue(0);
+  const offset = useSharedValue(75);
 
   const animatedStyles = useAnimatedStyle(() => {
     return {
-      height: offset.value,
+      height: withSpring(offset.value, {
+        damping: 65,
+        stiffness: 400,
+        restDisplacementThreshold: 0,
+      }),
     };
   });
-
-  const ani = useAnimatedStyle(() => {
-    return {
-      transform: [{rotateY: `${rotate.value}deg`}],
-    };
-  });
-
   const handlePress = () => {
-    if (pressed) {
-      setPressed(!pressed);
-
-      return (rotate.value = withSpring(180));
+    if (offset.value == 75) {
+      offset.value = 300;
     } else {
-      setPressed(!pressed);
-
-      return (rotate.value = withSpring(0));
+      offset.value = 75;
     }
+    setTimeout(() => onClick(index), 300);
   };
-
   return (
     <>
       <TouchableOpacity onPress={handlePress}>
-        <Animated.View style={[styles.box, animatedStyles]}>
-          <View style={{justifyContent: 'space-around'}}>
-            <Text style={{fontSize: 14, fontWeight: 'bold'}}>Stairmaster</Text>
-            <Text>Take the stairs at work today</Text>
+        <Animated.View
+          style={[styles.box, {overflow: 'hidden'}, animatedStyles]}
+        >
+          <View style={{justifyContent: 'space-around', paddingTop: 0}}>
+            <View style={{position: 'absolute', top: 1}}>
+              <Text style={{fontSize: 14, fontWeight: 'bold'}}>
+                Stairmaster
+              </Text>
+              <Text>Take the stairs at work today</Text>
+            </View>
+
+            <View style={styles.body}>
+              <Text>You Completed This activity a lot</Text>
+              <Text>You Completed This activity a lot</Text>
+              <Text>You Completed This activity a lot</Text>
+            </View>
           </View>
 
           <AntDesign name="down" size={15} />

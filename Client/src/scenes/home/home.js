@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {
   Dimensions,
   FlatList,
@@ -6,33 +6,21 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ScrollView,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {step0} from 'react-native/Libraries/Animated/Easing';
 import {SafeAreaView} from 'react-navigation';
-<<<<<<< HEAD
-//activity lists for each wellness category
-//once database is setup, these will be pulled from there
-//import {getName, getPoints, setPoints} from './data';
-// import {
-//   physicalActs,
-//   emotionalActs,
-//   intellectualActs,
-//   occupationalActs,
-//   spiritualActs,
-//   socialActs,
-// } from '../home/testActs';
-=======
-import {Header, ListItem} from '_atoms';
-
->>>>>>> cb7eeebd5901a419ee72751d5c4952e247cfa0bf
 import {
   getActivitiesByCategory,
   getCurrentUser,
   updateCurrentUserFields,
-  completeActivityForCurrentUser
+  completeActivityForCurrentUser,
 } from '_api/firebase-db';
 import {Header, ListItem} from '_atoms';
 import Card from './card';
+import {OutlinedButton} from '../../globals/styledcomponents';
+
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
@@ -124,7 +112,10 @@ const ProfileCard = ({navigation}) => {
         posuere congue. Donec hendrerit, diam eget viverra pretium, lacus ligula
         scelerisque felis, eu finibus neque massa eget justo.
       </Text>
-			<TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate("Profile")}>
+      <TouchableOpacity
+        style={styles.profileButton}
+        onPress={() => navigation.navigate('Profile')}
+      >
         <Ionicons name="person-circle-outline" size={20} color={'#0155A4'} />
         <Text style={styles.profileButtonText}>Profile</Text>
       </TouchableOpacity>
@@ -136,19 +127,36 @@ const Home = ({navigation}) => {
 
   const [totalPoints, setTotalPoints] = useState(getCurrentUser().points);
 
-<<<<<<< HEAD
+  const scrollRef = useRef();
+  const scrollUp = index => {
+    scrollRef.current?.scrollTo({
+      y: index * 85,
+      x: 0,
+      animated: true,
+    });
+    //console.log(e.target.measure);
+    //if (e) {
+    //e.target.measure((x, y, width, height, pageX, pageY) => {
+    //scrollRef.current?.scrollTo({
+    //y: 85 * {index}, //Math.max(pageY, 0), // This should be max
+    //x: 0,
+    //animated: true,
+    //});
+    //});
+    //} else {
+    //scrollRef.current?.scrollTo({y: 0, x: 0, animated: true});
+    //}
+  };
+
   const addPoints = points => {
-			
-			 let newTotal = totalPoints + points;
-			 setTotalPoints(newTotal);
-			 updateCurrentUserFields({points: newTotal}).catch(err => {
-			   setTotalPoints(newTotal - points);
-			   console.error(err);
-				 //TODO: Alert connection error
-			 });
-			 
-	};
-=======
+    let newTotal = totalPoints + points;
+    setTotalPoints(newTotal);
+    updateCurrentUserFields({points: newTotal}).catch(err => {
+      setTotalPoints(newTotal - points);
+      console.error(err);
+      //TODO: Alert connection error
+    });
+  };
   const action = item => {
     const newTotal = totalPoints + item.points;
 
@@ -159,50 +167,23 @@ const Home = ({navigation}) => {
       //TODO: Alert connection error
     });
   };
->>>>>>> cb7eeebd5901a419ee72751d5c4952e247cfa0bf
   return (
     <SafeAreaView style={{backgroundColor: '#F3F4F7', height: '100%'}}>
       <ProfileCard navigation={navigation} />
-      <Header title={totalPoints} width={0.95 * windowWidth} />
-      <View style={styles.buttons}>
-        <Text
-          style={styles.text}
-          onPress={() => setItems(getActivitiesByCategory('Physical'))}>
-          Physical
-        </Text>
-        <Text
-          style={styles.text}
-          onPress={() => setItems(getActivitiesByCategory('Emotional'))}>
-          Emotional
-        </Text>
-        <Text
-          style={styles.text}
-          onPress={() => setItems(getActivitiesByCategory('Intellectual'))}>
-          Intellectual
-        </Text>
-        <Text
-          style={styles.text}
-          onPress={() => setItems(getActivitiesByCategory('Occupational'))}>
-          Occupational
-        </Text>
-        <Text
-          style={styles.text}
-          onPress={() => setItems(getActivitiesByCategory('Spiritual'))}>
-          Spiritual
-        </Text>
-        <Text
-          style={styles.text}
-          onPress={() => setItems(getActivitiesByCategory('Social'))}>
-          Social
-        </Text>
-      </View>
+      <ScrollView ref={scrollRef}>
+        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(i => (
+          <Card onClick={scrollUp} index={i} />
+        ))}
+      </ScrollView>
 
-      <Card />
-
-      <FlatList
-        data={items}
-        renderItem={({item}) => <ListItem item={item} action={action} />}
-      />
+      <TouchableOpacity onPress={scrollUp}>
+        <OutlinedButton width={10}>HELLO</OutlinedButton>
+      </TouchableOpacity>
+      {/*
+       *<FlatList
+       *  data={items}
+       *  renderItem={({item}) => <ListItem item={item} action={action} />}
+       */}
     </SafeAreaView>
   );
 };

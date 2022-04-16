@@ -32,8 +32,7 @@ const ProgressB = ({milestone, points, width}) => {
         width: width,
         borderRadius: 24,
         height: 10,
-      }}
-    >
+      }}>
       <View
         style={{
           backgroundColor: COLORS.primary,
@@ -70,15 +69,13 @@ export default function Profile({navigation}) {
               style={{
                 ...TYPESCALE.h6,
                 textAlign: 'center',
-              }}
-            >{`${user.firstname} ${user.lastname}`}</Text>
+              }}>{`${user.firstname} ${user.lastname}`}</Text>
             <Text
               style={{
                 ...TYPESCALE.subtitle,
                 margin: 5,
                 textAlign: 'center',
-              }}
-            >{`@${user.username}`}</Text>
+              }}>{`@${user.username}`}</Text>
           </View>
 
           <View style={{alignItems: 'center', marginTop: 15}}>
@@ -99,8 +96,7 @@ export default function Profile({navigation}) {
             alignItems: 'center',
             height: 0.5 * wheight,
             width: wwidth,
-          }}
-        >
+          }}>
           {/*
             *<ProgressBar
             *  points={user.points}
@@ -115,8 +111,7 @@ export default function Profile({navigation}) {
                 alignSelf: 'flex-start',
                 marginLeft: Math.abs(wwidth * 1.1 - wwidth),
               },
-            ]}
-          >
+            ]}>
             Your Top Categories
           </Text>
           <View
@@ -132,8 +127,7 @@ export default function Profile({navigation}) {
               shadowOpacity: 0.1,
               shadowRadius: 1,
               elevation: 8,
-            }}
-          ></View>
+            }}></View>
         </View>
       </SafeAreaView>
     </>
