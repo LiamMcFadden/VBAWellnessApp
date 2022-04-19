@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, ScrollView, Pressable, Text, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, ScrollView, Image, Text, View } from 'react-native';
 
 const Activity = ({activity, action, toggleView}) => {
 
@@ -7,6 +7,8 @@ const Activity = ({activity, action, toggleView}) => {
         action(activity);
         toggleView(false);
     }
+
+    const timesCompleted = 0;
 
     return (
         <View style={styles.modalBackground}>
@@ -19,11 +21,20 @@ const Activity = ({activity, action, toggleView}) => {
             </View>
             <View style={{flexDirection: 'row', flexshrink: 1, justifyContent: 'space-between'}}>
                 {/* TODO: change below value to activity.timesTotal when updating database works */}
-                <Text style={{margin: 5, marginLeft: 10, color: '#0155A4', fontWeight: '600'}}>Times Completed: 0</Text>
+                <Text style={styles.timesCompletedText}>Times Completed: 0</Text>
                 <View style={{flexDirection: 'row'}}>
-                    <View style={{backgroundColor: 'lightgrey', borderRadius: 5, width: 20, height: 20, margin: 5, marginRight: 10}}></View>
-                    <View style={{backgroundColor: 'lightgrey', borderRadius: 5, width: 20, height: 20, margin: 5, marginRight: 10}}></View>
-                    <View style={{backgroundColor: 'lightgrey', borderRadius: 5, width: 20, height: 20, margin: 5, marginRight: 10}}></View>
+                    {timesCompleted >= 3 
+                        ? <Image source={require('_assets/images/BronzeBadgeIcon.png')} style={styles.badge}/>
+                        : <Image source={require('_assets/images/MissingBadgeIcon.png')} style={styles.badge}/>
+                    }
+                    {timesCompleted >= 5 
+                        ? <Image source={require('_assets/images/SilverBadgeIcon.png')} style={styles.badge}/>
+                        : <Image source={require('_assets/images/MissingBadgeIcon.png')} style={styles.badge}/>
+                    }
+                    {timesCompleted >= 10 
+                        ? <Image source={require('_assets/images/GoldBadgeIcon.png')} style={styles.badge}/>
+                        : <Image source={require('_assets/images/MissingBadgeIcon.png')} style={styles.badge}/>
+                    }
                 </View>
             </View>
             <ScrollView style={{margin: 15}} contentContainerStyle={{flexGrow: 1}}>
@@ -76,6 +87,18 @@ const styles = StyleSheet.create({
         width: '75%',
         fontSize: 28,
         color: 'white',
+    },
+    timesCompletedText: {
+        margin: 5, 
+        marginLeft: 10, 
+        color: '#0155A4', 
+        fontWeight: '600'
+    },
+    badge: {
+        width: 30,
+        aspectRatio: 0.873,
+        resizeMode: 'contain',
+        marginRight: 5,
     }
 });
 
