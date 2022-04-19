@@ -58,7 +58,7 @@ const routeConfig = {
     Activities: {
         iconName: 'plus-circle'
     },
-    Compete: {
+    Leaderboard: {
         iconName: 'leaderboard'
     },
     Settings: {
@@ -67,7 +67,7 @@ const routeConfig = {
 }
 
 const getIcon = (routeName, style) => {
-    if (routeName === 'Compete' || routeName === 'Settings') {
+    if (routeName === 'Leaderboard' || routeName === 'Settings') {
         return <MaterialIcon
             name={routeConfig[routeName].iconName}
             style={style}
@@ -155,7 +155,7 @@ export default function BottomTabs() {
                     component={Home}
                     options={{ headerShown: false }}
                 />
-                <TabBar.Screen name='Compete' component={Compete} options={{ headerShown: false }} />
+                <TabBar.Screen name='Leaderboard' component={Compete} options={{ headerShown: false }} />
                 <TabBar.Screen name='Activities' component={ActivitiesScreen} options={{ headerShown: false }} />
                 <TabBar.Screen name='Settings' component={Settings} options={{ headerShown: false }} />
             </TabBar.Navigator>
