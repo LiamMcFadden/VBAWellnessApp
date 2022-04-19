@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FlatList, Dimensions, StyleSheet, TouchableOpacity, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Modal from "react-native-modal";
+import Carousel from 'react-native-snap-carousel';
 import { Activity } from "_atoms"
 //activity lists for each wellness category
 //once database is setup, these will be pulled from there
@@ -22,8 +23,7 @@ const styles = StyleSheet.create({
         padding: 15,
         alignSelf: 'center',
         backgroundColor: '#0155A4',
-        width: '95%',
-        marginTop: 10
+        width: '100%',
     },
     headerText: {
         color: 'white',
@@ -31,12 +31,23 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     buttons: {
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
         backgroundColor: '#0155A4',
-        width: '95%',
+        width: '100%',
         alignSelf: 'center',
-        marginTop: 1
+        marginTop: 1,
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+        alignItems: 'center'
+    },
+    carouselItemText: {
+        color: 'white', 
+        fontSize: 25, 
+        alignSelf: 'center'
+    },
+    arrowText: {
+        fontSize: 27, 
+        color: 'white', 
+        fontWeight: '600', 
     },
     text: {
         color: 'white'
@@ -99,6 +110,54 @@ const ListItem = ({activity, openModal}) => {
         </TouchableOpacity>
 )};
 
+const CategoryCarousel = ({setItems}) => {
+
+    const items = [
+        "Physical",
+        "Emotional",
+        "Intellectual",
+        "Occupational",
+        "Spiritual",
+        "Social",
+    ];
+
+    let carousel;
+
+    return (
+        <View style={styles.buttons}>
+            <View style={{width: '10%', alignItems: 'center'}}>
+                <TouchableOpacity onPress={() => { carousel.snapToPrev(); }}>
+                    <Text style={[styles.arrowText, {paddingLeft: 15}]}>{'<'}</Text>
+                </TouchableOpacity>
+            </View>
+            <Carousel
+                ref={(c) => { carousel = c; }}
+                data={items}
+                renderItem={({ item }) => {
+                    return (
+                        <View style={{backgroundColor: '#0155A4', width: '100%'}}>
+                            <Text style={styles.carouselItemText}>{item}</Text>
+                        </View>
+                    );
+                }}
+                sliderWidth={0.8 * windowWidth}
+                itemWidth={0.8 * windowWidth}
+                onSnapToItem={ slideIndex => {
+                    setItems(getActivitiesByCategory(items[slideIndex]));
+                }}
+                initialNumToRender={30}
+                scrollEnabled={false}
+            />
+            <View style={{width: '10%', alignItems: 'center'}}>
+                <TouchableOpacity onPress={() => { carousel.snapToNext(); }}>
+                    <Text style={[styles.arrowText, {paddingRight: 15}]}>{'>'}</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+        
+    );
+}
+
 const ActivitiesScreen = () => {
     const [items, setItems] = useState(getActivitiesByCategory('Physical'));
 
@@ -133,26 +192,7 @@ const ActivitiesScreen = () => {
             <View style={styles.header}>
                 <Text style={styles.headerText}>{totalPoints}</Text>
             </View>
-            <View style={styles.buttons}>
-                <Text style={styles.text} onPress={() => setItems(getActivitiesByCategory('Physical'))}>
-                    Physical
-                </Text>
-                <Text style={styles.text} onPress={() => setItems(getActivitiesByCategory('Emotional'))}>
-                    Emotional
-                </Text>
-                <Text style={styles.text} onPress={() => setItems(getActivitiesByCategory('Intellectual'))}>
-                    Intellectual
-                </Text>
-                <Text style={styles.text} onPress={() => setItems(getActivitiesByCategory('Occupational'))}>
-                    Occupational
-                </Text>
-                <Text style={styles.text} onPress={() => setItems(getActivitiesByCategory('Spiritual'))}>
-                    Spiritual
-                </Text>
-                <Text style={styles.text} onPress={() => setItems(getActivitiesByCategory('Social'))}>
-                    Social
-                </Text>
-            </View>
+            <CategoryCarousel setItems={setItems}/>
             <View style={{flex: 1}}>
                 <FlatList
                     data={items}
