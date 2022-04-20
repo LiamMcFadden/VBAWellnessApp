@@ -3,6 +3,7 @@ import { FlatList, Dimensions, StyleSheet, TouchableOpacity, TextInput, Keyboard
 import { SafeAreaView } from 'react-navigation';
 import Modal from "react-native-modal";
 import Carousel from 'react-native-snap-carousel';
+import { ProgressBar } from '../../globals/styledcomponents';
 import { Activity } from "_atoms"
 //activity lists for each wellness category
 //once database is setup, these will be pulled from there
@@ -18,33 +19,47 @@ const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
     header: {
         height: 60,
-        padding: 15,
+        paddingTop: 15,
+        paddingBottom: 5,
         alignSelf: 'center',
-        backgroundColor: '#0155A4',
+        justifyContent: 'center',
+        alignItems: 'center',
+        //backgroundColor: '#0155A4',
+        backgroundColor: 'white',
         width: '100%',
+        height: 'auto',
+
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,  
+        elevation: 5
     },
     headerText: {
-        color: 'white',
+        //color: 'white',
+        color: '#0155A4',
         fontSize: 23,
         textAlign: 'center',
     },
     buttons: {
-        backgroundColor: '#0155A4',
+        //backgroundColor: '#0155A4',
+        backgroundColor: 'white',
         width: '100%',
         alignSelf: 'center',
-        marginTop: 1,
         flexDirection: 'row', 
         justifyContent: 'space-between', 
         alignItems: 'center'
     },
     carouselItemText: {
-        color: 'white', 
+        //color: 'white', 
+        color: '#0155A4', 
         fontSize: 25, 
         alignSelf: 'center'
     },
     arrowText: {
         fontSize: 27, 
-        color: 'white', 
+        //color: 'white', 
+        color: '#0155A4',
         fontWeight: '600', 
     },
     text: {
@@ -52,9 +67,17 @@ const styles = StyleSheet.create({
     },
     listItem: {
         padding: 15,
-        backgroundColor: '#f8f8f8',
-        borderBottomWidth: 1,
+        //backgroundColor: '#f8f8f8',
+        backgroundColor: 'white',
+        marginTop: 5,
         borderColor: '#eee',
+        borderRadius: 50,
+
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,  
+        elevation: 5
     },
     listItemView: {
         flexDirection: 'row',
@@ -88,6 +111,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#f8f8f8',
         borderBottomWidth: 1,
         borderColor: '#eee',
+
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,  
+        elevation: 5
     },
     customActView: {
         flexDirection: 'row',
@@ -189,7 +218,7 @@ const CategoryCarousel = ({setItems}) => {
         <View style={styles.buttons}>
             <View style={{width: '10%', alignItems: 'center'}}>
                 <TouchableOpacity onPress={() => { carousel.snapToPrev(); }}>
-                    <Text style={[styles.arrowText, {paddingLeft: 15}]}>{'<'}</Text>
+                    <Text style={[styles.arrowText, {paddingLeft: 15}]}>{'◁'}</Text>
                 </TouchableOpacity>
             </View>
             <Carousel
@@ -197,7 +226,7 @@ const CategoryCarousel = ({setItems}) => {
                 data={items}
                 renderItem={({ item }) => {
                     return (
-                        <View style={{backgroundColor: '#0155A4', width: '100%'}}>
+                        <View style={{backgroundColor: 'white', width: '100%'}}>
                             <Text style={styles.carouselItemText}>{item}</Text>
                         </View>
                     );
@@ -212,7 +241,7 @@ const CategoryCarousel = ({setItems}) => {
             />
             <View style={{width: '10%', alignItems: 'center'}}>
                 <TouchableOpacity onPress={() => { carousel.snapToNext(); }}>
-                    <Text style={[styles.arrowText, {paddingRight: 15}]}>{'>'}</Text>
+                    <Text style={[styles.arrowText, {paddingRight: 15}]}>{'▷'}</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -268,10 +297,15 @@ const ActivitiesScreen = () => {
         <SafeAreaView style={{flex: 1}}>
             <View style={styles.header}>
                 <Text style={styles.headerText}>{state.points}</Text>
+                {/* <Text>Level 26</Text> */}
+                <ProgressBar milestone={100} points={50} width={windowWidth * 0.6}/>
+                {/* <Text>50 points to the next level</Text> */}
+                <CategoryCarousel setItems={setItems}/>
             </View>
-            <CategoryCarousel setItems={setItems}/>
+            
             <View style={{flex: 1}}>
                 <FlatList
+                    contentContainerStyle={{paddingBottom: 20}}
                     data={items}
                     renderItem={({ item }) => {
                         if(item.available) {
