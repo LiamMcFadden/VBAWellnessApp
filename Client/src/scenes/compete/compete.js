@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
 import SwitchSelector from 'react-native-switch-selector';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ProfilePicture from 'react-native-profile-picture';
+import { getAllUsers, getCurrentUser } from '../../api/firebase-db';
 
 // TODO: replace this with db query of some sort
 import {
@@ -271,6 +272,15 @@ const PlayerCard = (props) => {
 }
 
 const Compete = () => {
+    const [users, setUsers] = useState([]);
+    useEffect(() => {
+        getAllUsers().then(allUsers => {
+            setUsers(allUsers); 
+            // this gets da data
+            console.log(allUsers.docs[0].data());
+        });
+    }, []);
+
     return (
         <View style={{flex:1}}>
             <PointsorBadges/>
