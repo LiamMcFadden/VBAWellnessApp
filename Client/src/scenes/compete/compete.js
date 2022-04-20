@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, RefreshControl, Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
 import SwitchSelector from 'react-native-switch-selector';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ProfilePicture from 'react-native-profile-picture';
 import { getAllUsers, getCurrentUser } from '../../api/firebase-db';
+import { render } from 'express/lib/response';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -15,9 +16,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: "#0155A4",
         marginBottom: 10
-    },
-    pointsorbadges: {
-        marginTop: 20
     },
     selector: {
         width: (windowWidth*.75),
@@ -75,6 +73,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: "#0155A4",
         marginBottom: 10
+    },
+    refreshButton: {
+        alignSelf: 'flex-end',
+        marginRight: 20,
+        marginTop: 20
     }
 });
 
@@ -89,13 +92,14 @@ const PointsorBadges = () => {
     ];
 
     return (
-        <View style={styles.pointsorbadges}>
+        <View> 
             <Text style={styles.header}>Leaderboard</Text>
             <SwitchSelector 
                 style={styles.selector}
                 options={options} 
                 initial={0} 
-                onPress={value => pointsOrBadges=value} 
+                // TODO: make dis do something
+                onPress={value => value} 
                 backgroundColor={"#A9A9A9"}
                 buttonColor={"white"}
                 textColor={"#0155A4"} 
@@ -269,70 +273,110 @@ const PlayerCard = (props) => {
     );
 }
 
+const wait = (timeout) => {
+    return new Promise(resolve => {
+        setTimeout(resolve, timeout);
+    });
+}
+
+
 const Compete = () => {
     const [users, setUsers] = useState([]);
     const [first, setFirst] = useState([]);
     const [second, setSecond] = useState([]);
     const [third, setThird] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
 
-    useEffect(() => {
+    /**
+     * Gets all users from the database, sorts them by points, and then sets the first, second, and third place users
+     */
+    const getUsers = () => {
         getAllUsers().then(allUsers => {
-            tempUsers = [];
+                    tempUsers = [];
 
-            // get array of user data
-            allUsers.docs.map((doc) => {tempUsers.push(doc.data())});
+                    // get array of user data
+                    allUsers.docs.map((doc) => {tempUsers.push(doc.data())});
 
-            // sort by points and assign ranks
-            tempUsers.sort((a, b) => (a.points < b.points) ? 1 : -1);
-            tempUsers.map((user, index) => { 
-                user.rank = index + 1; 
-                
-                /**
-                 * set first, second, and third place users for use as props later on
-                 * I'm doing this so we don't have to pass the the entire array of users
-                 * as a prop
-                 */
-                switch (index) {
-                    case 0:
-                        setFirst(user);
-                        break;
-                    case 1:
-                        setSecond(user);
-                        break;
-                    case 2:
-                        setThird(user);
-                        break;
-                    default:
-                        break;
-                }
-            });
+                    // sort by points and assign ranks
+                    tempUsers.sort((a, b) => (a.points < b.points) ? 1 : -1);
+                    tempUsers.map((user, index) => { 
+                        user.rank = index + 1; 
+                        
+                        /**
+                         * set first, second, and third place users for use as props later on
+                         * I'm doing this so we don't have to pass the the entire array of users
+                         * as a prop
+                         */
+                        switch (index) {
+                            case 0:
+                                setFirst(user);
+                                break;
+                            case 1:
+                                setSecond(user);
+                                break;
+                            case 2:
+                                setThird(user);
+                                break;
+                            default:
+                                break;
+                        }
+                    });
 
-            setUsers(tempUsers); 
-        });
+                    setUsers(tempUsers); 
+                });
+    }
+
+    // used for pull to refresh functionality
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        getUsers();
+        setRefreshing(false);
     }, []);
 
-    return (
-        <View style={{flex:1}}>
-            <PointsorBadges/>
-            <First/>
-            <FirstLabel
-                props={first}
-            />
-            <SecondAndThird/>
-            <SecondAndThirdLabels
-                props={[second, third]}
-            />
-            <View style={{flex:1}}>
-                <FlatList
-                    data={users}
-                    renderItem={({item}) => (
-                        <PlayerCard
-                            props={item}
-                        />
-                    )}
+    useEffect(getUsers, []);
+
+    // refresh button, refreshed with no indicator at the moment
+    const RefreshButton = () => {
+        return (
+            <View style={styles.refreshButton}>
+                <Ionicons 
+                    name="md-refresh" 
+                    size={30} 
+                    color="#0155A4" 
+                    onPress={() => onRefresh()}
                 />
             </View>
-        </View>
+        );
+    };
+
+    return (
+        <SafeAreaView style={{flex:1}}>
+            <View style={{flex:1}}>
+                <RefreshButton/>
+                <PointsorBadges/>
+                <First/>
+                <FirstLabel
+                    props={first}
+                />
+                <SecondAndThird/>
+                <SecondAndThirdLabels
+                    props={[second, third]}
+                />
+                <View style={{flex:1}}>
+                    <FlatList
+                        data={users}
+                        renderItem={({item}) => (
+                            <PlayerCard
+                                props={item}
+                            />
+                        )}
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                        }
+                    />
+                </View>
+            </View>
+        </SafeAreaView>
     );
 }
 
