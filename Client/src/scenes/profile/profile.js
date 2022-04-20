@@ -1,4 +1,5 @@
-import * as React from 'react';
+/* eslint-disable react-native/no-inline-styles */
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -8,10 +9,19 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {COLORS, TYPESCALE} from '../../globals/styles';
-
+import {
+  VictoryPolarAxis,
+  VictoryChart,
+  VictoryPie,
+  VictoryTheme,
+  VictoryBar,
+  VictoryArea,
+  VictoryLabel,
+} from 'victory-native';
 import {OutlinedButton, ContainedButton} from '../../globals/styledcomponents';
+import SwitchSelector from 'react-native-switch-selector';
 
-import ProgressBar from './progressbar';
+import {ProgressBar} from '../../globals/styledcomponents';
 
 const user = {
   firstname: 'John',
@@ -19,32 +29,43 @@ const user = {
   username: 'johnnysmith123',
   points: 79,
   milestone: 100,
+  categoryOverview: [
+    {x: 'Occupational', y: 25},
+    {x: 'Intellectual', y: 12},
+    {x: 'Spritual', y: 19},
+    {x: 'Physical', y: 9},
+    {x: 'Emotional', y: 5},
+    {x: 'Social', y: 8},
+  ],
 };
 
-//const Graph = ({totalPoints, categories}) => {};
-
-const ProgressB = ({milestone, points, width}) => {
-  const percentComplete = points / milestone;
-  return (
-    <View
-      style={{
-        backgroundColor: COLORS.secondary,
-        width: width,
-        borderRadius: 24,
-        height: 10,
-      }}>
-      <View
-        style={{
-          backgroundColor: COLORS.primary,
-          width: percentComplete * width,
-          height: 10,
-          borderRadius: 24,
-        }}
+const BarChart = ({width}) => (
+  <VictoryPie
+    animate={{duration: 2000}}
+    colorScale={['tomato', 'orange', 'gold', 'cyan', 'navy']}
+    responsive={true}
+    data={user.categoryOverview}
+    width={width * 0.7}
+    margin={0}
+    labelComponent={
+      <VictoryLabel
+        size={6}
+        verticalAnchor={({text}) => (text.length > 1 ? 'start' : 'middle')}
+        textAnchor={({text}) => (text.length > 1 ? 'start' : 'middle')}
       />
-    </View>
-  );
-};
+    }
+  />
+);
 
+const PolarChart = ({width}) => (
+  <VictoryChart polar domain={{x: [0, 360]}} theme={VictoryTheme.material}>
+    <VictoryArea
+      data={user.categoryOverview}
+      style={{data: {fill: '#c43a31', stroke: 'black', strokeWidth: 2}}}
+    />
+    <VictoryPolarAxis />
+  </VictoryChart>
+);
 const Background = () => (
   <View style={styles.backgroundContainer}>
     <View style={styles.backgroundTop} />
@@ -54,6 +75,7 @@ const Background = () => (
 
 export default function Profile({navigation}) {
   const {height: wheight, width: wwidth} = useWindowDimensions();
+  const [showBar, setShowBar] = useState(true);
   return (
     <>
       <Background />
@@ -80,7 +102,7 @@ export default function Profile({navigation}) {
 
           <View style={{alignItems: 'center', marginTop: 15}}>
             <Text style={[TYPESCALE.subtitle]}>Level. 7</Text>
-            <ProgressB
+            <ProgressBar
               points={user.points}
               milestone={user.milestone}
               width={wwidth / 1.5}
@@ -92,23 +114,17 @@ export default function Profile({navigation}) {
           style={{
             position: 'absolute',
             top: 0.3 * wheight,
-            justifyContent: 'space-between',
+            justifyContent: 'flex-start',
             alignItems: 'center',
             height: 0.5 * wheight,
             width: wwidth,
           }}>
-          {/*
-            *<ProgressBar
-            *  points={user.points}
-            *  milestone={user.milestone}
-            *  size={100}
-            >
-            */}
           <Text
             style={[
               TYPESCALE.h6,
               {
                 alignSelf: 'flex-start',
+                marginBottom: 20,
                 marginLeft: Math.abs(wwidth * 1.1 - wwidth),
               },
             ]}>
@@ -117,7 +133,7 @@ export default function Profile({navigation}) {
           <View
             style={{
               backgroundColor: 'white',
-              width: wwidth * 0.9,
+              width: wwidth * 0.95,
               height: 0.35 * wheight,
               borderRadius: 6,
               shadowOffset: {
@@ -127,7 +143,33 @@ export default function Profile({navigation}) {
               shadowOpacity: 0.1,
               shadowRadius: 1,
               elevation: 8,
-            }}></View>
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 0,
+              marginBottom: 20,
+            }}>
+            {showBar ? (
+              <BarChart width={wwidth} />
+            ) : (
+              <PolarChart width={wwidth} />
+            )}
+          </View>
+          <View style={{width: '80%'}}>
+            <SwitchSelector
+              options={[
+                {label: 'Pie Chart', value: true},
+                {label: 'Radar', value: false},
+              ]}
+              onPress={e => setShowBar(e)}
+              initial={0}
+              textColor={COLORS.primary}
+              selectedColor={'#fff'}
+              buttonColor={COLORS.primary}
+              borderColor={COLORS.primary}
+              height={30}
+              hasPadding
+            />
+          </View>
         </View>
       </SafeAreaView>
     </>
