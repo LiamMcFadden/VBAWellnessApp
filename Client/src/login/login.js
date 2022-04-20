@@ -52,7 +52,9 @@ const styles = StyleSheet.create({
   },
 
   form: {
-    height: '45%',
+    //height: '45%',
+    height: 'auto',
+    paddingVertical: 10,
     width: '90%',
     backgroundColor: '#fcfcfc',
     borderRadius: 10,
@@ -70,11 +72,12 @@ const styles = StyleSheet.create({
   textInput: {
     margin: 3,
     width: '80%',
-    height: 35,
+    //height: 35,
     backgroundColor: 'rgba(1, 85, 164, 0.1)',
     borderRadius: 3,
     textAlign: 'center',
     fontSize: 18,
+    height: 'auto'
   },
 
   signInBtn: {

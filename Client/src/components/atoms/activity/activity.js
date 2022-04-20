@@ -8,7 +8,12 @@ import {
 
 const Activity = ({activity, action, toggleView}) => {
 
-    const stats = getCurrentUserActivityStats(activity.uid);
+    let stats = getCurrentUserActivityStats(activity.uid);
+    if(stats == undefined) {
+        stats = {
+            timesTotal: 0,
+        };
+    }
 
     const completeActivity = () => {
         action(activity);
@@ -26,7 +31,7 @@ const Activity = ({activity, action, toggleView}) => {
             </View>
             <View style={{flexDirection: 'row', flexshrink: 1, justifyContent: 'space-between'}}>
                 {/* TODO: change below value to activity.timesTotal when updating database works */}
-                <Text style={styles.timesCompletedText}>Times Completed: {stats ? stats.timesTotal : 0}</Text>
+                <Text style={styles.timesCompletedText}>Times Completed: {stats.timesTotal}</Text>
                 <View style={{flexDirection: 'row'}}>
                     {stats.timesTotal >= 3 
                         ? <Image source={require('_assets/images/BronzeBadgeIcon.png')} style={styles.badge}/>
