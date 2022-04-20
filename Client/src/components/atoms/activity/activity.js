@@ -1,14 +1,19 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, Image, Text, View } from 'react-native';
+import { State } from 'react-native-gesture-handler';
+
+import {
+    getCurrentUserActivityStats,
+} from '_api/firebase-db';
 
 const Activity = ({activity, action, toggleView}) => {
+
+    const stats = getCurrentUserActivityStats(activity.uid);
 
     const completeActivity = () => {
         action(activity);
         toggleView(false);
     }
-
-    const timesCompleted = 0;
 
     return (
         <View style={styles.modalBackground}>
@@ -21,17 +26,17 @@ const Activity = ({activity, action, toggleView}) => {
             </View>
             <View style={{flexDirection: 'row', flexshrink: 1, justifyContent: 'space-between'}}>
                 {/* TODO: change below value to activity.timesTotal when updating database works */}
-                <Text style={styles.timesCompletedText}>Times Completed: 0</Text>
+                <Text style={styles.timesCompletedText}>Times Completed: {stats ? stats.timesTotal : 0}</Text>
                 <View style={{flexDirection: 'row'}}>
-                    {timesCompleted >= 3 
+                    {stats.timesTotal >= 3 
                         ? <Image source={require('_assets/images/BronzeBadgeIcon.png')} style={styles.badge}/>
                         : <Image source={require('_assets/images/MissingBadgeIcon.png')} style={styles.badge}/>
                     }
-                    {timesCompleted >= 5 
+                    {stats.timesTotal >= 5 
                         ? <Image source={require('_assets/images/SilverBadgeIcon.png')} style={styles.badge}/>
                         : <Image source={require('_assets/images/MissingBadgeIcon.png')} style={styles.badge}/>
                     }
-                    {timesCompleted >= 10 
+                    {stats.timesTotal >= 10 
                         ? <Image source={require('_assets/images/GoldBadgeIcon.png')} style={styles.badge}/>
                         : <Image source={require('_assets/images/MissingBadgeIcon.png')} style={styles.badge}/>
                     }
@@ -87,6 +92,7 @@ const styles = StyleSheet.create({
         width: '75%',
         fontSize: 28,
         color: 'white',
+        textAlign: 'center'
     },
     timesCompletedText: {
         margin: 5, 
