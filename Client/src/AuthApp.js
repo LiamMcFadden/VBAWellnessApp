@@ -3,6 +3,7 @@ import {Text, View} from 'react-native';
 import Login from './login/login';
 import BottomTabs from './navigation/app-navigator';
 
+import {UserProvider} from './components/Authentication/user';
 import {subscribeToAuthState, currentUser} from '_api/firebase-auth';
 import {fetch, clear} from '_api/firebase-db';
 
@@ -40,14 +41,15 @@ export const AppRouter = () => {
       subscriptionCallback(currentUser());
     } else {
       let subscription = subscribeToAuthState(subscriptionCallback);
-      return subscription;
-    } 
+    }
   }, []);
 
   return isLoading ? (
     <LoadingScreen />
   ) : authenticated ? (
-    <BottomTabs />
+    <UserProvider>
+      <BottomTabs />
+    </UserProvider>
   ) : (
     <Login />
   );

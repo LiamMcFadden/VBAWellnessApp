@@ -1,19 +1,11 @@
 import auth from '@react-native-firebase/auth';
-import {clear} from 'react-native/Libraries/LogBox/Data/LogBoxData';
-import {addUser} from './firebase-db';
+import {clear} from './firebase-db';
 
 const signIn = (email, password) => {
   return auth().signInWithEmailAndPassword(email, password);
 };
-const register = async (
-  email,
-  password,
-  firstName,
-  lastName,
-  competitionId,
-) => {
-  const res = await auth().createUserWithEmailAndPassword(email, password);
-  addUser(res.uid, email, firstName, lastName, competitionId);
+const register = (email, password) => {
+  return auth().createUserWithEmailAndPassword(email, password);
 };
 const signOut = async () => {
   const res = await auth().signOut();
