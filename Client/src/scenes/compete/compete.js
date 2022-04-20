@@ -5,14 +5,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import ProfilePicture from 'react-native-profile-picture';
 import { getAllUsers, getCurrentUser } from '../../api/firebase-db';
 
-// TODO: replace this with db query of some sort
-import {
-    top10
-} from '../compete/data';
-
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
-let pointsOrBadges = "points";
 
 const styles = StyleSheet.create({
     header: {
@@ -145,9 +139,8 @@ const First = () => {
     );
 }
 
-const FirstLabel = () => {
-    // TODO: replace with query to db
-    let name = "Jim";
+const FirstLabel = (props) => {
+    let name = props.props.firstName;
     return (
         <Text style={styles.pfpName}>{name}</Text>
     );
@@ -209,20 +202,23 @@ const SecondAndThird = () => {
     );
 }
 
-const SecondAndThirdLabels = () => {
-    // TODO: replace with query to db
-    let nameFirst = "Bob"
-    let nameSecond = "Sally"
+const SecondAndThirdLabels = (props) => {
+    let nameSecond = props.props[0].firstName;
+    let nameThird = props.props[1].firstName;
     return (
         <View style={styles.secondandthird}>
-            <Text style={styles.pfpName}>{nameFirst}</Text>
             <Text style={styles.pfpName}>{nameSecond}</Text>
+            <Text style={styles.pfpName}>{nameThird}</Text>
         </View>
     );
 }
 
-/*
+/** 
  * Displays a users name, rank, pfp/icon, and score/badges
+ * 
+ * TODO: * add some sort of refresh feature
+ *          - (i.e. if user refreshes page, it will update the leaderboard)
+ *       * pfp stuff 
  */
 const PlayerCard = (props) => {
     let backgroundColor = 'white';
@@ -249,23 +245,25 @@ const PlayerCard = (props) => {
             />
     }
 
-    switch (props.props.rank) {
-        case 1:
-            backgroundColor = 'gold';
-            break;
-        case 2:
-            backgroundColor = 'silver';
-            break;
-        case 3:
-            backgroundColor = '#CD7F32';
-            break;
+    if (props.props.rank) {
+        switch (props.props.rank) {
+            case 1:
+                backgroundColor = 'gold';
+                break;
+            case 2:
+                backgroundColor = 'silver';
+                break;
+            case 3:
+                backgroundColor = '#CD7F32';
+                break;
+        }
     }
 
     return (
         <View style={[styles.playerCard, {backgroundColor: backgroundColor}]}>
             <Text style={styles.playerRank}> {props.props.rank} </Text>
             {pfp}
-            <Text style={styles.playerName}>{props.props.name}</Text>
+            <Text style={styles.playerName}>{props.props.firstName}</Text>
             <Text style={styles.playerPoints}>{props.props.points} pts</Text>
         </View>
     );
@@ -273,11 +271,43 @@ const PlayerCard = (props) => {
 
 const Compete = () => {
     const [users, setUsers] = useState([]);
+    const [first, setFirst] = useState([]);
+    const [second, setSecond] = useState([]);
+    const [third, setThird] = useState([]);
+
     useEffect(() => {
         getAllUsers().then(allUsers => {
-            setUsers(allUsers); 
-            // this gets da data
-            console.log(allUsers.docs[0].data());
+            tempUsers = [];
+
+            // get array of user data
+            allUsers.docs.map((doc) => {tempUsers.push(doc.data())});
+
+            // sort by points and assign ranks
+            tempUsers.sort((a, b) => (a.points < b.points) ? 1 : -1);
+            tempUsers.map((user, index) => { 
+                user.rank = index + 1; 
+                
+                /**
+                 * set first, second, and third place users for use as props later on
+                 * I'm doing this so we don't have to pass the the entire array of users
+                 * as a prop
+                 */
+                switch (index) {
+                    case 0:
+                        setFirst(user);
+                        break;
+                    case 1:
+                        setSecond(user);
+                        break;
+                    case 2:
+                        setThird(user);
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            setUsers(tempUsers); 
         });
     }, []);
 
@@ -285,12 +315,16 @@ const Compete = () => {
         <View style={{flex:1}}>
             <PointsorBadges/>
             <First/>
-            <FirstLabel/>
+            <FirstLabel
+                props={first}
+            />
             <SecondAndThird/>
-            <SecondAndThirdLabels/>
+            <SecondAndThirdLabels
+                props={[second, third]}
+            />
             <View style={{flex:1}}>
                 <FlatList
-                    data={top10}
+                    data={users}
                     renderItem={({item}) => (
                         <PlayerCard
                             props={item}
