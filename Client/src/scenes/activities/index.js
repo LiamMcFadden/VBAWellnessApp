@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { FlatList, Dimensions, StyleSheet, TouchableOpacity, TextInput, Keyboard, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Modal from "react-native-modal";
@@ -7,12 +7,9 @@ import { Activity } from "_atoms"
 //activity lists for each wellness category
 //once database is setup, these will be pulled from there
 import {
-    getCurrentUser,
     getActivitiesByCategory,
-    updateCurrentUserFields,
-    completeActivityForCurrentUser
 } from '_api/firebase-db';
-import { AuthContext } from '_components';
+import { UserContext } from '_components/Authentication/user';
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -255,23 +252,7 @@ const CustomActPrompt = ({toggleView}) => {
 const ActivitiesScreen = () => {
     const [items, setItems] = useState(getActivitiesByCategory('Physical'));
 
-    const addPoints = points => {
-        console.log('adding')
-        setTotalPoints(totalPoints + points);
-    };
-
-    const action = item => {
-        const newTotal = totalPoints + item.points;
-    
-        setTotalPoints(newTotal);
-        completeActivityForCurrentUser(item.uid).catch(err => {
-          setTotalPoints(newTotal - points);
-          console.error(err);
-          //TODO: Alert connection error
-        });
-    }
-
-    const [totalPoints, setTotalPoints] = useState(getCurrentUser().points);
+    const {state, completeActivity} = useContext(UserContext);
 
     const [isModalVisible, setModalVisible] = useState(false);
     const [modalActivity, setModalActivity] = useState(null);
@@ -286,7 +267,7 @@ const ActivitiesScreen = () => {
     return (
         <SafeAreaView style={{flex: 1}}>
             <View style={styles.header}>
-                <Text style={styles.headerText}>{totalPoints}</Text>
+                <Text style={styles.headerText}>{state.points}</Text>
             </View>
             <CategoryCarousel setItems={setItems}/>
             <View style={{flex: 1}}>
@@ -310,7 +291,7 @@ const ActivitiesScreen = () => {
                 </TouchableOpacity>
             </View>
             <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)}>
-                <Activity activity={modalActivity} action={action} toggleView={setModalVisible}/>
+                <Activity activity={modalActivity} action={completeActivity} toggleView={setModalVisible}/>
             </Modal>
             <Modal isVisible={customModalVisible} onBackdropPress={() => setCustomModalVisible(false)}>
                 <CustomActPrompt toggleView={setCustomModalVisible}/>

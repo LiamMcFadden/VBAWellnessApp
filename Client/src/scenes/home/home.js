@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useContext} from 'react';
 import {
   Dimensions,
   FlatList,
@@ -10,13 +10,9 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SafeAreaView} from 'react-navigation';
 import {Header, ListItem} from '_atoms';
+import {UserContext} from '_components/Authentication/user';
 
-import {
-  getCurrentUser,
-  getActivitiesByCategory,
-  updateCurrentUserFields,
-  completeActivityForCurrentUser
-} from '_api/firebase-db';
+import {getActivitiesByCategory} from '_api/firebase-db';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -88,7 +84,8 @@ const styles = StyleSheet.create({
  * // TODO Check Styles for responsiveness --> this might not be good Right now
  */
 const ProfileCard = () => {
-  const name = getCurrentUser().firstName + ' ' + getCurrentUser().lastName;
+  const context = useContext(UserContext);
+  const name = context.state.firstName + ' ' + context.state.lastName;
   return (
     <View style={styles.profileCard}>
       <Text style={styles.nameText}>{name}</Text>
@@ -105,24 +102,14 @@ const ProfileCard = () => {
   );
 };
 const Home = () => {
+  const {state, completeActivity} = useContext(UserContext);
+
   const [items, setItems] = useState(getActivitiesByCategory('Physical'));
 
-  const [totalPoints, setTotalPoints] = useState(getCurrentUser().points);
-
-  const action = item => {
-    const newTotal = totalPoints + item.points;
-
-    setTotalPoints(newTotal);
-    completeActivityForCurrentUser(item.uid).catch(err => {
-      setTotalPoints(newTotal - points);
-      console.error(err);
-      //TODO: Alert connection error
-    });
-  };
   return (
     <SafeAreaView>
       <ProfileCard />
-      <Header title={totalPoints} width={0.95 * windowWidth} />
+      <Header title={state.points} width={0.95 * windowWidth} />
       <View style={styles.buttons}>
         <Text
           style={styles.text}
@@ -157,7 +144,9 @@ const Home = () => {
       </View>
       <FlatList
         data={items}
-        renderItem={({item}) => <ListItem item={item} action={action} />}
+        renderItem={({item}) => (
+          <ListItem item={item} action={completeActivity} />
+        )}
       />
     </SafeAreaView>
   );
