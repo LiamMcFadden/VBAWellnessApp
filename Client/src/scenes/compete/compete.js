@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { SafeAreaView, RefreshControl, Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
 import SwitchSelector from 'react-native-switch-selector';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ProfilePicture from 'react-native-profile-picture';
 import { getAllUsers, getCurrentUser } from '../../api/firebase-db';
-import { render } from 'express/lib/response';
+import {UserContext} from '_components/Authentication/user';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-end',
         marginRight: 20,
         marginTop: 20
-    }
+    },
 });
 
 /*
@@ -114,7 +114,6 @@ const PointsorBadges = () => {
  */
 const First = () => {
     // TODO: replace with query to db
-    //let pfp = require('./test.png')
     let pfp = null;
 
     // use default icon if no pfp is found
@@ -155,7 +154,6 @@ const FirstLabel = (props) => {
  */
 const SecondAndThird = () => {
     // TODO: replace with query to db
-    //let pfpSecond = require('./test.png');
     let pfpSecond = null;
 
     // use default icon if no pfp is found
@@ -225,10 +223,11 @@ const SecondAndThirdLabels = (props) => {
  *       * pfp stuff 
  */
 const PlayerCard = (props) => {
+    const [points, setPoints] = useState(props.props.points);
+
     let backgroundColor = 'white';
 
     // TODO: replace with DB query
-    //let pfp = require('./test.png');
     let pfp = null;
     // use default icon if no pfp is found
     if (pfp === null) {
@@ -272,13 +271,6 @@ const PlayerCard = (props) => {
         </View>
     );
 }
-
-const wait = (timeout) => {
-    return new Promise(resolve => {
-        setTimeout(resolve, timeout);
-    });
-}
-
 
 const Compete = () => {
     const [users, setUsers] = useState([]);
@@ -326,6 +318,10 @@ const Compete = () => {
                 });
     }
 
+    // get current users for prop
+    const {state, completeActivity} = useContext(UserContext);
+    const currUser = users.filter(user => user.email === state.email)[0];
+
     // used for pull to refresh functionality
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
@@ -349,10 +345,11 @@ const Compete = () => {
         );
     };
 
+    //<RefreshButton/> -- deleted for now
     return (
         <SafeAreaView style={{flex:1}}>
             <View style={{flex:1}}>
-                <RefreshButton/>
+                <PlayerCard props={currUser}/>
                 <PointsorBadges/>
                 <First/>
                 <FirstLabel
