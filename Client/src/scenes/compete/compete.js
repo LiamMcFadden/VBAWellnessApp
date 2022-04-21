@@ -223,7 +223,7 @@ const SecondAndThirdLabels = (props) => {
  *       * pfp stuff 
  */
 const PlayerCard = (props) => {
-    const [points, setPoints] = useState(props.props.points);
+    props = props ? props : {};
 
     let backgroundColor = 'white';
 
@@ -274,17 +274,20 @@ const PlayerCard = (props) => {
 
 const Compete = () => {
     const [users, setUsers] = useState([]);
+    const [currUser, setCurrUser] = useState([]);
     const [first, setFirst] = useState([]);
     const [second, setSecond] = useState([]);
     const [third, setThird] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
+    const {state, completeActivity} = useContext(UserContext);
 
     /**
      * Gets all users from the database, sorts them by points, and then sets the first, second, and third place users
      */
     const getUsers = () => {
         getAllUsers().then(allUsers => {
-                    tempUsers = [];
+                    let tempUsers = [];
+                    let tempCurrUser = [];
 
                     // get array of user data
                     allUsers.docs.map((doc) => {tempUsers.push(doc.data())});
@@ -312,15 +315,17 @@ const Compete = () => {
                             default:
                                 break;
                         }
+
+                        if (user.email === state.email) {
+                            tempCurrUser = user;
+                        }
                     });
 
                     setUsers(tempUsers); 
+                    setCurrUser(tempCurrUser);
                 });
     }
 
-    // get current users for prop
-    const {state, completeActivity} = useContext(UserContext);
-    const currUser = users.filter(user => user.email === state.email)[0];
 
     // used for pull to refresh functionality
     const onRefresh = React.useCallback(() => {
@@ -346,6 +351,7 @@ const Compete = () => {
     };
 
     //<RefreshButton/> -- deleted for now
+    console.log(currUser);
     return (
         <SafeAreaView style={{flex:1}}>
             <View style={{flex:1}}>
