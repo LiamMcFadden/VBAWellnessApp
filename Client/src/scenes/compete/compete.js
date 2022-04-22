@@ -281,6 +281,23 @@ const Compete = () => {
     const [refreshing, setRefreshing] = useState(false);
     const {state, completeActivity} = useContext(UserContext);
 
+    // background refresh
+    // rate is set to 3 secs by default
+    const REFRESH_INTERVAL = 3000;
+    useEffect(() => {
+        const interval = setInterval(() => {
+            getUsers();
+        }, REFRESH_INTERVAL);
+        return () => clearInterval(interval);
+    }, []);
+
+    // used for pull to refresh functionality
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        getUsers();
+        setRefreshing(false);
+    }, []);
+
     /**
      * Gets all users from the database, sorts them by points, and then sets the first, second, and third place users
      */
@@ -333,14 +350,6 @@ const Compete = () => {
                     setCurrUser(tempCurrUser);
                 });
     }
-
-
-    // used for pull to refresh functionality
-    const onRefresh = React.useCallback(() => {
-        setRefreshing(true);
-        getUsers();
-        setRefreshing(false);
-    }, []);
 
     useEffect(getUsers, []);
 
