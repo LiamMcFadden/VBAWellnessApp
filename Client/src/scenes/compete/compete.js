@@ -294,8 +294,16 @@ const Compete = () => {
 
                     // sort by points and assign ranks
                     tempUsers.sort((a, b) => (a.points < b.points) ? 1 : -1);
+                    let prev = tempUsers[0];
                     tempUsers.map((user, index) => { 
-                        user.rank = index + 1; 
+                        // handle ties
+                        if (user.points === prev.points && prev.rank) 
+                            user.rank = prev.rank;
+                        else if (user.points === prev.points && !prev.rank) 
+                            user.rank = index + 1;
+                        else 
+                            user.rank = prev.rank + 1;
+                        prev = user;
                         
                         /**
                          * set first, second, and third place users for use as props later on
@@ -351,7 +359,6 @@ const Compete = () => {
     };
 
     //<RefreshButton/> -- deleted for now
-    console.log(currUser);
     return (
         <SafeAreaView style={{flex:1}}>
             <View style={{flex:1}}>
