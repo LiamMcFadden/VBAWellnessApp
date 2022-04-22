@@ -115,8 +115,8 @@ const getCompetitionById = competitionId => {
     .get();
 };
 
-const getAllUsers = async () => {
-  await firestore().collection(USERS_COLLECTION).get();
+const getAllUsers = () => {
+  return firestore().collection(USERS_COLLECTION).get();
 };
 
 /*

@@ -1,17 +1,13 @@
-import React from 'react';
-import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
+import React, { useContext, useState, useEffect } from 'react';
+import { SafeAreaView, RefreshControl, Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
 import SwitchSelector from 'react-native-switch-selector';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ProfilePicture from 'react-native-profile-picture';
-
-// TODO: replace this with db query of some sort
-import {
-    top10
-} from '../compete/data';
+import { getAllUsers, getCurrentUser } from '../../api/firebase-db';
+import {UserContext} from '_components/Authentication/user';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
-let pointsOrBadges = "points";
 
 const styles = StyleSheet.create({
     header: {
@@ -20,9 +16,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: "#0155A4",
         marginBottom: 10
-    },
-    pointsorbadges: {
-        marginTop: 20
     },
     selector: {
         width: (windowWidth*.75),
@@ -80,7 +73,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: "#0155A4",
         marginBottom: 10
-    }
+    },
+    refreshButton: {
+        alignSelf: 'flex-end',
+        marginRight: 20,
+        marginTop: 20
+    },
 });
 
 /*
@@ -94,13 +92,14 @@ const PointsorBadges = () => {
     ];
 
     return (
-        <View style={styles.pointsorbadges}>
+        <View> 
             <Text style={styles.header}>Leaderboard</Text>
             <SwitchSelector 
                 style={styles.selector}
                 options={options} 
                 initial={0} 
-                onPress={value => pointsOrBadges=value} 
+                // TODO: make dis do something
+                onPress={value => value} 
                 backgroundColor={"#A9A9A9"}
                 buttonColor={"white"}
                 textColor={"#0155A4"} 
@@ -115,7 +114,6 @@ const PointsorBadges = () => {
  */
 const First = () => {
     // TODO: replace with query to db
-    //let pfp = require('./test.png')
     let pfp = null;
 
     // use default icon if no pfp is found
@@ -144,9 +142,8 @@ const First = () => {
     );
 }
 
-const FirstLabel = () => {
-    // TODO: replace with query to db
-    let name = "Jim";
+const FirstLabel = (props) => {
+    let name = props.props.firstName;
     return (
         <Text style={styles.pfpName}>{name}</Text>
     );
@@ -157,7 +154,6 @@ const FirstLabel = () => {
  */
 const SecondAndThird = () => {
     // TODO: replace with query to db
-    //let pfpSecond = require('./test.png');
     let pfpSecond = null;
 
     // use default icon if no pfp is found
@@ -208,26 +204,30 @@ const SecondAndThird = () => {
     );
 }
 
-const SecondAndThirdLabels = () => {
-    // TODO: replace with query to db
-    let nameFirst = "Bob"
-    let nameSecond = "Sally"
+const SecondAndThirdLabels = (props) => {
+    let nameSecond = props.props[0].firstName;
+    let nameThird = props.props[1].firstName;
     return (
         <View style={styles.secondandthird}>
-            <Text style={styles.pfpName}>{nameFirst}</Text>
             <Text style={styles.pfpName}>{nameSecond}</Text>
+            <Text style={styles.pfpName}>{nameThird}</Text>
         </View>
     );
 }
 
-/*
+/** 
  * Displays a users name, rank, pfp/icon, and score/badges
+ * 
+ * TODO: * add some sort of refresh feature
+ *          - (i.e. if user refreshes page, it will update the leaderboard)
+ *       * pfp stuff 
  */
 const PlayerCard = (props) => {
+    props = props ? props : {};
+
     let backgroundColor = 'white';
 
     // TODO: replace with DB query
-    //let pfp = require('./test.png');
     let pfp = null;
     // use default icon if no pfp is found
     if (pfp === null) {
@@ -248,47 +248,154 @@ const PlayerCard = (props) => {
             />
     }
 
-    switch (props.props.rank) {
-        case 1:
-            backgroundColor = 'gold';
-            break;
-        case 2:
-            backgroundColor = 'silver';
-            break;
-        case 3:
-            backgroundColor = '#CD7F32';
-            break;
+    if (props.props.rank) {
+        switch (props.props.rank) {
+            case 1:
+                backgroundColor = 'gold';
+                break;
+            case 2:
+                backgroundColor = 'silver';
+                break;
+            case 3:
+                backgroundColor = '#CD7F32';
+                break;
+        }
     }
 
     return (
         <View style={[styles.playerCard, {backgroundColor: backgroundColor}]}>
             <Text style={styles.playerRank}> {props.props.rank} </Text>
             {pfp}
-            <Text style={styles.playerName}>{props.props.name}</Text>
+            <Text style={styles.playerName}>{props.props.firstName}</Text>
             <Text style={styles.playerPoints}>{props.props.points} pts</Text>
         </View>
     );
 }
 
 const Compete = () => {
-    return (
-        <View style={{flex:1}}>
-            <PointsorBadges/>
-            <First/>
-            <FirstLabel/>
-            <SecondAndThird/>
-            <SecondAndThirdLabels/>
-            <View style={{flex:1}}>
-                <FlatList
-                    data={top10}
-                    renderItem={({item}) => (
-                        <PlayerCard
-                            props={item}
-                        />
-                    )}
+    const [users, setUsers] = useState([]);
+    const [currUser, setCurrUser] = useState([]);
+    const [first, setFirst] = useState([]);
+    const [second, setSecond] = useState([]);
+    const [third, setThird] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
+    const {state, completeActivity} = useContext(UserContext);
+
+    // background refresh
+    // rate is set to 3 secs by default
+    const REFRESH_INTERVAL = 3000;
+    useEffect(() => {
+        const interval = setInterval(() => {
+            getUsers();
+        }, REFRESH_INTERVAL);
+        return () => clearInterval(interval);
+    }, []);
+
+    // used for pull to refresh functionality
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        getUsers();
+        setRefreshing(false);
+    }, []);
+
+    /**
+     * Gets all users from the database, sorts them by points, and then sets the first, second, and third place users
+     */
+    const getUsers = () => {
+        getAllUsers().then(allUsers => {
+                    let tempUsers = [];
+                    let tempCurrUser = [];
+
+                    // get array of user data
+                    allUsers.docs.map((doc) => {tempUsers.push(doc.data())});
+
+                    // sort by points and assign ranks
+                    tempUsers.sort((a, b) => (a.points < b.points) ? 1 : -1);
+                    let prev = tempUsers[0];
+                    tempUsers.map((user, index) => { 
+                        // handle ties
+                        if (user.points === prev.points && prev.rank) 
+                            user.rank = prev.rank;
+                        else if (user.points === prev.points && !prev.rank) 
+                            user.rank = index + 1;
+                        else 
+                            user.rank = prev.rank + 1;
+                        prev = user;
+                        
+                        /**
+                         * set first, second, and third place users for use as props later on
+                         * I'm doing this so we don't have to pass the the entire array of users
+                         * as a prop
+                         */
+                        switch (index) {
+                            case 0:
+                                setFirst(user);
+                                break;
+                            case 1:
+                                setSecond(user);
+                                break;
+                            case 2:
+                                setThird(user);
+                                break;
+                            default:
+                                break;
+                        }
+
+                        if (user.email === state.email) {
+                            tempCurrUser = user;
+                        }
+                    });
+
+                    setUsers(tempUsers); 
+                    setCurrUser(tempCurrUser);
+                });
+    }
+
+    useEffect(getUsers, []);
+
+    // refresh button, refreshed with no indicator at the moment
+    const RefreshButton = () => {
+        return (
+            <View style={styles.refreshButton}>
+                <Ionicons 
+                    name="md-refresh" 
+                    size={30} 
+                    color="#0155A4" 
+                    onPress={() => onRefresh()}
                 />
             </View>
-        </View>
+        );
+    };
+
+    //<RefreshButton/> -- deleted for now
+    return (
+        <SafeAreaView style={{flex:1}}>
+            <View style={{flex:1}}>
+                <PlayerCard props={currUser}/>
+                <PointsorBadges/>
+                <First/>
+                <FirstLabel
+                    props={first}
+                />
+                <SecondAndThird/>
+                <SecondAndThirdLabels
+                    props={[second, third]}
+                />
+                <View style={{flex:1}}>
+                    <FlatList
+                        data={users}
+                        renderItem={({item}) => (
+                            <PlayerCard
+                                props={item}
+                            />
+                        )}
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                        }
+                    />
+                </View>
+            </View>
+        </SafeAreaView>
     );
 }
 
