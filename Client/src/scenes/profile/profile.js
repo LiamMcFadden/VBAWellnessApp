@@ -21,7 +21,7 @@ import {
 import {OutlinedButton, ContainedButton} from '../../globals/styledcomponents';
 import SwitchSelector from 'react-native-switch-selector';
 
-import {ProgressBar} from '../../globals/styledcomponents';
+import ProgressBar from './progressbar';
 
 const user = {
   firstname: 'John',
@@ -91,6 +91,7 @@ export default function Profile({navigation}) {
     {x: 'Social', y: 0},
   ]);
 
+  //TODO Replace with request or cached data?
   useEffect(() => {
     setChartData(user.categoryOverview);
   }, []);

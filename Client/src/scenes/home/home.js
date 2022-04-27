@@ -115,6 +115,7 @@ const Home = ({navigation}) => {
   };
   const action = item => {
     const newTotal = totalPoints + item.points;
+  };
 
   return (
     <SafeAreaView style={{backgroundColor: '#F3F4F7', height: '100%'}}>

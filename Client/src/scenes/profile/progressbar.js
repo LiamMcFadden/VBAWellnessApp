@@ -109,8 +109,7 @@ const styles = (width, percentComplete) =>
 //width: size,
 //height: size,
 //borderRadius: size / 2, //Circle
-//backgroundColor: 'white',
-//},
+//backgroundColor: 'white', },
 //progressBackground: {
 //width: size,
 //height: size,

@@ -12,7 +12,7 @@ target 'VBAWellnessApp' do
     :hermes_enabled => false
   )
 
-  pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
+
 
   target 'VBAWellnessAppTests' do
     inherit! :complete
