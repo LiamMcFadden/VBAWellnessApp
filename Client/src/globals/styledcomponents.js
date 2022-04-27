@@ -32,9 +32,7 @@ const OutlinedButton = ({
     underlayColor={COLORS.tintPrimary(0.2)}
     onPress={onPress}
     style={[BUTTONSTYLE.OUTLINED(width, height), buttonStyle]}>
-    <Text style={[TYPESCALE.button, {color: COLORS.primary}, textStyle]}>
-      {children}
-    </Text>
+    {children}
   </TouchableHighlight>
 );
 

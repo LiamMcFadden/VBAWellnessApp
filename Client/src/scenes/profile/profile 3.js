@@ -1,5 +1,4 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, {useState, useEffect} from 'react';
+import * as React from 'react';
 import {
   View,
   Text,
@@ -9,19 +8,10 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {COLORS, TYPESCALE} from '../../globals/styles';
-import {
-  VictoryPolarAxis,
-  VictoryChart,
-  VictoryPie,
-  VictoryTheme,
-  VictoryBar,
-  VictoryArea,
-  VictoryLabel,
-} from 'victory-native';
-import {OutlinedButton, ContainedButton} from '../../globals/styledcomponents';
-import SwitchSelector from 'react-native-switch-selector';
 
-import {ProgressBar} from '../../globals/styledcomponents';
+import {OutlinedButton, ContainedButton} from '../../globals/styledcomponents';
+
+import ProgressBar from './progressbar';
 
 const user = {
   firstname: 'John',
@@ -29,48 +19,31 @@ const user = {
   username: 'johnnysmith123',
   points: 79,
   milestone: 100,
-  categoryOverview: [
-    {x: 'Occupational', y: 25},
-    {x: 'Intellectual', y: 12},
-    {x: 'Spritual', y: 19},
-    {x: 'Physical', y: 9},
-    {x: 'Emotional', y: 5},
-    {x: 'Social', y: 8},
-  ],
 };
 
-const test = [
-  {x: 1, y: 2},
-  {x: 8, y: 3},
-  {x: 2, y: 5},
-  {x: 4, y: 1},
-  {x: 5, y: 8},
-];
+//const Graph = ({totalPoints, categories}) => {};
 
-const BarChart = ({data, width}) => (
-  <VictoryPie
-    animate={{easing: 'exp', duration: 5000}}
-    colorScale={[
-      '#003f5c',
-      '#444e86',
-      '#955196',
-      '#dd5182',
-      '#ff6e54',
-      '#ffa600',
-    ]}
-    responsive={true}
-    data={data}
-    width={width * 0.7}
-    margin={0}
-    labelComponent={
-      <VictoryLabel
-        size={6}
-        verticalAnchor={({text}) => (text.length > 1 ? 'start' : 'middle')}
-        textAnchor={({text}) => (text.length > 1 ? 'start' : 'middle')}
+const ProgressB = ({milestone, points, width}) => {
+  const percentComplete = points / milestone;
+  return (
+    <View
+      style={{
+        backgroundColor: COLORS.secondary,
+        width: width,
+        borderRadius: 24,
+        height: 10,
+      }}>
+      <View
+        style={{
+          backgroundColor: COLORS.primary,
+          width: percentComplete * width,
+          height: 10,
+          borderRadius: 24,
+        }}
       />
-    }
-  />
-);
+    </View>
+  );
+};
 
 const Background = () => (
   <View style={styles.backgroundContainer}>
@@ -81,19 +54,6 @@ const Background = () => (
 
 export default function Profile({navigation}) {
   const {height: wheight, width: wwidth} = useWindowDimensions();
-  const [showBar, setShowBar] = useState(true);
-  const [chartData, setChartData] = useState([
-    {x: 'Occupational', y: 100},
-    {x: 'Intellectual', y: 0},
-    {x: 'Spritual', y: 0},
-    {x: 'Physical', y: 0},
-    {x: 'Emotional', y: 0},
-    {x: 'Social', y: 0},
-  ]);
-
-  useEffect(() => {
-    setChartData(user.categoryOverview);
-  }, []);
   return (
     <>
       <Background />
@@ -120,7 +80,7 @@ export default function Profile({navigation}) {
 
           <View style={{alignItems: 'center', marginTop: 15}}>
             <Text style={[TYPESCALE.subtitle]}>Level. 7</Text>
-            <ProgressBar
+            <ProgressB
               points={user.points}
               milestone={user.milestone}
               width={wwidth / 1.5}
@@ -132,17 +92,23 @@ export default function Profile({navigation}) {
           style={{
             position: 'absolute',
             top: 0.3 * wheight,
-            justifyContent: 'flex-start',
+            justifyContent: 'space-between',
             alignItems: 'center',
             height: 0.5 * wheight,
             width: wwidth,
           }}>
+          {/*
+            *<ProgressBar
+            *  points={user.points}
+            *  milestone={user.milestone}
+            *  size={100}
+            >
+            */}
           <Text
             style={[
               TYPESCALE.h6,
               {
                 alignSelf: 'flex-start',
-                marginBottom: 20,
                 marginLeft: Math.abs(wwidth * 1.1 - wwidth),
               },
             ]}>
@@ -151,7 +117,7 @@ export default function Profile({navigation}) {
           <View
             style={{
               backgroundColor: 'white',
-              width: wwidth * 0.95,
+              width: wwidth * 0.9,
               height: 0.35 * wheight,
               borderRadius: 6,
               shadowOffset: {
@@ -161,13 +127,7 @@ export default function Profile({navigation}) {
               shadowOpacity: 0.1,
               shadowRadius: 1,
               elevation: 8,
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 0,
-              marginBottom: 20,
-            }}>
-            <BarChart data={chartData} width={wwidth} />
-          </View>
+            }}></View>
         </View>
       </SafeAreaView>
     </>
