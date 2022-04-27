@@ -61,7 +61,7 @@ const BUTTONSTYLE = {
   // Should also use TouchableHighlight for this as it darkens background
   // On Press
   OUTLINED: (width, height) => ({
-    minWidth: width,
+    width: width,
     height: height,
     alignItems: 'center',
     justifyContent: 'center',
@@ -109,15 +109,30 @@ const FONTWEIGHT = {
  *
  * */
 const TYPESCALE = {
+  h3: {
+    ...FONTWEIGHT.regular,
+    fontSize: 48,
+    letterSpacing: 0,
+  },
+  h4: {
+    ...FONTWEIGHT.regular,
+    fontSize: 38,
+    letterSpacing: 0.25,
+  },
+  h5: {
+    ...FONTWEIGHT.regular,
+    fontSize: 24,
+    letterSpacing: 0,
+  },
   h6: {
     ...FONTWEIGHT.medium,
     fontSize: 20,
     letterSpacing: 0.15,
   },
-  h5: {
-    ...FONTWEIGHT.thin,
-    fontSize: 24,
-    letterSpacing: 0,
+  body1: {
+    ...FONTWEIGHT.regular,
+    fontSize: 15,
+    letterSpacing: 0.5,
   },
   subtitle: {
     fontWeight: 'normal',
