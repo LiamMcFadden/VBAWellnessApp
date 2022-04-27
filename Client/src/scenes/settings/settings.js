@@ -8,7 +8,6 @@ import Admin from '_scenes/admin/admin';
 import storage from '@react-native-firebase/storage';
 import { currentUser } from '_api/firebase-auth';
 import { _taskHandle } from 'react-native/Libraries/Interaction/Batchinator';
-import { launchImageLibrary } from 'react-native-image-picker';
 import * as ImagePicker from 'react-native-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -102,12 +101,12 @@ const SettingsScreen = ({navigation}) => {
       <Text>Settings</Text>
       <Button title="Sign out" onPress={signOutValidation} />
       <UploadScreen/>
-      {{getCurrentUser().admin === true && (
+      {getCurrentUser().admin === true && (
         <View>
           <Text>Admin Settings</Text>
           <Button title="Admin" onPress={() => navigation.navigate('Admin')} />
         </View>
-      )}}
+      )}
     </View>
   );
 }
@@ -119,10 +118,10 @@ const Settings = () => {
             name='SettingsScreen'
             component={SettingsScreen}
         />
-        {/* <Stack.Screen
+        <Stack.Screen
             name='Admin'
             component={Admin}
-        /> */}
+        />
     </Stack.Navigator>
     
 );
