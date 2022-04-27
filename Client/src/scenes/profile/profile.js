@@ -51,7 +51,7 @@ const test = [
 
 const BarChart = ({data, width}) => (
   <VictoryPie
-    animate={{easing: 'exp', duration: 5000}}
+    // animate={{easing: 'exp', duration: 5000}}
     colorScale={[
       '#003f5c',
       '#444e86',
