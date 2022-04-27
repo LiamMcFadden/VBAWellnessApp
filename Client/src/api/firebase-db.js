@@ -16,7 +16,7 @@ const CATEGORIES = [
 let currentUser;
 let competition;
 let activities;
-
+//Security Rules: https://www.sentinelstand.com/article/firestore-security-rules-examples
 const fetch = async userId => {
   let userAndCompetitionPromise = firestore()
     .collection(USERS_COLLECTION)
@@ -24,7 +24,6 @@ const fetch = async userId => {
     .get()
     .then(res => {
       currentUser = res.data();
-
       if (
         currentUser.competition != null &&
         currentUser.competition.length > 0
@@ -63,27 +62,28 @@ const getActivities = () => {
   return activities;
 };
 const getActivityById = activityUid => {
+  let activity;
   activities.forEach(category => {
-    let found = category.find((activity) => {
-      activity.uid == activityUid
+    let found = category.activities.find(({uid}) => {
+      return uid === activityUid;
     });
-    if(found) {
-      return found;
+    if (found) {
+      activity = found;
     }
   });
-  return null;
+  return activity;
 };
 const getActivitiesByCategory = category => {
-  return activities[CATEGORIES.indexOf(category)]['activities'];
+  return activities[CATEGORIES.indexOf(category)].activities;
 };
 
 const getCurrentUserActivityStats = activityUid => {
-  return currentUser['activityStats'].find((activity) => activity.uid == activityUid) || {};
+  return currentUser['activityStats'][activityUid];
 };
 
 const getActivitiesAndCurrentUserStats = () => {
   let catList = [];
-  activities.forEach(cat=> {
+  activities.forEach(cat => {
     catList.push({
       category: cat.category,
       activities: cat.activities.map(activity => {
@@ -97,26 +97,26 @@ const getActivitiesAndCurrentUserStats = () => {
           timesToday: stats.timesToday,
           timesTotal: stats.timesTotal,
           lastCompleted: stats.lastCompleted,
-        }
-      })
+        };
+      }),
     });
   });
   return catList;
-}
+};
 
 const getUserById = async userId => {
   await firestore().collection(USERS_COLLECTION).doc(userId).get();
 };
 
-const getCompetitionById = async competitionId => {
-  await firestore()
+const getCompetitionById = competitionId => {
+  return firestore()
     .collection(COMPETITIONS_COLLECTION)
     .doc(competitionId)
     .get();
 };
 
-const getAllUsers = async () => {
-  await firestore().collection(USERS_COLLECTION).get();
+const getAllUsers = () => {
+  return firestore().collection(USERS_COLLECTION).get();
 };
 
 /*
@@ -135,22 +135,27 @@ const completeActivityForCurrentUser = activityUid => {
   let activity = getActivityById(activityUid);
   let stats = getCurrentUserActivityStats(activityUid);
 
+  if (stats == undefined) {
+    stats = {};
+    currentUser['activityStats'][activityUid] = stats;
+  }
+
   currentUser.points = currentUser.points + activity.points;
   let userUpdate = {
-    points: currentUser.points
+    points: currentUser.points,
   };
 
   stats.timesToday = stats.timesToday ? stats.timesToday + 1 : 1;
   stats.timesTotal = stats.timesTotal ? stats.timesTotal + 1 : 1;
   stats.lastCompleted = new Date();
-  
+
   userUpdate[`activityStats.${activityUid}`] = stats;
 
   return firestore()
     .collection(USERS_COLLECTION)
     .doc(curUser().uid)
     .update(userUpdate);
-}
+};
 
 const generateUserDoc = (uid, email, firstName, lastName, competitionId) => {
   const userObj = {
@@ -158,6 +163,7 @@ const generateUserDoc = (uid, email, firstName, lastName, competitionId) => {
     firstName: firstName,
     lastName: lastName,
     competition: competitionId,
+    points: 0,
     private: false,
     activityStats: {},
   };

@@ -1,4 +1,6 @@
 import React, {useState} from 'react';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {NavigationContainer} from '@react-navigation/native';
 import {
   Alert,
   Dimensions,
@@ -10,6 +12,7 @@ import {
   View,
 } from 'react-native';
 import * as auth from '_api/firebase-auth';
+import {generateUserDoc, getCompetitionById} from '_api/firebase-db';
 
 //import { AuthContext } from "../components/Authentication/auth";
 // https://reactnavigation.org/docs/auth-flow
@@ -49,7 +52,9 @@ const styles = StyleSheet.create({
   },
 
   form: {
-    height: '45%',
+    //height: '45%',
+    height: 'auto',
+    paddingVertical: 10,
     width: '90%',
     backgroundColor: '#fcfcfc',
     borderRadius: 10,
@@ -67,11 +72,12 @@ const styles = StyleSheet.create({
   textInput: {
     margin: 3,
     width: '80%',
-    height: 35,
+    //height: 35,
     backgroundColor: 'rgba(1, 85, 164, 0.1)',
     borderRadius: 3,
     textAlign: 'center',
     fontSize: 18,
+    height: 'auto'
   },
 
   signInBtn: {
@@ -120,19 +126,31 @@ const Background = () => (
 const alert = (title, msg) => {
   return Alert.alert(title, msg);
 };
-const alertError = err => {
-  return Alert.alert('Error', err.message);
+const errorMessages = {
+  //Login:
+  'auth/invalid-email': 'Invalid email address provided', // Thrown if the email address is not valid.
+  'auth/user-disabled': 'This user is disabled', // Thrown if the user corresponding to the given email has been disabled.
+  'auth/user-not-found': 'Incorrect Email or Password', // Thrown if there is no user corresponding to the given email.
+  'auth/wrong-password': 'Incorrect Email or Password', // Thrown if the password is invalid for the given email, or the account corresponding to the email does not have a password set.
+  //Register:
+  'auth/email-already-in-use': 'An account already exists for this email', // Thrown if there already exists an account with the given email address.
+  'auth/invalid-email': 'Invalid email address provided', // Thrown if the email address is not valid.
+  'auth/operation-not-allowed': 'Accounts CurrentlyDisabled', // Thrown if email/password accounts are not enabled. Enable email/password accounts in the Firebase Console, under the Auth tab.
+  'auth/weak-password': 'Password not strong enough', // Thrown if the password is not strong enough.
 };
+const alertError = err => {
+  return Alert.alert('Error', errorMessages[err.code]);
+};
+const Stack = createNativeStackNavigator();
 
-const Login = () => {
-  const {height, width} = useWindowDimensions();
+const LoginScreen = ({navigation}) => {
   const [emailAddress, setEmailAddress] = useState('');
   const [password, setPassword] = useState('');
 
   const validate = () => {
     if (!emailAddress.trim() || !password.trim()) {
       alert(
-        'Email and Pasword Requird',
+        'Email and Password Required',
         'Please fill out both your email and password to continue',
       );
     } else {
@@ -144,7 +162,6 @@ const Login = () => {
         .catch(alertError);
     }
   };
-
   return (
     <>
       <Background />
@@ -159,7 +176,6 @@ const Login = () => {
               maxLength={100}
               onChangeText={e => setEmailAddress(e)}
               blurOnSubmit={true}
-              onSubmitEditing={e => submitEditing(e)}
             />
             <TextInput
               placeholder="Password"
@@ -181,39 +197,189 @@ const Login = () => {
             style={{textAlign: 'center', fontWeight: 'bold', marginBottom: 10}}>
             OR...
           </Text>
-          <TouchableOpacity style={styles.createAccBtn} onPress={validate}>
+          <TouchableOpacity
+            style={styles.createAccBtn}
+            onPress={() => navigation.navigate('Register')}>
             <Text style={styles.createAccBtnText}>Sign Up</Text>
           </TouchableOpacity>
         </View>
       </View>
     </>
-    // <View style={styles.parent}>
-    //     <View style={styles.child}>
-    //         <Text style={styles.heading}>Sign In</Text>
-
-    //         <View style={styles.form}>
-    //             <View style={{ width: '100%', alignItems: 'center' }}>
-    //                 <TextInput
-    //                     placeholder="Username"
-    //                     textContentType="username"
-    //                     style={styles.textInput}
-    //                 />
-    //                 <TextInput
-    //                     placeholder="Password"
-    //                     textContentType="password"
-    //                     style={styles.textInput} />
-    //             </View>
-
-    //             <TouchableOpacity
-    //                 style={styles.signInButton}
-    //                 onPress={() => signIn(username, password)}
-    //             >
-    //                 <Text style={{ color: '#fff' }}>Login</Text>
-    //             </TouchableOpacity>
-    //         </View>
-    //     </View>
-    // </View>
   );
 };
 
+const RegisterScreen = ({navigation}) => {
+  const [emailAddress, setEmailAddress] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [competitionCode, setCompetitionCode] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const validate = () => {
+    if (
+      !emailAddress.trim() ||
+      !firstName.trim() ||
+      !lastName.trim() ||
+      !competitionCode.trim() ||
+      !password.trim() ||
+      !confirmPassword.trim()
+    ) {
+      alert(
+        'All Fields Required',
+        'Please fill out all fields to create your account',
+      );
+      return;
+    }
+    if (password != confirmPassword) {
+      alert(
+        'Passwords must match',
+        'Please review your passwords so they match',
+      );
+      return;
+    }
+    getCompetitionById(competitionCode)
+      .then(competition => {
+        if (competition != null) {
+          auth
+            .register(emailAddress, password)
+            .then(res => {
+              generateUserDoc(
+                res.user.uid,
+                emailAddress,
+                firstName,
+                lastName,
+                competitionCode,
+              );
+              console.log('new account with email address: ' + emailAddress);
+            })
+            .catch(alertError);
+        } else {
+          alert(
+            'Competition not found',
+            'Please review your competition code and ensure it is correct',
+          );
+        }
+      })
+      .catch(() => {
+        alert(
+          'Competition not found',
+          'Please review your competition code and ensure it is correct',
+        );
+      });
+  };
+  return (
+    <>
+      <Background />
+      <View style={styles.abs}>
+        <Text style={styles.heading}>Sign Up</Text>
+        <View style={styles.form}>
+          <View style={{width: '100%', alignItems: 'center'}}>
+            <TextInput
+              placeholder="Email"
+              textContentType="emailAddress"
+              style={styles.textInput}
+              maxLength={100}
+              onChangeText={e => setEmailAddress(e)}
+              blurOnSubmit={true}
+            />
+            <TextInput
+              placeholder="First Name"
+              textContentType="givenName"
+              style={styles.textInput}
+              maxLength={100}
+              onChangeText={e => setFirstName(e)}
+              blurOnSubmit={true}
+            />
+            <TextInput
+              placeholder="Last Name"
+              textContentType="familyName"
+              style={styles.textInput}
+              maxLength={100}
+              onChangeText={e => setLastName(e)}
+              blurOnSubmit={true}
+            />
+            <TextInput
+              placeholder="Competition Code"
+              textContentType="none"
+              style={styles.textInput}
+              maxLength={5}
+              onChangeText={e => setCompetitionCode(e)}
+              blurOnSubmit={true}
+            />
+            <TextInput
+              placeholder="Password"
+              textContentType="newPassword"
+              style={styles.textInput}
+              maxLength={100}
+              secureTextEntry={true}
+              onChangeText={e => setPassword(e)}
+              blurOnSubmit={true}
+            />
+            <TextInput
+              placeholder="Confirm Password"
+              textContentType="password"
+              style={styles.textInput}
+              maxLength={100}
+              secureTextEntry={true}
+              onChangeText={e => setConfirmPassword(e)}
+              blurOnSubmit={true}
+            />
+          </View>
+
+          <TouchableOpacity style={styles.signInBtn} onPress={validate}>
+            <Text style={styles.signInBtnText}>Create Account</Text>
+          </TouchableOpacity>
+        </View>
+        <View>
+          <Text
+            style={{textAlign: 'center', fontWeight: 'bold', marginBottom: 10}}>
+            OR...
+          </Text>
+          <TouchableOpacity
+            style={styles.createAccBtn}
+            onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.createAccBtnText}>Login</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </>
+  );
+};
+const Login = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
 export default Login;
+// <View style={styles.parent}>
+//     <View style={styles.child}>
+//         <Text style={styles.heading}>Sign In</Text>
+
+//         <View style={styles.form}>
+//             <View style={{ width: '100%', alignItems: 'center' }}>
+//                 <TextInput
+//                     placeholder="Username"
+//                     textContentType="username"
+//                     style={styles.textInput}
+//                 />
+//                 <TextInput
+//                     placeholder="Password"
+//                     textContentType="password"
+//                     style={styles.textInput} />
+//             </View>
+
+//             <TouchableOpacity
+//                 style={styles.signInButton}
+//                 onPress={() => signIn(username, password)}
+//             >
+//                 <Text style={{ color: '#fff' }}>Login</Text>
+//             </TouchableOpacity>
+//         </View>
+//     </View>
+// </View>

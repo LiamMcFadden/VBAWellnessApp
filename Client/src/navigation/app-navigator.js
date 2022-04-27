@@ -1,23 +1,22 @@
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React, {useContext} from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useContext } from 'react';
 import {
   Dimensions,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import {AuthContext} from '_components/Authentication/auth';
-import AddScreen from '_scenes/addScreen/addScreen';
+import { AuthContext } from '_components/Authentication/auth';
 import Compete from '_scenes/compete/compete';
-import Profile from '../scenes/profile/profile';
 import Home from '_scenes/home/home';
 import Settings from '_scenes/settings/settings';
-import {COLORS, FONTWEIGHT, TYPESCALE} from '../globals/styles';
+import { COLORS } from '../globals/styles';
+import Profile from '../scenes/profile/profile';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -57,28 +56,27 @@ const styles = StyleSheet.create({
 
 const routeConfig = {
   Home: {
-    iconName: 'home',
+    iconName: 'home'
   },
-  Add: {
-    iconName: 'plus-circle',
+  Activities: {
+    iconName: 'plus-circle'
   },
-  Compete: {
-    iconName: 'leaderboard',
+  Leaderboard: {
+    iconName: 'leaderboard'
   },
   Settings: {
-    iconName: 'settings',
-  },
-};
+    iconName: 'settings'
+  }
+}
 
 const getIcon = (routeName, style) => {
-  if (routeName === 'Compete' || routeName === 'Settings') {
-    return (
-      <MaterialIcon
-        name={routeConfig[routeName].iconName}
-        style={style}
-        size={windowWidth / 12}
-      />
-    );
+  if (routeName === 'Leaderboard' || routeName === 'Settings') {
+    return <MaterialIcon
+      name={routeConfig[routeName].iconName}
+      style={style}
+      size={windowWidth / 12
+      }
+    />
   } else {
     return (
       <Icon
@@ -86,16 +84,19 @@ const getIcon = (routeName, style) => {
         style={style}
         size={windowWidth / 12}
       />
-    );
+    )
   }
-};
+}
 
-function CustomTabBar({state, descriptors, navigation}) {
+
+
+
+function CustomTabBar({ state, descriptors, navigation }) {
   return (
     <View style={styles.containerView}>
       {state.routes.map((route, idx) => {
         //Descriptors[route.key] gives descripter for this route
-        const {options} = descriptors[route.key];
+        const { options } = descriptors[route.key];
         const label = options.tabBarLabels ?? options.title ?? route.name;
 
         // Handle Navigation Transaction
@@ -131,7 +132,7 @@ function CustomTabBar({state, descriptors, navigation}) {
           >
             <View style={styles.tabItem}>
               {getIcon(label, selectStyle(idx))}
-              <Text style={{...styles.tabContentText, ...selectStyle(idx)}}>
+              <Text style={{ ...styles.tabContentText, ...selectStyle(idx) }}>
                 {label}
               </Text>
             </View>
@@ -147,7 +148,7 @@ const HomeStackComponent = () => (
     <HomeStack.Screen
       name="HomeScreen"
       component={Home}
-      options={{headerShown: false}}
+      options={{ headerShown: false }}
     />
     <HomeStack.Screen
       name="Profile"
@@ -167,23 +168,23 @@ const TabBarContainer = () => (
   <TabBar.Navigator tabBar={props => <CustomTabBar {...props} />}>
     <TabBar.Screen
       name="Home"
-      options={{headerShown: false}}
+      options={{ headerShown: false }}
       component={Home}
     />
     <TabBar.Screen
-      name="Compete"
+      name="Leaderboard"
       component={Compete}
-      options={{headerShown: false}}
+      options={{ headerShown: false }}
     />
     <TabBar.Screen
-      name="Add"
+      name="Activities"
       component={AddScreen}
-      options={{headerShown: false}}
+      options={{ headerShown: false }}
     />
     <TabBar.Screen
       name="Settings"
       component={Settings}
-      options={{headerShown: false}}
+      options={{ headerShown: false }}
     />
   </TabBar.Navigator>
 );
@@ -198,7 +199,7 @@ export default function BottomTabs() {
         <Stack.Screen
           name={'TabStack'}
           component={TabBarContainer}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name={'Profile'}

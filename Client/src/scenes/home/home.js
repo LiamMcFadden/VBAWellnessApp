@@ -116,13 +116,6 @@ const Home = ({navigation}) => {
   const action = item => {
     const newTotal = totalPoints + item.points;
 
-    setTotalPoints(newTotal);
-    completeActivityForCurrentUser(item.uid).catch(err => {
-      setTotalPoints(newTotal - points);
-      console.error(err);
-      //TODO: Alert connection error
-    });
-  };
   return (
     <SafeAreaView style={{backgroundColor: '#F3F4F7', height: '100%'}}>
       <ProfileCard navigation={navigation} />
