@@ -1,6 +1,6 @@
 import firestore from '@react-native-firebase/firestore';
 import uuid from 'react-native-uuid';
-import { currentUser as curUser } from '_api/firebase-auth';
+import {currentUser as curUser} from '_api/firebase-auth';
 const COMPETITIONS_COLLECTION = 'Competitions';
 const USERS_COLLECTION = 'Users';
 const ACTIVITIES_DOC = 'Activities';
@@ -95,9 +95,34 @@ const getActivitiesAndCurrentUserStats = () => {
           points: activity.points,
           uid: activity.uid,
           dailyLimit: activity.dailyLimit,
-          timesToday: stats.timesToday,
-          timesTotal: stats.timesTotal,
-          lastCompleted: stats.lastCompleted,
+          timesToday: stats == undefined ? 0 : stats.timesToday,
+          timesTotal: stats == undefined ? 0 : stats.timesTotal,
+          lastCompleted: stats == undefined ? new Date() : stats.lastCompleted,
+        };
+      }),
+    });
+  });
+  return catList;
+};
+
+const getActivitiesAndUserStats = async (userId) => {
+  let user = await firestore().collection(USERS_COLLECTION).doc(userId).get();
+  user = user.data();
+  let catList = [];
+  activities.forEach(cat => {
+    catList.push({
+      category: cat.category,
+      activities: cat.activities.map(activity => {
+        let stats = user.activityStats[activity.uid];
+        return {
+          title: activity.title,
+          description: activity.description,
+          points: activity.points,
+          uid: activity.uid,
+          dailyLimit: activity.dailyLimit,
+          timesToday: stats == undefined ? 0 : stats.timesToday,
+          timesTotal: stats == undefined ? 0 : stats.timesTotal,
+          lastCompleted: stats == undefined ? new Date() : stats.lastCompleted,
         };
       }),
     });
@@ -107,6 +132,25 @@ const getActivitiesAndCurrentUserStats = () => {
 
 const getUserById = async userId => {
   await firestore().collection(USERS_COLLECTION).doc(userId).get();
+};
+const getUserPointsByCategory = async userId => {
+  let userActs;
+  if(userId == curUser().uid) {
+    userActs = getActivitiesAndCurrentUserStats();
+  } else {
+    userActs = await getActivitiesAndUserStats();
+  }
+  let breakdown = [0, 0, 0, 0, 0, 0];
+  
+  userActs.forEach((category, index) => {
+    category.activities.forEach((activityStat) => {
+      breakdown[index] += activityStat.points * activityStat.timesTotal;
+    });
+  });
+
+  return CATEGORIES.map((name, index) => {
+    return {category: name, total: breakdown[index]};
+  });
 };
 
 const getCompetitionById = competitionId => {
@@ -206,7 +250,7 @@ const updateActivity = updated => {
   return firestore()
     .collection(COMPETITIONS_COLLECTION)
     .doc(ACTIVITIES_DOC)
-    .set({ categories: activities });
+    .set({categories: activities});
 };
 
 const addActivity = newActivity => {
@@ -245,6 +289,7 @@ export {
   getAllUsers,
   getCurrentUserActivityStats,
   getActivitiesAndCurrentUserStats,
+  getUserPointsByCategory,
   completeActivityForCurrentUser,
   updateCurrentUserFields,
   generateUserDoc,
@@ -257,4 +302,4 @@ export {
   addActivity,
   deleteActivity,
 };
-export { fetch, clear };
+export {fetch, clear};

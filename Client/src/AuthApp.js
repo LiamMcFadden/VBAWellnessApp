@@ -66,10 +66,9 @@ export const AppRouter = () => {
   useEffect(() => {
     if (currentUser() != null) {
       subscriptionCallback(currentUser());
-    } else {
-      let subscription = subscribeToAuthState(subscriptionCallback);
-      return subscription;
     }
+    let subscription = subscribeToAuthState(subscriptionCallback);
+    return subscription;
   }, []);
   if (isLoading) {
     return <LoadingScreen />;
