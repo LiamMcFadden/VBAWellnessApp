@@ -8,7 +8,6 @@ import Admin from '_scenes/admin/admin';
 import storage from '@react-native-firebase/storage';
 import { currentUser } from '_api/firebase-auth';
 import { _taskHandle } from 'react-native/Libraries/Interaction/Batchinator';
-import { launchImageLibrary } from 'react-native-image-picker';
 import * as ImagePicker from 'react-native-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -130,10 +129,10 @@ const Settings = () => {
             name='SettingsScreen'
             component={SettingsScreen}
         />
-        {/* <Stack.Screen
+        <Stack.Screen
             name='Admin'
             component={Admin}
-        /> */}
+        />
     </Stack.Navigator>
     
 );
