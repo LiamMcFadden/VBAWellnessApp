@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  TouchableHighlight,
   View,
   ScrollView,
 } from 'react-native';
@@ -71,7 +72,7 @@ const ProfileCard = ({navigation}) => {
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc molestie
         posuere congue.{' '}
       </Text>
-      <OutlinedButton
+      {/* <OutlinedButton
         width={'40%'}
         height={35}
         buttonStyle={{marginBottom: 0, marginLeft: 0}}
@@ -86,7 +87,44 @@ const ProfileCard = ({navigation}) => {
             Profile
           </Text>
         </View>
-      </OutlinedButton>
+      </OutlinedButton> */}
+      <TouchableHighlight 
+      underlayColor={COLORS.tintPrimary(0.2)}
+      onPress={() => navigation.navigate("Profile")}
+      style={{
+        width: '40%',
+        height: 35,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#fefefe', //offwhiteish
+        borderWidth: 1,
+        borderColor: '#0155A4',
+        borderRadius: 4,
+        margin: 5,
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 1, //might be better to use 2 and 1 for w and h
+          height: 0,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 4,
+        paddingLeft: 16,
+        paddingRight: 16,
+        marginBottom: 0,
+        marginLeft: 0,
+      }}>
+        <View style={profileStyles.pfpBtnContents}>
+          <Ionicons name="person-circle-outline" size={25} color={'#0155A4'} />
+          <Text
+            style={[
+              TYPESCALE.button,
+              {marginLeft: 20, textAlign: 'center', color: COLORS.primary},
+            ]}>
+            Profile
+          </Text>
+        </View>
+      </TouchableHighlight>
     </View>
   );
 };
