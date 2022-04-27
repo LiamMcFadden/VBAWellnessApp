@@ -293,7 +293,7 @@ const AdminActivitiesScreen = ({navigation}) => {
                         <Text style={{color: '#0155A4', fontWeight: '600', fontSize: 18}}>Back</Text>
                     </TouchableOpacity>
                 </View>
-                <Text style={{flex: 1, paddingTop: 5, height: 35, fontWeight: '600', fontSize: 22, paddingRight: 15, textAlign: 'center'}}>Edit Activities</Text>
+                <Text style={{flex: 1, paddingTop: 5, height: 35, fontWeight: '600', fontSize: 22, paddingRight: 15, textAlign: 'center', color: '#0155A4'}}>Edit Activities</Text>
                 <View style={{paddingRight: 10}}>
                     <TouchableOpacity style={{height: 40, borderRadius: 5, alignSelf: 'flex-end', width: 30}} onPress={toggleModal}>
                         <Text style={{color: 'green', fontWeight: '600', fontSize: 30, alignSelf: 'center'}}>+</Text>
@@ -456,8 +456,9 @@ const CategoryHeader = ({
                     {open ? '▲' : '▼'}
                 </Text>
             </TouchableOpacity>
-            {open &&
+            {open && activities.length > 0 &&
                 <FlatList
+                    style={{paddingBottom: 5}}
                     data={activities}
                     renderItem={({ item }) => (
                         <ActivityItem
@@ -487,15 +488,17 @@ const ActivityItem = ({
 
     return (
         <View>
-            <TouchableOpacity onPress={() => toggleModal()} style={{padding: 15, backgroundColor: activity.available ? 'white' : 'lightgrey', borderBottomWidth: 2, borderColor: 'grey',}}>
+            <TouchableOpacity onPress={() => toggleModal()} style={[styles.activityItemView, {backgroundColor: activity.available ? 'white' : 'lightgray'}]}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                     <View style={{
                         flexDirection: 'column',
-                        justifyContent: 'space-between'
+                        justifyContent: 'space-between',
+                        maxWidth: '80%'
                     }}>
                         <Text style={{
                             fontSize: 18,
-                            color: '#0155A4'}}>
+                            color: '#0155A4',
+                            }}>
                             {activity.title ?? "Activity"}
                         </Text>
                         <Text>
@@ -635,6 +638,22 @@ const styles = StyleSheet.create({
         fontWeight: '600', // i.e semi-bold
         fontSize: 18
     },
+    activityItemView: {
+        padding: 15,
+        paddingLeft: 25,
+        paddingRight: 25,
+        marginTop: 5,
+        marginLeft: 5,
+        marginRight: 5,
+        borderColor: '#eee',
+        borderRadius: 50,
+
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,  
+        elevation: 5
+    }
 });
 
 const actStyles = StyleSheet.create({
