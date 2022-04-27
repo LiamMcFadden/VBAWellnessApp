@@ -28,12 +28,13 @@ const fetch = async userId => {
         currentUser.competition != null &&
         currentUser.competition.length > 0
       ) {
-        firestore()
+        return firestore()
           .collection(COMPETITIONS_COLLECTION)
           .doc(currentUser.competition)
           .get()
           .then(res => {
             competition = res.data();
+            competition.id = currentUser.competition;
           });
       }
     });
@@ -113,6 +114,23 @@ const getCompetitionById = competitionId => {
     .collection(COMPETITIONS_COLLECTION)
     .doc(competitionId)
     .get();
+};
+
+const isCompetitionValid = () => {
+  const date = new Date();
+  let startDate = competition['startTime'].toDate();
+  let endDate = competition['endTime'].toDate();
+  if (!(startDate != null && endDate != null)) {
+    return -1; //Missing
+  } else if (date > startDate && date < endDate) {
+    return 1; //Good to go
+  } else if (date < startDate && date < endDate) {
+    return 0; //Starting soon
+  } else if (date > startDate && date > endDate) {
+    return 2; //Competition over
+  } else {
+    return -1; //Missing
+  }
 };
 
 const getAllUsers = () => {
@@ -223,6 +241,7 @@ export {
   getCurrentCompetition,
   getUserById,
   getCompetitionById,
+  isCompetitionValid,
   getAllUsers,
   getCurrentUserActivityStats,
   getActivitiesAndCurrentUserStats,

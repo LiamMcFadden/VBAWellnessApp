@@ -4,6 +4,7 @@ import Modal from "react-native-modal";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {Picker} from '@react-native-picker/picker';
 import CheckBox from '@react-native-community/checkbox';
+import {signOut} from '_api/firebase-auth';
 import {
     getActivitiesByCategory,
     getActivities,
@@ -196,17 +197,30 @@ if (Platform.OS === 'android') {
 const Stack = createNativeStackNavigator();
 
 const competitionStatus = () => {
+    const [isModalVisible, setModalVisible] = useState(false);
+
+    const toggleModal = () => {
+        setModalVisible(!isModalVisible);
+    };
+
     const date = new Date();
-    let startDate = getCurrentCompetition()['startTime'];
-    let endDate = getCurrentCompetition()['endTime'];
+    let startDate = getCurrentCompetition()['startTime'].toDate();
+    let endDate = getCurrentCompetition()['endTime'].toDate();
     let exists = (startDate != null && endDate != null);
     let compText;
     let compButton = null;
     if(!exists) {
         compText = <Text style={styles.font}>No Competition Set</Text>;
+        compButton = (
+            <TouchableOpacity style={styles.resultsBtn} onPress={() => toggleModal()}>
+                <Text style={styles.btnFont}>Create Competition</Text>
+            </TouchableOpacity>
+        );
     }
     else if(date > startDate && date < endDate) {
         compText = <Text style={styles.font}>Competition Currently Active</Text>;
+        //https://github.com/react-native-clipboard/clipboard#example
+        compButton = <Text style={styles.font}>Join Code: {getCurrentCompetition().id}</Text>;
     }
     else if(date < startDate && date < endDate) {
         compText = <Text style={styles.font}>Competition starting soon</Text>;
@@ -229,7 +243,34 @@ const competitionStatus = () => {
         </View>
     );
 }
+const CompetitionModal = () => {
 
+    const [title, onChangeTitle] = useState(activity != null ? activity.title : '');
+
+    return (
+        <KeyboardAvoidingView behavior='padding' style={{backgroundColor: 'white', borderRadius: 10, flex: 1}}>
+            <View style={{margin: 20, justifyContent: 'space-between'}}>
+                
+                <View>
+                    <Text style={{color: '#0155A4', fontSize: 18, fontWeight: '600'}}>Title</Text>
+                    <TextInput 
+                        value={title}
+                        onChangeText={text => onChangeTitle(text)}
+                        style={{fontSize: 16, borderWidth: 1, borderRadius: 5, borderColor: 'grey'}}
+                    />
+                </View>
+                <View style={{marginTop: 10, flexDirection: 'row', justifyContent: 'space-around'}}>
+                    <TouchableOpacity onPress={() => toggleModal()} style={{borderRadius: 5, margin: 20, width: '30%', backgroundColor: 'grey'}}>
+                        <Text style={{alignSelf: 'center', fontSize: 20, padding: 5, color: 'white', fontWeight: '600'}}>Cancel</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={saveActivity} style={{borderRadius: 5, margin: 20, width: '30%', backgroundColor: '#0155A4'}}>
+                        <Text style={{alignSelf: 'center', fontSize: 20, padding: 5, color: 'white', fontWeight: '600'}}>Save</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </KeyboardAvoidingView>
+    )
+}
 const AdminActivitiesScreen = ({navigation}) => {
 
     const [isModalVisible, setModalVisible] = useState(false);
@@ -477,13 +518,13 @@ const ActivityItem = ({
 };
 
 const AdminMainScreen = ({navigation}) => {
-    const startDate = new Date(getCurrentCompetition()['startTime']);
-    const endDate = new Date(getCurrentCompetition()['endTime']);
+    const startDate = getCurrentCompetition()['startTime'].toDate();
+    const endDate = getCurrentCompetition()['endTime'].toDate();
     return (
         <SafeAreaView style={{backgroundColor: '#0155A4', flex: 1, alignItems: "center"}}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
-                <TouchableOpacity style={{borderRadius: 5, margin: 15, alignSelf: 'flex-start', width: 75}} onPress={() => navigation.navigate('SettingsScreen')}>
-                    <Text style={{color: 'white', fontWeight: '600', fontSize: 18}}>Settings</Text>
+                <TouchableOpacity style={{borderRadius: 5, margin: 15, alignSelf: 'flex-start', width: 75}} onPress={() => signOut()}>
+                    <Text style={{color: 'white', fontWeight: '600', fontSize: 18}}>Sign Out</Text>
                 </TouchableOpacity>
                 <Text style={{fontSize: 30, fontWeight: "800", padding: 5, paddingRight: 125, color: 'white'}}>Admin Page</Text>
             </View>

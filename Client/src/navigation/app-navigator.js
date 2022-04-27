@@ -146,7 +146,6 @@ const TabBar = createBottomTabNavigator()
 export default function BottomTabs() {
     const context = useContext(AuthContext);
     return (
-        <NavigationContainer >
             <TabBar.Navigator
                 tabBar={(props) => <CustomTabBar {...props} />}
             >
@@ -159,6 +158,5 @@ export default function BottomTabs() {
                 <TabBar.Screen name='Activities' component={ActivitiesScreen} options={{ headerShown: false }} />
                 <TabBar.Screen name='Settings' component={Settings} options={{ headerShown: false }} />
             </TabBar.Navigator>
-        </NavigationContainer>
     )
 }

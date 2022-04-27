@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import * as auth from '_api/firebase-auth';
-import {generateUserDoc, getCompetitionById} from '_api/firebase-db';
+import {generateUserDoc, getCompetitionById, updateCurrentUserFields} from '_api/firebase-db';
 
 //import { AuthContext } from "../components/Authentication/auth";
 // https://reactnavigation.org/docs/auth-flow
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     textAlign: 'center',
     fontSize: 18,
-    height: 'auto'
+    height: 'auto',
   },
 
   signInBtn: {
@@ -201,6 +201,45 @@ const LoginScreen = ({navigation}) => {
             style={styles.createAccBtn}
             onPress={() => navigation.navigate('Register')}>
             <Text style={styles.createAccBtnText}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </>
+  );
+};
+
+const CompetitionCodeScreen = ({navigation}) => {
+  const [competitionCode, setCompetitionCode] = useState('');
+
+  const validate = () => {
+    if (!competitionCode.trim()) {
+      alert(
+        'Competition Code required',
+        'Please enter a competition join code to continue',
+      );
+    } else {
+      
+    }
+  };
+  return (
+    <>
+      <Background />
+      <View style={styles.abs}>
+        <Text style={styles.heading}>Sign In</Text>
+        <View style={styles.form}>
+          <View style={{width: '100%', alignItems: 'center'}}>
+            <TextInput
+              placeholder="Competition Code"
+              textContentType="none"
+              style={styles.textInput}
+              maxLength={100}
+              onChangeText={e => setCompetitionCode(e)}
+              blurOnSubmit={true}
+            />
+          </View>
+
+          <TouchableOpacity style={styles.signInBtn} onPress={validate}>
+            <Text style={styles.signInBtnText}>Join Competition</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -348,12 +387,10 @@ const RegisterScreen = ({navigation}) => {
 };
 const Login = () => {
   return (
-    <NavigationContainer>
       <Stack.Navigator screenOptions={{headerShown: false}}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
       </Stack.Navigator>
-    </NavigationContainer>
   );
 };
 export default Login;
