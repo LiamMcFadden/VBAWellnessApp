@@ -1,15 +1,13 @@
-import React, {useEffect} from 'react';
-import {COLORS, TYPESCALE, BUTTONSTYLE} from './styles';
+import React, { useEffect } from 'react';
+import { StyleSheet, Text } from 'react-native';
 import {
   TouchableHighlight,
-  TouchableOpacity,
+  TouchableOpacity
 } from 'react-native-gesture-handler';
-import {View, StyleSheet, Text} from 'react-native';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
+  useAnimatedStyle, useSharedValue, withTiming
 } from 'react-native-reanimated';
+import { BUTTONSTYLE, COLORS, TYPESCALE } from './styles';
 
 /*
  * @params:
@@ -32,9 +30,7 @@ const OutlinedButton = ({
     underlayColor={COLORS.tintPrimary(0.2)}
     onPress={onPress}
     style={[BUTTONSTYLE.OUTLINED(width, height), buttonStyle]}>
-    <Text style={[TYPESCALE.button, {color: COLORS.primary}, textStyle]}>
-      {children}
-    </Text>
+    {children}
   </TouchableHighlight>
 );
 
@@ -52,20 +48,20 @@ const ContainedButton = ({
   <TouchableOpacity
     onPress={onPress}
     style={[BUTTONSTYLE.CONTAINED(width, height), buttonStyle]}>
-    <Text style={[TYPESCALE.button, {color: 'white'}, textStyle]}>
+    <Text style={[TYPESCALE.button, { color: 'white' }, textStyle]}>
       {children}
     </Text>
   </TouchableOpacity>
 );
 
 /*
- * Milestone progress bar
+ * Milstone progress bar
  * @params:
  *    milestone --> total points required to reach milestone
  *    points --> users current total
- *    width --> parameter specifying bar width
+ *    width? --> optional parameter specifying bar width
  * */
-const ProgressBar = ({milestone, points, width}) => {
+const ProgressBar = ({ milestone, points, width }) => {
   const percentComplete = points / milestone;
   const foregroundWidth = useSharedValue(5);
   const progress_styles = progess_bar_styles(width);
@@ -108,4 +104,4 @@ const progess_bar_styles = width =>
     },
   });
 
-export {ProgressBar, OutlinedButton, ContainedButton};
+export { ProgressBar, OutlinedButton, ContainedButton };

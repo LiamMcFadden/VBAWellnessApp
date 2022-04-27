@@ -1,6 +1,6 @@
 import firestore from '@react-native-firebase/firestore';
-import {currentUser as curUser} from '_api/firebase-auth';
 import uuid from 'react-native-uuid';
+import { currentUser as curUser } from '_api/firebase-auth';
 const COMPETITIONS_COLLECTION = 'Competitions';
 const USERS_COLLECTION = 'Users';
 const ACTIVITIES_DOC = 'Activities';
@@ -28,12 +28,13 @@ const fetch = async userId => {
         currentUser.competition != null &&
         currentUser.competition.length > 0
       ) {
-        firestore()
+        return firestore()
           .collection(COMPETITIONS_COLLECTION)
           .doc(currentUser.competition)
           .get()
           .then(res => {
             competition = res.data();
+            competition.id = currentUser.competition;
           });
       }
     });
@@ -115,6 +116,23 @@ const getCompetitionById = competitionId => {
     .get();
 };
 
+const isCompetitionValid = () => {
+  const date = new Date();
+  let startDate = competition['startTime'].toDate();
+  let endDate = competition['endTime'].toDate();
+  if (!(startDate != null && endDate != null)) {
+    return -1; //Missing
+  } else if (date > startDate && date < endDate) {
+    return 1; //Good to go
+  } else if (date < startDate && date < endDate) {
+    return 0; //Starting soon
+  } else if (date > startDate && date > endDate) {
+    return 2; //Competition over
+  } else {
+    return -1; //Missing
+  }
+};
+
 const getAllUsers = () => {
   return firestore().collection(USERS_COLLECTION).get();
 };
@@ -188,7 +206,7 @@ const updateActivity = updated => {
   return firestore()
     .collection(COMPETITIONS_COLLECTION)
     .doc(ACTIVITIES_DOC)
-    .set({categories: activities});
+    .set({ categories: activities });
 };
 
 const addActivity = newActivity => {
@@ -223,6 +241,7 @@ export {
   getCurrentCompetition,
   getUserById,
   getCompetitionById,
+  isCompetitionValid,
   getAllUsers,
   getCurrentUserActivityStats,
   getActivitiesAndCurrentUserStats,
@@ -238,4 +257,4 @@ export {
   addActivity,
   deleteActivity,
 };
-export {fetch, clear};
+export { fetch, clear };

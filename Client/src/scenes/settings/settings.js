@@ -102,12 +102,12 @@ const SettingsScreen = ({navigation}) => {
       <Text>Settings</Text>
       <Button title="Sign out" onPress={signOutValidation} />
       <UploadScreen/>
-      {getCurrentUser().admin === true && (
+      {{getCurrentUser().admin === true && (
         <View>
           <Text>Admin Settings</Text>
           <Button title="Admin" onPress={() => navigation.navigate('Admin')} />
         </View>
-      )}
+      )}}
     </View>
   );
 }
@@ -119,10 +119,10 @@ const Settings = () => {
             name='SettingsScreen'
             component={SettingsScreen}
         />
-        <Stack.Screen
+        {/* <Stack.Screen
             name='Admin'
             component={Admin}
-        />
+        /> */}
     </Stack.Navigator>
     
 );
