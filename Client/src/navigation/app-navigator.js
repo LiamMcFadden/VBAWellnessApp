@@ -193,7 +193,6 @@ const Stack = createNativeStackNavigator();
 export default function BottomTabs() {
   const context = useContext(AuthContext);
   return (
-    <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
           name={'TabStack'}
@@ -213,6 +212,5 @@ export default function BottomTabs() {
           }}
         />
       </Stack.Navigator>
-    </NavigationContainer>
   );
 }
