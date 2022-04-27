@@ -142,8 +142,8 @@ export default function Profile({navigation}) {
 
         <View
           style={{
-            position: 'absolute',
-            top: 0.3 * wheight,
+            
+            
             justifyContent: 'flex-start',
             alignItems: 'center',
             height: 0.5 * wheight,
@@ -153,9 +153,9 @@ export default function Profile({navigation}) {
             style={[
               TYPESCALE.h6,
               {
-                alignSelf: 'flex-start',
-                marginBottom: 20,
-                marginLeft: Math.abs(wwidth * 1.1 - wwidth),
+                alignSelf: 'center',
+                marginBottom: 10,
+                
               },
             ]}>
             Your Top Categories
@@ -164,7 +164,7 @@ export default function Profile({navigation}) {
             style={{
               backgroundColor: 'white',
               width: wwidth * 0.95,
-              height: 0.35 * wheight,
+              height: 0.4 * wheight,
               borderRadius: 6,
               shadowOffset: {
                 width: 1,
@@ -228,8 +228,11 @@ const styles = StyleSheet.create({
     marginTop: 25,
   },
   heading: {
-    height: 100,
+    height: 'auto',
+    width: '100%',
+    paddingBottom: 10,
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: '#f8f8f8'
   },
 });

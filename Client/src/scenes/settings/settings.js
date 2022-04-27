@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {Button, Text, View} from 'react-native';
+import {Button, Text, View, TouchableOpacity, StyleSheet} from 'react-native';
 //import { AuthContext } from "_components/Authentication/auth";
 import {signOut} from '_api/firebase-auth';
 import {getCurrentUser} from '_api/firebase-db';
@@ -73,11 +73,15 @@ const SettingsScreen = ({navigation}) => {
     };
 
     return (
-      <SafeAreaView>
-        <Button onPress={selectImage} title="Select Profile Picture"/>
-        <Button onPress={uploadImage} disabled={image == null} title="Save Changes"/>
-        {uploading && ( <Text>Uploading... {transfered}%</Text>)}
-      </SafeAreaView>
+      <View style={{width: '100%', justifyContent: 'space-around', alignItems: 'center'}}>
+        <TouchableOpacity onPress={selectImage} style={styles.button}>
+          <Text style={styles.buttonText}>Select Profile Picture</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={uploadImage} disabled={image == null} style={image == null ? styles.disabledButton : styles.button}>
+          <Text style={styles.buttonText}>Save Changes</Text>
+        </TouchableOpacity>
+        {uploading && ( <Text style={styles.buttonText}>Uploading... {transfered}%</Text>)}
+      </View>
     )
   };
 
@@ -92,22 +96,29 @@ const SettingsScreen = ({navigation}) => {
       });
   }
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         alignItems: 'center',
       }}>
-      <Text>Settings</Text>
-      <Button title="Sign out" onPress={signOutValidation} />
-      <UploadScreen/>
-      {getCurrentUser().admin === true && (
+      <View style={{width: '100%', height: '15%', justifyContent: 'center', alignItems: 'center'}}>
+        <Text style={styles.title}>Settings</Text>
+      </View>
+      <View style={{width: '100%', height: '85%', justifyContent: 'space-around', alignItems: 'center'}}>
+        <UploadScreen/>
+        <TouchableOpacity onPress={signOutValidation} style={styles.button}>
+          <Text style={styles.buttonText}>Sign Out</Text>
+        </TouchableOpacity>
+      </View>
+      
+      {/* {getCurrentUser().admin === true && (
         <View>
           <Text>Admin Settings</Text>
           <Button title="Admin" onPress={() => navigation.navigate('Admin')} />
         </View>
-      )}
-    </View>
+      )} */}
+    </SafeAreaView>
   );
 }
 
@@ -126,5 +137,49 @@ const Settings = () => {
     
 );
 }
+
+const styles = StyleSheet.create({
+  title: {
+    textAlign: 'center',
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#0155A4',
+    marginBottom: 10,
+  },
+  button: {
+    padding: 15,
+    width: '75%',
+    backgroundColor: 'white',
+    marginTop: 5,
+    borderColor: '#eee',
+    borderRadius: 50,
+    alignItems: 'center',
+
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,  
+    elevation: 5,
+  },
+  disabledButton: {
+    padding: 15,
+    width: '75%',
+    backgroundColor: 'lightgray',
+    marginTop: 5,
+    borderColor: '#eee',
+    borderRadius: 50,
+    alignItems: 'center',
+
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,  
+    elevation: 5
+  },
+  buttonText: {
+    fontSize: 18,
+    color: '#0155A4',
+  },
+});
 
 export default Settings;
