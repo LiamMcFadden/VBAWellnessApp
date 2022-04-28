@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import { Text, View, TextInput, KeyboardAvoidingView, Alert, UIManager, SafeAreaView, LayoutAnimation, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { Text, View, TextInput, KeyboardAvoidingView, StatusBar, Alert, UIManager, SafeAreaView, LayoutAnimation, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import Modal from "react-native-modal";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {Picker} from '@react-native-picker/picker';
@@ -365,8 +365,8 @@ const ActivityModal = ({
     }
 
     return (
-        <KeyboardAvoidingView behavior='padding' style={{backgroundColor: 'white', borderRadius: 10, flex: 1}}>
-            <View style={{margin: 20, justifyContent: 'space-between'}}>
+        <KeyboardAvoidingView behavior='position' style={{backgroundColor: 'white', borderRadius: 10, flex: 1}} contentContainerStyle={{backgroundColor: 'white', borderRadius: 10, flex: 1}}>
+            <View style={{margin: 20, backgroundColor: 'white', justifyContent: 'space-between'}}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                     <View style={{width: '50%'}}>
                         <Text style={{color: '#0155A4', fontSize: 18, fontWeight: '600'}}>Wellness Category</Text>
@@ -419,7 +419,7 @@ const ActivityModal = ({
                         onChangeText={text => onChangeDescription(text)}
                         multiline={true}
                         numberOfLines={5}
-                        style={{fontSize: 16, borderWidth: 1, borderRadius: 5, borderColor: 'grey'}}
+                        style={{fontSize: 16, borderWidth: 1, borderRadius: 5, borderColor: 'grey', maxHeight: 120}}
                     />
                 </View>
                 <View style={{marginTop: 10, flexDirection: 'row', justifyContent: 'space-around'}}>
@@ -512,7 +512,7 @@ const ActivityItem = ({
                     </View>
                 </View>
             </TouchableOpacity>
-            <Modal isVisible={isModalVisible} propagateSwipe={true} statusBarTranslucent={true} style={{marginTop: 100, marginBottom: 100}}>
+            <Modal isVisible={isModalVisible} propagateSwipe={true} statusBarTranslucent={true} style={{marginTop: 100, marginBottom: 100, flex: 1}}>
                 <ActivityModal wellnessCategory={category} activity={activity} toggleModal={toggleModal} />
             </Modal>
         </View>
