@@ -4,6 +4,7 @@ import Modal from "react-native-modal";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {Picker} from '@react-native-picker/picker';
 import CheckBox from '@react-native-community/checkbox';
+import Compete from '_scenes/compete/compete';
 import {signOut} from '_api/firebase-auth';
 import {
     getActivitiesByCategory,
@@ -14,179 +15,6 @@ import {
     updateActivity,
     getAllUsers,
   } from '_api/firebase-db';
-// const startDate = new Date(2022, 1, 30);
-// const endDate = new Date(2022, 2, 30);
-
-const totalActivities = [
-    {
-        category: 'Physical',
-        activities: [
-            {
-                title: 'Track Star',
-                text: 'Run 1 mile this week and earn 10 points',
-                points: 10,
-                available: true
-            },
-            {
-                title: 'Work Ready',
-                text: 'Walk to work 3 days this week and earn 5 points',
-                points: 5,
-                available: false
-            },
-            {
-                title: 'The Swimmer',
-                text: 'Swim for a total of 10 minutes today and earn 15 points',
-                points: 15,
-                available: false
-            },
-            {
-                title: 'Always Working',
-                text: 'Go to the gym and workout for at least 15 minutes to earn 10 points',
-                points: 10,
-                available: false
-            },
-            {
-                title: 'The Cruiser',
-                text: 'Ride your bike for 5 minutes today and earn 5 points',
-                points: 5,
-                available: true
-            },
-            {
-                title: 'Stair Master',
-                text: 'Take the stairs at work today and earn 2 points',
-                points: 2,
-                available: true
-            },
-            {
-                title: 'Track Star',
-                text: 'Run 1 mile this week and earn 10 points',
-                points: 10,
-                available: false
-            },
-        ]
-    },
-    {
-        category: 'Emotional',
-        activities: [
-            {
-                title: 'Work Ready',
-                text: 'Walk to work 3 days this week and earn 5 points',
-                points: 5,
-                available: true
-            },
-            {
-                title: 'The Swimmer',
-                text: 'Swim for a total of 10 minutes today and earn 15 points',
-                points: 15,
-                available: false
-            },
-            {
-                title: 'Always Working',
-                text: 'Go to the gym and workout for at least 15 minutes to earn 10 points',
-                points: 10,
-                available: true
-            },
-        ]
-    },
-    {
-        category: 'Intellectual',
-        activities: [
-            {
-                title: 'The Swimmer',
-                text: 'Swim for a total of 10 minutes today and earn 15 points',
-                points: 15,
-                available: true
-            },
-            {
-                title: 'Always Working',
-                text: 'Go to the gym and workout for at least 15 minutes to earn 10 points',
-                points: 10,
-                available: true
-            },
-            {
-                title: 'The Cruiser',
-                text: 'Ride your bike for 5 minutes today and earn 5 points',
-                points: 5,
-                available: true
-            },
-            {
-                title: 'Stair Master',
-                text: 'Take the stairs at work today and earn 2 points',
-                points: 2,
-                available: true
-            }
-        ]
-    },
-    {
-        category: 'Occupational',
-        activities: [
-            {
-                title: 'The Swimmer',
-                text: 'Swim for a total of 10 minutes today and earn 15 points',
-                points: 15,
-                available: false
-            },
-            {
-                title: 'Always Working',
-                text: 'Go to the gym and workout for at least 15 minutes to earn 10 points',
-                points: 10,
-                available: false
-            },
-            {
-                title: 'The Cruiser',
-                text: 'Ride your bike for 5 minutes today and earn 5 points',
-                points: 5,
-                available: true
-            },
-            {
-                title: 'Stair Master',
-                text: 'Take the stairs at work today and earn 2 points',
-                points: 2,
-                available: true
-            },
-            {
-                title: 'Track Star',
-                text: 'Run 1 mile this week and earn 10 points',
-                points: 10,
-                available: false
-            },
-        ]
-    },
-    {
-        category: 'Spiritual',
-        activities: [
-            {
-                title: 'The Cruiser',
-                text: 'Ride your bike for 5 minutes today and earn 5 points',
-                points: 5,
-                available: true
-            },
-            {
-                title: 'Stair Master',
-                text: 'Take the stairs at work today and earn 2 points',
-                points: 2,
-                available: false
-            },
-            {
-                title: 'Track Star',
-                text: 'Run 1 mile this week and earn 10 points',
-                points: 10,
-                available: true
-            },
-        ]
-    },
-    {
-        category: 'Social',
-        activities: [
-            {
-                title: 'Work Ready',
-                text: 'Walk to work 3 days this week and earn 5 points',
-                points: 5,
-                available: true
-            },
-        ]
-    },
-];
 
 if (Platform.OS === 'android') {
     if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -243,34 +71,78 @@ const competitionStatus = () => {
         </View>
     );
 }
-const CompetitionModal = () => {
 
-    const [title, onChangeTitle] = useState(activity != null ? activity.title : '');
+const CompetitionSettingsScreen = ({navigation}) => {
+
+    const [startDate, setStartDate] = useState(getCurrentCompetition()['startTime'].toDate().toLocaleDateString())
+    const [endDate, setEndDate] = useState(getCurrentCompetition()['endTime'].toDate().toLocaleDateString())
+
+    const [datesChanged, setDatesChanged] = useState(false);
+
+    const saveDates = () => {
+
+    };
+
+    const discardDates = () => {
+        setStartDate(getCurrentCompetition()['startTime'].toDate().toLocaleDateString());
+        setEndDate(getCurrentCompetition()['endTime'].toDate().toLocaleDateString());
+        setDatesChanged(false);
+    }
 
     return (
-        <KeyboardAvoidingView behavior='padding' style={{backgroundColor: 'white', borderRadius: 10, flex: 1}}>
-            <View style={{margin: 20, justifyContent: 'space-between'}}>
-                
-                <View>
-                    <Text style={{color: '#0155A4', fontSize: 18, fontWeight: '600'}}>Title</Text>
-                    <TextInput 
-                        value={title}
-                        onChangeText={text => onChangeTitle(text)}
-                        style={{fontSize: 16, borderWidth: 1, borderRadius: 5, borderColor: 'grey'}}
-                    />
+        <SafeAreaView behavior='padding' style={{flex: 1, alignItems: 'center'}}>
+            <View style={{width: '100%', height: '100%', justifyContent: 'space-around', alignItems: 'center'}}>
+                <View style={{height: '20%', width: '90%', borderRadius: 20, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.8, shadowRadius: 2, elevation: 5}}>
+                    <Text style={{fontSize: 20, color: '#0155A4'}}>Join Code</Text>
+                    <Text style={{fontSize: 40, color: 'dimgray'}}>{getCurrentCompetition().id}</Text>
                 </View>
-                <View style={{marginTop: 10, flexDirection: 'row', justifyContent: 'space-around'}}>
-                    <TouchableOpacity onPress={() => toggleModal()} style={{borderRadius: 5, margin: 20, width: '30%', backgroundColor: 'grey'}}>
-                        <Text style={{alignSelf: 'center', fontSize: 20, padding: 5, color: 'white', fontWeight: '600'}}>Cancel</Text>
+                <View style={{height: '70%', width: '90%', borderRadius: 20, backgroundColor: 'white', justifyContent: 'space-around', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.8, shadowRadius: 2, elevation: 5}}>
+                    <TouchableOpacity onPress={() => navigation.navigate("Results")} style={{backgroundColor: '#2e8b57', width: '80%', alignItems: 'center', borderRadius: 50, paddingTop: 10, paddingBottom: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.8, shadowRadius: 2, elevation: 5}}>
+                        <Text style={{fontSize: 20, color: 'white'}}>View Competition Results</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={saveActivity} style={{borderRadius: 5, margin: 20, width: '30%', backgroundColor: '#0155A4'}}>
-                        <Text style={{alignSelf: 'center', fontSize: 20, padding: 5, color: 'white', fontWeight: '600'}}>Save</Text>
+                    <View style={{width: '100%', height: '50%', justifyContent: 'space-around', alignItems: 'center'}}>
+                        <View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-around'}}>
+                            <View style={{width: '50%', alignItems: 'center'}}>
+                                <Text style={{fontSize: 18, color: 'dimgray'}}>Start Date</Text>
+                                <TextInput
+                                    value={startDate}
+                                    onChangeText={text => {
+                                        setStartDate(text);
+                                        setDatesChanged(true);
+                                    }}
+                                    textAlign={'center'}
+                                    style={{width: '80%', fontSize: 18, borderWidth: 1, borderRadius: 50, borderColor: 'lightgrey', color: 'dimgray'}}
+                                />
+                            </View>
+                            <View style={{width: '50%', alignItems: 'center'}}>
+                                <Text style={{fontSize: 18, color: 'dimgray'}}>End Date</Text>
+                                <TextInput
+                                    value={endDate}
+                                    onChangeText={text => {
+                                        setEndDate(text);
+                                        setDatesChanged(true);
+                                    }}
+                                    textAlign={'center'}
+                                    style={{width: '80%', fontSize: 18, borderWidth: 1, borderRadius: 50, borderColor: 'lightgrey', color: 'dimgray'}}
+                                />
+                            </View>
+                        </View>
+                        <TouchableOpacity onPress={() => saveDates()} disabled={!datesChanged} style={[{width: '40%', alignItems: 'center', borderRadius: 50, paddingTop: 10, paddingBottom: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.8, shadowRadius: 2, elevation: 5}, datesChanged ? {backgroundColor: 'white'} : {backgroundColor: 'lightgray'}]}>
+                            <Text style={{fontSize: 15, color: '#0155A4'}}>Save Changes</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => discardDates()} disabled={!datesChanged} style={[{width: '40%', alignItems: 'center', borderRadius: 50, paddingTop: 10, paddingBottom: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.8, shadowRadius: 2, elevation: 5}, datesChanged ? {backgroundColor: 'white'} : {backgroundColor: 'lightgray'}]}>
+                            <Text style={{fontSize: 15, color: '#0155A4'}}>Discard Changes</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity style={{backgroundColor: '#a52a2a', width: '80%', alignItems: 'center', borderRadius: 50, paddingTop: 10, paddingBottom: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.8, shadowRadius: 2, elevation: 5}}>
+                        <Text style={{fontSize: 20, color: 'white'}}>Start New Competition</Text>
                     </TouchableOpacity>
                 </View>
             </View>
-        </KeyboardAvoidingView>
+        </SafeAreaView>
     )
 }
+
 const AdminActivitiesScreen = ({navigation}) => {
 
     const [isModalVisible, setModalVisible] = useState(false);
@@ -286,23 +158,7 @@ const AdminActivitiesScreen = ({navigation}) => {
     }
 
     return (
-        <View style={{flex: 1, backgroundColor: 'white'}}>
-            <View style={{flexDirection: "row",  borderBottomWidth: 2, borderColor: 'grey'}}>
-                <View style={{paddingTop: 7, paddingLeft: 10}}>
-                    <TouchableOpacity style={{borderRadius: 5, alignSelf: 'flex-start', width: 45}} onPress={() => navigation.navigate('Main')}>
-                        <Text style={{color: '#0155A4', fontWeight: '600', fontSize: 18}}>Back</Text>
-                    </TouchableOpacity>
-                </View>
-                <Text style={{flex: 1, paddingTop: 5, height: 35, fontWeight: '600', fontSize: 22, paddingRight: 15, textAlign: 'center', color: '#0155A4'}}>Edit Activities</Text>
-                <View style={{paddingRight: 10}}>
-                    <TouchableOpacity style={{height: 40, borderRadius: 5, alignSelf: 'flex-end', width: 30}} onPress={toggleModal}>
-                        <Text style={{color: 'green', fontWeight: '600', fontSize: 30, alignSelf: 'center'}}>+</Text>
-                    </TouchableOpacity>
-                    <Modal isVisible={isModalVisible} propagateSwipe={true} statusBarTranslucent={true} style={{marginTop: 100, marginBottom: 100}}>
-                        <ActivityModal wellnessCategory={null} activity={null} toggleModal={() => toggleModal()} />
-                    </Modal>
-                </View>
-            </View>
+        <View style={{flex: 1}}>
             <View style={{flex: 1}}>
                 <FlatList 
                     data={getActivities()}
@@ -315,6 +171,12 @@ const AdminActivitiesScreen = ({navigation}) => {
                         />
                     )}
                 />
+                <TouchableOpacity activeOpacity={0.9} style={{width: 50, height: 50, borderRadius: 100, backgroundColor: 'white', position: 'absolute', bottom: 10, right: 10, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.8, shadowRadius: 2, elevation: 5}} onPress={toggleModal}>
+                    <Text style={{color: 'green', fontWeight: '600', fontSize: 35}}>+</Text>
+                </TouchableOpacity>
+                <Modal isVisible={isModalVisible} propagateSwipe={true} statusBarTranslucent={true} style={{marginTop: 100, marginBottom: 100}}>
+                    <ActivityModal wellnessCategory={null} activity={null} toggleModal={() => toggleModal()} />
+                </Modal>
             </View>
         </View>
     );
@@ -450,7 +312,7 @@ const CategoryHeader = ({
 
     return (
         <View style={{flex: 1}}>
-            <TouchableOpacity activeOpacity={1} style={{padding: 15, backgroundColor: '#0155A4', flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 2, borderColor: 'grey',}} onPress={toggleHeader}>
+            <TouchableOpacity activeOpacity={1} style={{padding: 15, backgroundColor: '#0155A4', flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 2, borderColor: 'lightgrey',}} onPress={toggleHeader}>
                 <Text style={{color: 'white', fontSize: 18}}>{category}</Text>
                 <Text style={{color: 'white', fontSize: 18}}>
                     {open ? '▲' : '▼'}
@@ -541,22 +403,22 @@ const AdminMainScreen = ({navigation}) => {
                             <Text>Start Date: {startDate != null ? startDate.toLocaleDateString() : 'No date set'}</Text>
                             <Text>End Date: {endDate != null ? endDate.toLocaleDateString() : 'No date set'}</Text>
                         </View>
-                        <TouchableOpacity style={styles.btn}>
-                            <Text style={styles.btnFont}>Set Competition Dates</Text>
+                        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Competition Settings')}>
+                            <Text style={styles.btnFont}>Competition Settings</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={{padding: 5, width: "80%"}}>
+                    {/* <View style={{padding: 5, width: "80%"}}>
                         <TouchableOpacity style={styles.btn}>
                             <Text style={styles.btnFont}>Edit Users</Text>
                         </TouchableOpacity>
-                    </View>
-                    <View style={{padding: 5, width: "80%"}}>
+                    </View> */}
+                    {/* <View style={{padding: 5, width: "80%"}}>
                         <TouchableOpacity style={styles.btn}>
                             <Text style={styles.btnFont}>Edit Milestones</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
                     <View style={{padding: 5, width: "80%"}}>
-                        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Activities')}>
+                        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Edit Activities')}>
                             <Text style={styles.btnFont}>Edit Activities</Text>
                         </TouchableOpacity>
                     </View>
@@ -568,17 +430,30 @@ const AdminMainScreen = ({navigation}) => {
 
 const Admin = ({navigation}) => {
     return (
-        <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Navigator screenOptions={{
+            headerTintColor: '#0155A4',
+            headerTitleStyle: {
+                fontWeight: '600', fontSize: 25, color: '#0155A4'
+            }
+        }}>
             <Stack.Screen
                 name='Main'
                 component={AdminMainScreen}
+                options={{headerShown: false}}
             />
             <Stack.Screen
-                name='Activities'
+                name='Edit Activities'
                 component={AdminActivitiesScreen}
             />
+            <Stack.Screen
+                name='Competition Settings'
+                component={CompetitionSettingsScreen}
+            />
+            <Stack.Screen
+                name="Results"
+                component={Compete}
+            />
         </Stack.Navigator>
-        
     );
 }
 
