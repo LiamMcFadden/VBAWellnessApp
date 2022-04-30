@@ -18,6 +18,7 @@ let competition;
 let activities;
 //Security Rules: https://www.sentinelstand.com/article/firestore-security-rules-examples
 const fetch = async userId => {
+  if (currentUser && competition && activities) return;
   let userAndCompetitionPromise = firestore()
     .collection(USERS_COLLECTION)
     .doc(userId)
@@ -33,8 +34,10 @@ const fetch = async userId => {
           .doc(currentUser.competition)
           .get()
           .then(res => {
-            competition = res.data();
-            competition.id = currentUser.competition;
+            if(res.data()) {
+              competition = res.data();
+              competition.id = currentUser.competition;
+            }
           });
       }
     });
@@ -105,7 +108,7 @@ const getActivitiesAndCurrentUserStats = () => {
   return catList;
 };
 
-const getActivitiesAndUserStats = async (userId) => {
+const getActivitiesAndUserStats = async userId => {
   let user = await firestore().collection(USERS_COLLECTION).doc(userId).get();
   user = user.data();
   let catList = [];
@@ -135,15 +138,15 @@ const getUserById = async userId => {
 };
 const getUserPointsByCategory = async userId => {
   let userActs;
-  if(userId == curUser().uid) {
+  if (userId == curUser().uid) {
     userActs = getActivitiesAndCurrentUserStats();
   } else {
     userActs = await getActivitiesAndUserStats();
   }
   let breakdown = [0, 0, 0, 0, 0, 0];
-  
+
   userActs.forEach((category, index) => {
-    category.activities.forEach((activityStat) => {
+    category.activities.forEach(activityStat => {
       breakdown[index] += activityStat.points * activityStat.timesTotal;
     });
   });
@@ -161,6 +164,7 @@ const getCompetitionById = competitionId => {
 };
 
 const isCompetitionValid = () => {
+  if (!competition) return -1;
   const date = new Date();
   let startDate = competition['startTime'].toDate();
   let endDate = competition['endTime'].toDate();
@@ -210,6 +214,82 @@ const completeActivityForCurrentUser = activityUid => {
   stats.timesToday = stats.timesToday ? stats.timesToday + 1 : 1;
   stats.timesTotal = stats.timesTotal ? stats.timesTotal + 1 : 1;
   stats.lastCompleted = new Date();
+  if (!currentUser.badges) {
+    currentUser.badges = recalculateBadgesForCurrentUser();
+  } else {
+    switch (stats.timesTotal) {
+      case 3:
+        currentUser.badges.bronze += 1;
+        break;
+      case 5:
+        currentUser.badges.silver += 1;
+        break;
+      case 10:
+        currentUser.badges.gold += 1;
+        break;
+    }
+  }
+  userUpdate['badges'] = {
+    bronze: currentUser.badges.bronze,
+    silver: currentUser.badges.silver,
+    gold: currentUser.badges.gold,
+  };
+  userUpdate[`activityStats.${activityUid}`] = stats;
+
+  return firestore()
+    .collection(USERS_COLLECTION)
+    .doc(curUser().uid)
+    .update(userUpdate);
+};
+
+
+//Badge Scoring: bronze 1 pt, silver 2 pts, gold 3 pts 
+const recalculateBadgesForCurrentUser = () => {
+  let badges = {bronze: 0, silver: 0, gold: 0};
+  for (const [_key, value] of Object.entries(currentUser['activityStats'])) {
+    let times = value.timesTotal;
+    if (times >= 10) badges.gold += 1;
+    if (times >= 5) badges.silver += 1;
+    if (times >= 3) badges.bronze += 1;
+  }
+  return badges;
+};
+
+const undoActivityForCurrentUser = activityUid => {
+  let activity = getActivityById(activityUid);
+  let stats = getCurrentUserActivityStats(activityUid);
+
+  if (stats == undefined) {
+    stats = {};
+    currentUser['activityStats'][activityUid] = stats;
+  }
+
+  currentUser.points = currentUser.points - activity.points;
+  let userUpdate = {
+    points: currentUser.points,
+  };
+
+  stats.timesToday = stats.timesToday - 1;
+  stats.timesTotal = stats.timesTotal - 1;
+  stats.lastCompleted = new Date();
+  if (currentUser.badges) {
+    switch (stats.timesTotal) {
+      case 2:
+        currentUser.badges.bronze -= 1;
+        break;
+      case 4:
+        currentUser.badges.silver -= 1;
+        break;
+      case 9:
+        currentUser.badges.gold -= 1;
+        break;
+    }
+  }
+  userUpdate['badges'] = {
+    bronze: currentUser.badges.bronze,
+    silver: currentUser.badges.silver,
+    gold: currentUser.badges.gold,
+  };
 
   userUpdate[`activityStats.${activityUid}`] = stats;
 
@@ -228,6 +308,11 @@ const generateUserDoc = (uid, email, firstName, lastName, competitionId) => {
     points: 0,
     private: false,
     activityStats: {},
+    badges: {
+      bronze: 0,
+      silver: 0,
+      gold: 0,
+    },
   };
   return firestore().collection(USERS_COLLECTION).doc(uid).set(userObj);
 };
@@ -291,6 +376,7 @@ export {
   getActivitiesAndCurrentUserStats,
   getUserPointsByCategory,
   completeActivityForCurrentUser,
+  undoActivityForCurrentUser,
   updateCurrentUserFields,
   generateUserDoc,
 };

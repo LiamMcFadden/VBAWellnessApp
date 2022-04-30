@@ -3,9 +3,15 @@ import {Text, View, StyleSheet, Image} from 'react-native';
 import Login from './login/login';
 import BottomTabs from './navigation/app-navigator';
 import Admin from '_scenes/admin/admin';
+import {CompetitionCodeScreen} from '_scenes/joinCode/joinCode';
 import {UserProvider} from './components/Authentication/user';
 import {subscribeToAuthState, currentUser} from '_api/firebase-auth';
-import {fetch, clear, isCompetitionValid, getCurrentUser} from '_api/firebase-db';
+import {
+  fetch,
+  clear,
+  isCompetitionValid,
+  getCurrentUser,
+} from '_api/firebase-db';
 
 const styles = StyleSheet.create({
   background: {
@@ -35,22 +41,19 @@ const LoadingScreen = () => (
     <Text style={styles.text}>Wellness Challenge</Text>
   </View>
 );
-const InvalidCompetition = () => {
-  return;
-}
 export const AppRouter = () => {
   const [isLoading, setLoading] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [validCompetition, setValidCompetition] = useState(1);
 
-  function subscriptionCallback(userState) {
+  function updateAuthAndCompetition(userState) {
     if (userState != null) {
       setLoading(true);
       fetch(userState.uid)
         .then(() => {
           setLoading(false);
           setAuthenticated(true);
-          //setValidCompetition(isCompetitionValid());
+          setValidCompetition(isCompetitionValid());
           console.log('authed with ' + userState.uid);
         })
         .catch(err => {
@@ -65,34 +68,33 @@ export const AppRouter = () => {
 
   useEffect(() => {
     if (currentUser() != null) {
-      subscriptionCallback(currentUser());
+      updateAuthAndCompetition(currentUser());
     }
-    let subscription = subscribeToAuthState(subscriptionCallback);
+    let subscription = subscribeToAuthState(updateAuthAndCompetition);
     return subscription;
   }, []);
   if (isLoading) {
     return <LoadingScreen />;
   } else {
     if (authenticated) {
-      return (
-        <UserProvider>
-          {getCurrentUser().admin === true ? <Admin /> : <BottomTabs />}
-        </UserProvider>
-      );
-    } else if (validCompetition != 1) {
-      return <InvalidCompetition/>;
+      if (getCurrentUser().admin === true) {
+        return (
+          <UserProvider>
+            <Admin />
+          </UserProvider>
+        );
+      }
+      if (validCompetition == 1) {
+        return (
+          <UserProvider>
+            <BottomTabs />
+          </UserProvider>
+        );
+      } else {
+        return <CompetitionCodeScreen authCallback={updateAuthAndCompetition} valid={validCompetition} />;
+      }
     } else {
-      return <Login />
+      return <Login />;
     }
   }
-  // return isLoading ? (
-  // ) : authenticated ?
-  // validCompetition ?  : (
-  //   <UserProvider>
-  //     <BottomTabs />
-  //   </UserProvider>
-  // )
-  //   : (
-  //   <Login />
-  // );
 };
