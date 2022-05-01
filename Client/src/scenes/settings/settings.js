@@ -74,7 +74,7 @@ const SettingsScreen = ({navigation}) => {
       setImage(null);
 
       // store url to image in user doc
-      let url = storage()
+      storage()
         .ref('users/' + currentUser().uid + '/profile.jpg')
         .getDownloadURL()
         .then(url => {
