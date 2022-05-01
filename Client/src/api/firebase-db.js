@@ -25,6 +25,7 @@ const fetch = async userId => {
     .get()
     .then(res => {
       currentUser = res.data();
+      currentUser.uid = userId;
       if (
         currentUser.competition != null &&
         currentUser.competition.length > 0
@@ -107,6 +108,10 @@ const getActivitiesAndCurrentUserStats = () => {
   });
   return catList;
 };
+
+const getRecentActivitiesAndStats = () => {
+  return getActivitiesAndCurrentUserStats.sort((a,b ) => a.lastCompleted.toDate() - b.lastCompleted.toDate());
+}
 
 const getActivitiesAndUserStats = async userId => {
   let user = await firestore().collection(USERS_COLLECTION).doc(userId).get();

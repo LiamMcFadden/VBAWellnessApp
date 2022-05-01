@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
   StyleSheet,
   Text,
@@ -18,6 +19,7 @@ import {
 import Compete from '_scenes/compete/compete';
 
 export {CompetitionCodeScreen};
+
 const CompetitionCodeScreen = ({navigation, authCallback, valid }) => {
   switch (valid) {
     case -1:
@@ -25,7 +27,7 @@ const CompetitionCodeScreen = ({navigation, authCallback, valid }) => {
     case 0:
       return <StartingSoonScreen />;
     case 2:
-      return <EndedScreen />;
+      return <EndedScreenStack />;
   }
 };
 
@@ -33,7 +35,7 @@ const alert = (title, msg) => {
   return Alert.alert(title, msg);
 };
 
-const MissingCodeScreen = ({authCallback, valid}) => {
+const MissingCodeScreen = ({authCallback}) => {
   const [competitionCode, setCompetitionCode] = useState('');
   const [loading, setLoading] = useState(false);
   const validate = () => {
@@ -100,9 +102,12 @@ const StartingSoonScreen = () => { //FIXME: Needs styling
     </View>
   );
 };
+
+const Stack = createNativeStackNavigator();
+
 const EndedScreen = ({navigation}) => {
   const viewResults = () => {
-    //navigation.navigate(<Compete/>); //FIXME: I don't think this works
+    navigation.navigate('Compete');
   };
   return (
     <View>
@@ -113,11 +118,30 @@ const EndedScreen = ({navigation}) => {
     </View>
   );
 };
+
+const EndedScreenStack = () => {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: true}}>
+        <Stack.Screen
+            name='Main'
+            component={EndedScreen}
+            options={{headerShown: false}}
+        />
+        <Stack.Screen
+            name='Compete'
+            component={Compete}
+            options={{headerTitle: 'Results'}}
+        />
+    </Stack.Navigator>
+    
+);
+}
 const Background = () => (
   <View style={styles.topColor}>
     <View style={styles.bottomColor}></View>
   </View>
 );
+
 const window = Dimensions.get('window');
 const styles = StyleSheet.create({
   topColor: {

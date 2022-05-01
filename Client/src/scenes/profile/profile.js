@@ -20,8 +20,7 @@ import {
 } from 'victory-native';
 import {OutlinedButton, ContainedButton} from '../../globals/styledcomponents';
 import SwitchSelector from 'react-native-switch-selector';
-import {getUserPointsByCategory} from '_api/firebase-db';
-import {currentUser } from '_api/firebase-auth';
+import {getUserPointsByCategory, getUserById, getCurrentUser} from '_api/firebase-db';
 import {UserContext} from '_components/Authentication/user'
 import ProgressBar from './progressbar';
 
@@ -40,14 +39,6 @@ const user = {
     {x: 'Social', y: 8},
   ],
 };
-
-const test = [
-  {x: 1, y: 2},
-  {x: 8, y: 3},
-  {x: 2, y: 5},
-  {x: 4, y: 1},
-  {x: 5, y: 8},
-];
 
 const BarChart = ({data, width}) => (
   <VictoryPie
@@ -81,12 +72,13 @@ const Background = () => (
   </View>
 );
 
-export default function Profile({navigation}) {
+export default function Profile(props) {
   const {height: wheight, width: wwidth} = useWindowDimensions();
   const [showBar, setShowBar] = useState(true);
   const [chartData, setChartData] = useState([]);
+  const [user, setUser] = useState({});
   const {state} = useContext(UserContext);
-  //TODO Replace with request or cached data?
+  
   const fetchChartData = (userId) => {
     return getUserPointsByCategory(userId).then((data) => {
       let chartData = [];
@@ -99,13 +91,15 @@ export default function Profile({navigation}) {
       return chartData;
     }).catch(console.error);
   }
-  useEffect(() => {
-    fetchChartData(currentUser().uid).then((data) => {
-      setChartData(data);
-    });
 
-    //setChartData(user.categoryOverview);
+  useEffect(() => {
+    let id = props.route.params.userId;
+    fetchChartData(id).then((data) => {
+      setChartData(data);
+      setUser(id == getCurrentUser().uid ? getCurrentUser() : getUserById(id));
+    });
   }, []);
+
   return (
     <>
       <Background />
@@ -121,20 +115,20 @@ export default function Profile({navigation}) {
               style={{
                 ...TYPESCALE.h6,
                 textAlign: 'center',
-              }}>{`${state.firstName} ${state.lastName}`}</Text>
+              }}>{`${user.firstName} ${user.lastName}`}</Text>
             <Text
               style={{
                 ...TYPESCALE.subtitle,
                 margin: 5,
                 textAlign: 'center',
-              }}>{`${state.email}`}</Text>
+              }}>{`${user.email}`}</Text>
           </View>
 
           <View style={{alignItems: 'center', marginTop: 15}}>
-            <Text style={[TYPESCALE.subtitle]}>{state.points} pts{/*Level. 7*/}</Text>
+            <Text style={[TYPESCALE.subtitle]}>{user.points} pts{/*Level. 7*/}</Text>
             <ProgressBar
-              points={state.points}
-              milestone={state.points}
+              points={user.points}
+              milestone={user.points * 1.5}
               width={wwidth / 1.5}
             />
           </View>

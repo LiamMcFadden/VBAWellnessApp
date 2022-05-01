@@ -256,7 +256,7 @@ const PlayerCard = props => {
         break;
     }
   }
-
+  // onPress={navigation.navigate('Profile', {userId: props.props.uid})}
   return (
     <View style={[styles.playerCard, {backgroundColor: backgroundColor}]}>
       <Text style={styles.playerRank}> {props.props.rank} </Text>

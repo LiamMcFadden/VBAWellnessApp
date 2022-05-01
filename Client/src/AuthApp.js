@@ -91,7 +91,14 @@ export const AppRouter = () => {
           </UserProvider>
         );
       } else {
-        return <CompetitionCodeScreen authCallback={updateAuthAndCompetition} valid={validCompetition} />;
+        return (
+          <UserProvider>
+            <CompetitionCodeScreen
+              authCallback={updateAuthAndCompetition}
+              valid={validCompetition}
+            />
+          </UserProvider>
+        );
       }
     } else {
       return <Login />;
