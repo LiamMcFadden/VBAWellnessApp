@@ -11,8 +11,8 @@ import {
 import SwitchSelector from 'react-native-switch-selector';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ProfilePicture from 'react-native-profile-picture';
-import {getAllUsers, getCurrentUser} from '../../api/firebase-db';
-import {UserContext} from '_components/Authentication/user';
+import {getAllUsers} from '../../api/firebase-db';
+import { currentUser } from '_api/firebase-auth';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -120,12 +120,11 @@ const PointsorBadges = () => {
 /*
  * Displays the pfp/icon for first place user
  */
-const First = () => {
-  // TODO: replace with query to db
-  let pfp = null;
+const First = (props) => {
+  let pfp = props.props.profileImage;
 
   // use default icon if no pfp is found
-  if (pfp === null) {
+  if (pfp === undefined) {
     pfp = (
       <Ionicons
         style={styles.cardIcon}
@@ -136,7 +135,7 @@ const First = () => {
     );
   } else {
     pfp = (
-      <ProfilePicture isPicture={true} requirePicture={pfp} shape="circle" />
+      <ProfilePicture isPicture={true} URLPicture={pfp} shape="circle" />
     );
   }
 
@@ -151,12 +150,11 @@ const FirstLabel = props => {
 /*
  * Displays the pfp/icon for second and third place user
  */
-const SecondAndThird = () => {
-  // TODO: replace with query to db
-  let pfpSecond = null;
+const SecondAndThird = (props) => {
+  let pfpSecond = props.props[0].profileImage;
 
   // use default icon if no pfp is found
-  if (pfpSecond === null) {
+  if (pfpSecond === undefined) {
     pfpSecond = (
       <Ionicons
         style={styles.cardIcon}
@@ -169,17 +167,16 @@ const SecondAndThird = () => {
     pfpSecond = (
       <ProfilePicture
         isPicture={true}
-        requirePicture={pfpSecond}
+        URLPicture={pfpSecond}
         shape="circle"
       />
     );
   }
 
-  //let pfpThird = require('./test.png');
-  let pfpThird = null;
+  let pfpThird = props.props[1].profileImage;
 
   // use default icon if no pfp is found
-  if (pfpThird === null) {
+  if (pfpThird === undefined) {
     pfpThird = (
       <Ionicons
         style={styles.cardIcon}
@@ -192,7 +189,7 @@ const SecondAndThird = () => {
     pfpThird = (
       <ProfilePicture
         isPicture={true}
-        requirePicture={pfpThird}
+        URLPicture={pfpThird}
         shape="circle"
       />
     );
@@ -229,10 +226,9 @@ const PlayerCard = props => {
 
   let backgroundColor = 'white';
 
-  // TODO: replace with DB query
-  let pfp = null;
+  let pfp = props.props.profileImage;
   // use default icon if no pfp is found
-  if (pfp === null) {
+  if (pfp === undefined) {
     pfp = (
       <Ionicons
         style={styles.cardIcon}
@@ -243,7 +239,7 @@ const PlayerCard = props => {
     );
   } else {
     pfp = (
-      <ProfilePicture isPicture={true} requirePicture={pfp} shape="circle" />
+      <ProfilePicture isPicture={true} URLPicture={pfp} shape="circle" />
     );
   }
 
@@ -260,7 +256,7 @@ const PlayerCard = props => {
         break;
     }
   }
-
+  // onPress={navigation.navigate('Profile', {userId: props.props.uid})}
   return (
     <View style={[styles.playerCard, {backgroundColor: backgroundColor}]}>
       <Text style={styles.playerRank}> {props.props.rank} </Text>
@@ -278,7 +274,6 @@ const Compete = () => {
   const [second, setSecond] = useState([]);
   const [third, setThird] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const {state, completeActivity} = useContext(UserContext);
 
   // background refresh
   // rate is set to 3 secs by default
@@ -307,6 +302,7 @@ const Compete = () => {
 
       // get array of user data
       allUsers.docs.map(doc => {
+        doc.data().uid = doc.id;
         tempUsers.push(doc.data());
       });
 
@@ -343,7 +339,7 @@ const Compete = () => {
             break;
         }
 
-        if (user.email === state.email) {
+        if (user.uid === currentUser().uid) {
           tempCurrUser = user;
         }
       });
@@ -375,9 +371,9 @@ const Compete = () => {
       <View style={{flex: 1}}>
         <PlayerCard props={currUser} />
         <PointsorBadges />
-        <First />
+        <First props={first} />
         <FirstLabel props={first} />
-        <SecondAndThird />
+        <SecondAndThird props={[second, third]} />
         <SecondAndThirdLabels props={[second, third]} />
         <View style={{flex: 1}}>
           <FlatList

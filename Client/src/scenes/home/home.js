@@ -17,6 +17,7 @@ import {
   updateCurrentUserFields,
   completeActivityForCurrentUser,
 } from '_api/firebase-db';
+import {currentUser} from '_api/firebase-auth';
 import {Header, ListItem} from '_atoms';
 import Card from './card';
 import {OutlinedButton} from '../../globals/styledcomponents';
@@ -90,7 +91,7 @@ const ProfileCard = ({navigation}) => {
       </OutlinedButton> */}
       <TouchableHighlight 
       underlayColor={COLORS.tintPrimary(0.2)}
-      onPress={() => navigation.navigate("Profile")}
+      onPress={() => navigation.navigate("Profile", {userId: currentUser().uid})}
       style={{
         width: '40%',
         height: 35,
