@@ -303,7 +303,10 @@ const Compete = () => {
       // get array of user data
       allUsers.docs.map(doc => {
         doc.data().uid = doc.id;
-        tempUsers.push(doc.data());
+
+        // ignore admins
+        if (!doc.data().admin) 
+          tempUsers.push(doc.data());
       });
 
       // sort by points and assign ranks
