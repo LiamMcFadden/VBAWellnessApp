@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import { Text, View, TextInput, KeyboardAvoidingView, StatusBar, Alert, UIManager, SafeAreaView, LayoutAnimation, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import Modal from "react-native-modal";
+import DatePicker from 'react-native-date-picker'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {Picker} from '@react-native-picker/picker';
 import CheckBox from '@react-native-community/checkbox';
@@ -74,20 +75,60 @@ const competitionStatus = () => {
 
 const CompetitionSettingsScreen = ({navigation}) => {
 
-    const [startDate, setStartDate] = useState(getCurrentCompetition()['startTime'].toDate().toLocaleDateString())
-    const [endDate, setEndDate] = useState(getCurrentCompetition()['endTime'].toDate().toLocaleDateString())
+    const [startDate, setStartDate] = useState(getCurrentCompetition()['startTime'].toDate())
+    const [endDate, setEndDate] = useState(getCurrentCompetition()['endTime'].toDate())
 
     const [datesChanged, setDatesChanged] = useState(false);
 
     const saveDates = () => {
-
+        if(startDate > endDate) {
+            Alert.alert(
+                "Incorrect Dates",
+                "Make sure that the start date is not later than the end date.",
+                [
+                    {
+                        text: 'OK',
+                    },
+                ],
+                {
+                    cancelable: true
+                }
+            );
+        }
+        else {
+            //TODO: make this save the start and end dates into the database, overwriting the old ones (so the admin can change the dates of the current competition)
+        }
     };
 
     const discardDates = () => {
-        setStartDate(getCurrentCompetition()['startTime'].toDate().toLocaleDateString());
-        setEndDate(getCurrentCompetition()['endTime'].toDate().toLocaleDateString());
+        setStartDate(getCurrentCompetition()['startTime'].toDate());
+        setEndDate(getCurrentCompetition()['endTime'].toDate());
         setDatesChanged(false);
     }
+
+    const startNewCompetition = () => {
+        Alert.alert(
+            "Start New Competition?",
+            "If you start a new competition, all previous competition data will be wiped.\n\nRemember to set the competition dates after making the new competition.",
+            [
+                {
+                    text: 'Cancel',
+                },
+                {
+                    text: 'Confirm',
+                    onPress: () => {
+                        //TODO: make this function start a new competition (generate new competition code and wipe all previous competition data from the database)
+                    }
+                }
+            ],
+            {
+                cancelable: true
+            }
+        );
+    }
+
+    const [startOpen, setStartOpen] = useState(false);
+    const [endOpen, setEndOpen] = useState(false);
 
     return (
         <SafeAreaView behavior='padding' style={{flex: 1, alignItems: 'center'}}>
@@ -104,26 +145,38 @@ const CompetitionSettingsScreen = ({navigation}) => {
                         <View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-around'}}>
                             <View style={{width: '50%', alignItems: 'center'}}>
                                 <Text style={{fontSize: 18, color: 'dimgray'}}>Start Date</Text>
-                                <TextInput
-                                    value={startDate}
-                                    onChangeText={text => {
-                                        setStartDate(text);
-                                        setDatesChanged(true);
+                                <Text onPress={() => setStartOpen(true)} style={{paddingTop: 10, paddingBottom: 10, width: '80%', fontSize: 18, borderWidth: 1, borderRadius: 50, borderColor: 'lightgrey', color: 'dimgray', textAlign: 'center'}}>{startDate.toLocaleDateString()}</Text>
+                                <DatePicker
+                                    modal
+                                    open={startOpen}
+                                    date={startDate}
+                                    onConfirm={(date) => {
+                                    setStartOpen(false)
+                                    setStartDate(date)
+                                    setDatesChanged(true)
                                     }}
-                                    textAlign={'center'}
-                                    style={{width: '80%', fontSize: 18, borderWidth: 1, borderRadius: 50, borderColor: 'lightgrey', color: 'dimgray'}}
+                                    onCancel={() => {
+                                    setStartOpen(false)
+                                    }}
+                                    mode="date"
                                 />
                             </View>
                             <View style={{width: '50%', alignItems: 'center'}}>
                                 <Text style={{fontSize: 18, color: 'dimgray'}}>End Date</Text>
-                                <TextInput
-                                    value={endDate}
-                                    onChangeText={text => {
-                                        setEndDate(text);
-                                        setDatesChanged(true);
+                                <Text onPress={() => setEndOpen(true)} style={{paddingTop: 10, paddingBottom: 10, width: '80%', fontSize: 18, borderWidth: 1, borderRadius: 50, borderColor: 'lightgrey', color: 'dimgray', textAlign: 'center'}}>{endDate.toLocaleDateString()}</Text>
+                                <DatePicker
+                                    modal
+                                    open={endOpen}
+                                    date={endDate}
+                                    onConfirm={(date) => {
+                                    setEndOpen(false)
+                                    setEndDate(date)
+                                    setDatesChanged(true)
                                     }}
-                                    textAlign={'center'}
-                                    style={{width: '80%', fontSize: 18, borderWidth: 1, borderRadius: 50, borderColor: 'lightgrey', color: 'dimgray'}}
+                                    onCancel={() => {
+                                    setEndOpen(false)
+                                    }}
+                                    mode="date"
                                 />
                             </View>
                         </View>
@@ -134,7 +187,7 @@ const CompetitionSettingsScreen = ({navigation}) => {
                             <Text style={{fontSize: 15, color: '#0155A4'}}>Discard Changes</Text>
                         </TouchableOpacity>
                     </View>
-                    <TouchableOpacity style={{backgroundColor: '#a52a2a', width: '80%', alignItems: 'center', borderRadius: 50, paddingTop: 10, paddingBottom: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.8, shadowRadius: 2, elevation: 5}}>
+                    <TouchableOpacity onPress={() => startNewCompetition()} style={{backgroundColor: '#a52a2a', width: '80%', alignItems: 'center', borderRadius: 50, paddingTop: 10, paddingBottom: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.8, shadowRadius: 2, elevation: 5}}>
                         <Text style={{fontSize: 20, color: 'white'}}>Start New Competition</Text>
                     </TouchableOpacity>
                 </View>
@@ -158,7 +211,7 @@ const AdminActivitiesScreen = ({navigation}) => {
     }
 
     return (
-        <View style={{flex: 1}}>
+        <SafeAreaView style={{flex: 1}}>
             <View style={{flex: 1}}>
                 <FlatList 
                     data={getActivities()}
@@ -178,7 +231,7 @@ const AdminActivitiesScreen = ({navigation}) => {
                     <ActivityModal wellnessCategory={null} activity={null} toggleModal={() => toggleModal()} />
                 </Modal>
             </View>
-        </View>
+        </SafeAreaView>
     );
 }
 
