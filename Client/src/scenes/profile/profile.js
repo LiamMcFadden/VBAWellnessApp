@@ -1,28 +1,17 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, {useState, useEffect, useContext} from 'react';
+//ofile Screen
+import React, { useContext, useEffect, useState } from 'react';
 import {
-  View,
-  Text,
   SafeAreaView,
-  StyleSheet,
-  useWindowDimensions,
+  StyleSheet, Text, useWindowDimensions, View
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {COLORS, TYPESCALE} from '../../globals/styles';
 import {
-  VictoryPolarAxis,
-  VictoryChart,
-  VictoryPie,
-  VictoryTheme,
-  VictoryBar,
-  VictoryArea,
-  VictoryLabel,
+  VictoryLabel, VictoryPie
 } from 'victory-native';
-import {OutlinedButton, ContainedButton} from '../../globals/styledcomponents';
-import SwitchSelector from 'react-native-switch-selector';
-import {getUserPointsByCategory, getUserById, getCurrentUser} from '_api/firebase-db';
-import {UserContext} from '_components/Authentication/user'
-import ProgressBar from './progressbar';
+import { getCurrentUser, getUserById, getUserPointsByCategory } from '_api/firebase-db';
+import { UserContext } from '_components/Authentication/user';
+import { COLORS, TYPESCALE } from '../../globals/styles';
+import { ProgressBar } from '../../globals/styledcomponents'
 
 const user = {
   firstname: 'John',
@@ -31,16 +20,16 @@ const user = {
   points: 79,
   milestone: 100,
   categoryOverview: [
-    {x: 'Occupational', y: 25},
-    {x: 'Intellectual', y: 12},
-    {x: 'Spritual', y: 19},
-    {x: 'Physical', y: 9},
-    {x: 'Emotional', y: 5},
-    {x: 'Social', y: 8},
+    { x: 'Occupational', y: 25 },
+    { x: 'Intellectual', y: 12 },
+    { x: 'Spritual', y: 19 },
+    { x: 'Physical', y: 9 },
+    { x: 'Emotional', y: 5 },
+    { x: 'Social', y: 8 },
   ],
 };
 
-const BarChart = ({data, width}) => (
+const BarChart = ({ data, width }) => (
   <VictoryPie
     // animate={{easing: 'exp', duration: 5000}}
     colorScale={[
@@ -58,8 +47,8 @@ const BarChart = ({data, width}) => (
     labelComponent={
       <VictoryLabel
         size={6}
-        verticalAnchor={({text}) => (text.length > 1 ? 'start' : 'middle')}
-        textAnchor={({text}) => (text.length > 1 ? 'start' : 'middle')}
+        verticalAnchor={({ text }) => (text.length > 1 ? 'start' : 'middle')}
+        textAnchor={({ text }) => (text.length > 1 ? 'start' : 'middle')}
       />
     }
   />
@@ -73,25 +62,24 @@ const Background = () => (
 );
 
 export default function Profile(props) {
-  const {height: wheight, width: wwidth} = useWindowDimensions();
-  const [showBar, setShowBar] = useState(true);
+  const { height: wheight, width: wwidth } = useWindowDimensions();
+
   const [chartData, setChartData] = useState([]);
   const [user, setUser] = useState({});
-  const {state} = useContext(UserContext);
-  
+  const { state } = useContext(UserContext);
+
   const fetchChartData = (userId) => {
     return getUserPointsByCategory(userId).then((data) => {
       let chartData = [];
 
-      data.forEach((obj) => {
-        chartData.push({x: obj.category, y: obj.total});
-      })
+      data.forEach(obj => {
+        chartData.push({ x: obj.category, y: obj.total });
+      });
       chartData = chartData.filter(obj => obj.y > 0);
 
       return chartData;
     }).catch(console.error);
   }
-
   useEffect(() => {
     let id = props.route.params.userId;
     fetchChartData(id).then((data) => {
@@ -105,7 +93,7 @@ export default function Profile(props) {
       <Background />
       <SafeAreaView style={styles.profileContainer}>
         <View style={styles.heading}>
-          <View style={{alignItems: 'center'}}>
+          <View style={{ alignItems: 'center' }}>
             <Ionicons
               name="person-circle-outline"
               size={100}
@@ -115,6 +103,7 @@ export default function Profile(props) {
               style={{
                 ...TYPESCALE.h6,
                 textAlign: 'center',
+                color: COLORS.primary
               }}>{`${user.firstName} ${user.lastName}`}</Text>
             <Text
               style={{
@@ -124,20 +113,18 @@ export default function Profile(props) {
               }}>{`${user.email}`}</Text>
           </View>
 
-          <View style={{alignItems: 'center', marginTop: 15}}>
-            <Text style={[TYPESCALE.subtitle]}>{user.points} pts{/*Level. 7*/}</Text>
+          <View style={{ alignItems: 'center', marginTop: 15 }}>
+            <Text style={[TYPESCALE.h6, {color: COLORS.primary}]}>{user.points} pts</Text>
             <ProgressBar
               points={user.points}
-              milestone={user.points * 1.5}
               width={wwidth / 1.5}
+              textOrientation={'center'}
             />
           </View>
         </View>
 
         <View
           style={{
-            
-            
             justifyContent: 'flex-start',
             alignItems: 'center',
             height: 0.5 * wheight,
@@ -149,7 +136,6 @@ export default function Profile(props) {
               {
                 alignSelf: 'center',
                 marginBottom: 10,
-                
               },
             ]}>
             Your Top Categories
@@ -219,14 +205,25 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 25,
   },
   heading: {
     height: 'auto',
     width: '100%',
-    paddingBottom: 10,
+    paddingBottom: 20,
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#f8f8f8'
+    backgroundColor: '#f8f8f8',
+
+    shadowOffset: {
+      width: 1,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 0,
+    marginBottom: 20,
   },
 });

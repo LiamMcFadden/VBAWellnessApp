@@ -6,6 +6,7 @@ import {
     getCurrentUserActivityStats,
 } from '_api/firebase-db';
 
+
 const Activity = ({activity, action, toggleView}) => {
 
     let stats = getCurrentUserActivityStats(activity.uid);
@@ -49,9 +50,9 @@ const Activity = ({activity, action, toggleView}) => {
             </View>
             <ScrollView style={{margin: 15}} contentContainerStyle={{flexGrow: 1}}>
                 {/* PLACEHOLDER: the image for the activity can be rendered in this view */}
-                <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'lightgrey', width: '100%', height: 150, marginBottom: 10}}>
+                {/* <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'lightgrey', width: '100%', height: 150, marginBottom: 10}}>
                     <Text style={{fontSize: 15}}>Filler for where an optional image will go</Text>
-                </View>
+                </View> */}
                 <Text style={{flex: 1, fontWeight: '600', color: 'dimgrey'}}>{activity.description}</Text>
             </ScrollView>
             <TouchableOpacity style={styles.completeButton} onPress={completeActivity}>

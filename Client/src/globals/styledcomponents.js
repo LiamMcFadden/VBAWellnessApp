@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import {
   TouchableHighlight,
   TouchableOpacity
@@ -61,10 +61,11 @@ const ContainedButton = ({
  *    points --> users current total
  *    width? --> optional parameter specifying bar width
  * */
-const ProgressBar = ({ milestone, points, width }) => {
-  const percentComplete = points / milestone;
+const ProgressBar = ({ points, width, textOrientation }) => {
+  const percentComplete = (points % 100) / 100;
   const foregroundWidth = useSharedValue(5);
-  const progress_styles = progess_bar_styles(width);
+  const progress_styles = progess_bar_styles(width, textOrientation);
+  const level = Math.floor(points / 100) + 1;
 
   useEffect(() => {
     foregroundWidth.value = percentComplete * width;
@@ -78,17 +79,16 @@ const ProgressBar = ({ milestone, points, width }) => {
   });
 
   return (
-    <TouchableOpacity
-      onPress={() => {
-        foregroundWidth.value = 100;
-      }}
-      style={progress_styles.background}>
+    <>
+    <Text style={progress_styles.text}>Level {level}</Text>
+    <View style={progress_styles.background}>
       <Animated.View style={[progress_styles.foreground, animatedStyles]} />
-    </TouchableOpacity>
+    </View>
+    </>
   );
 };
 
-const progess_bar_styles = width =>
+const progess_bar_styles = (width, textOrientation) =>
   StyleSheet.create({
     background: {
       backgroundColor: COLORS.secondary,
@@ -102,6 +102,10 @@ const progess_bar_styles = width =>
       height: 10,
       borderRadius: 24,
     },
+
+    text: {
+      alignSelf: textOrientation
+    }
   });
 
 export { ProgressBar, OutlinedButton, ContainedButton };

@@ -1,6 +1,6 @@
-import React, {useEffect} from 'react';
-import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
-import {COLORS, TYPESCALE, FONTWEIGHT} from '../../globals/styles';
+import React, { useEffect } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { COLORS, TYPESCALE, FONTWEIGHT } from '../../globals/styles';
 import Animated, {
   SharedValue,
   useAnimatedStyle,
@@ -9,7 +9,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 
-const ProgressBar = ({milestone, points, width}) => {
+const ProgressBar = ({ milestone, points, width }) => {
   const percentComplete = points / milestone;
   const foregroundWidth = useSharedValue(5);
   const progress_styles = styles(width, percentComplete);
@@ -27,10 +27,7 @@ const ProgressBar = ({milestone, points, width}) => {
   });
 
   return (
-    <TouchableOpacity
-      onPress={() => {
-        foregroundWidth.value = 100;
-      }}
+    <View
       style={progress_styles.background}>
       <Animated.View
         style={[
@@ -42,7 +39,7 @@ const ProgressBar = ({milestone, points, width}) => {
           animatedStyles,
         ]}
       />
-    </TouchableOpacity>
+    </View>
   );
 };
 
