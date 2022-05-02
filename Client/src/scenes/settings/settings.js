@@ -6,6 +6,7 @@ import {getCurrentUser} from '_api/firebase-db';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Admin from '_scenes/admin/admin';
 import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
 import { currentUser } from '_api/firebase-auth';
 import { _taskHandle } from 'react-native/Libraries/Interaction/Batchinator';
 import * as ImagePicker from 'react-native-image-picker';
@@ -16,6 +17,7 @@ const Stack = createNativeStackNavigator();
 const SettingsScreen = ({navigation}) => {
   //const { signOut } = useContext(AuthContext)?.functions
 
+  // screen for uploading an image
   const UploadScreen = () => {
     const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
@@ -70,6 +72,20 @@ const SettingsScreen = ({navigation}) => {
 
       setUploading(false);
       setImage(null);
+
+      // store url to image in user doc
+      storage()
+        .ref('users/' + currentUser().uid + '/profile.jpg')
+        .getDownloadURL()
+        .then(url => {
+          firestore()
+            .collection('Users')
+            .doc(currentUser().uid)
+            .update({
+              profileImage: url
+            });
+        });
+
     };
 
     return (

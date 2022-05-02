@@ -1,7 +1,6 @@
 import firestore from '@react-native-firebase/firestore'
 import uuid from 'react-native-uuid'
-import warnOnce from 'react-native/Libraries/Utilities/warnOnce'
-import {currentUser as curUser} from '_api/firebase-auth'
+import { currentUser as curUser } from '_api/firebase-auth'
 const COMPETITIONS_COLLECTION = 'Competitions'
 const USERS_COLLECTION = 'Users'
 const ACTIVITIES_DOC = 'Activities'
@@ -27,7 +26,8 @@ const fetch = async userId => {
     .doc(userId)
     .get()
     .then(res => {
-      currentUser = res.data()
+      currentUser = res.data();
+      currentUser.uid = userId;
       if (
         currentUser.competition != null &&
         currentUser.competition.length > 0
@@ -71,7 +71,7 @@ const getActivities = () => {
 const getActivityById = activityUid => {
   let activity
   activities.forEach(category => {
-    let found = category.activities.find(({uid}) => {
+    let found = category.activities.find(({ uid }) => {
       return uid === activityUid
     })
     if (found) {
@@ -109,6 +109,10 @@ const getActivitiesAndCurrentUserStats = () => {
     })
   })
   return catList
+}
+
+const getRecentActivitiesAndStats = () => {
+  return getActivitiesAndCurrentUserStats.sort((a, b) => a.lastCompleted.toDate() - b.lastCompleted.toDate());
 }
 
 const getActivitiesAndUserStats = async userId => {
@@ -155,7 +159,7 @@ const getUserPointsByCategory = async userId => {
   })
 
   return CATEGORIES.map((name, index) => {
-    return {category: name, total: breakdown[index]}
+    return { category: name, total: breakdown[index] }
   })
 }
 
@@ -251,7 +255,7 @@ const completeActivityForCurrentUser = activityUid => {
 
 //Badge Scoring: bronze 1 pt, silver 2 pts, gold 3 pts
 const recalculateBadgesForCurrentUser = () => {
-  let badges = {bronze: 0, silver: 0, gold: 0}
+  let badges = { bronze: 0, silver: 0, gold: 0 }
   for (const [_key, value] of Object.entries(currentUser.activityStats)) {
     let times = value.timesTotal
     if (times >= 10) {
@@ -349,7 +353,7 @@ const updateActivity = updated => {
   return firestore()
     .collection(COMPETITIONS_COLLECTION)
     .doc(ACTIVITIES_DOC)
-    .set({categories: activities})
+    .set({ categories: activities })
 }
 
 const addActivity = newActivity => {
@@ -452,4 +456,4 @@ export {
   deleteActivity,
   getActivitiesSortedByDate,
 }
-export {fetch, clear}
+export { fetch, clear }

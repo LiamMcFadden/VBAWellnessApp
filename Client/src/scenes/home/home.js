@@ -1,35 +1,21 @@
 /* eslint-disable react-native/no-inline-styles */
-import {useFocusEffect} from '@react-navigation/native'
-import React, {useState, useCallback, useEffect, useRef} from 'react'
+import { useFocusEffect } from '@react-navigation/native'
+import React, { useCallback, useState } from 'react'
 import {
-  Dimensions,
-  FlatList,
-  StyleSheet,
+  Dimensions, Image, StyleSheet,
   Text,
-  TouchableOpacity,
-  TouchableHighlight,
-  View,
-  ScrollView,
-  Image
+  TouchableOpacity, View
 } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import warnOnce from 'react-native/Libraries/Utilities/warnOnce'
-import {SafeAreaView} from 'react-navigation'
+import { SafeAreaView } from 'react-navigation'
 import {
-  getCurrentUserActivityStats,
-  getActivitiesByCategory,
-  getCurrentUser,
-  updateCurrentUserFields,
-  completeActivityForCurrentUser,
-  getActivitiesAndCurrentUserStats,
   getActivitiesSortedByDate,
-  getActivityById,
+  getActivityById, getCurrentUser
 } from '_api/firebase-db'
-import {OutlinedButton} from '../../globals/styledcomponents'
-import {TYPESCALE, COLORS} from '../../globals/styles'
+import { OutlinedButton, ProgressBar } from '../../globals/styledcomponents'
+import { COLORS, TYPESCALE } from '../../globals/styles'
 import Activities from './activityList'
 import VBALogo from './cartoon.jpg'
-import {ProgressBar} from "../../globals/styledcomponents"
 
 const windowWidth = Dimensions.get('window').width
 const windowHeight = Dimensions.get('window').height
@@ -64,9 +50,9 @@ const profileStyles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
-  pfpImage : {
+  pfpImage: {
     position: 'absolute',
-    width:0.95 * windowWidth,    
+    width: 0.95 * windowWidth,
     height: "80%",
     top: 0,
     marginLeft: 0,
@@ -75,20 +61,20 @@ const profileStyles = StyleSheet.create({
 
 })
 
-const PFP = ({navigation}) => {
+const PFP = ({ navigation }) => {
   const name = getCurrentUser().firstName + ' ' + getCurrentUser().lastName
   return (
-    <TouchableOpacity 
-      onPress={() => navigation.navigate('Profile')}      
+    <TouchableOpacity
+      onPress={() => navigation.navigate('Profile')}
       style={[profileStyles.profileContainer,
-      {padding: 0, alignItems: 'flex-start', justifyContent: 'flex-end', overflow: 'hidden', backgroundColor: "#fff"}]}
+      { padding: 0, alignItems: 'flex-start', justifyContent: 'flex-end', overflow: 'hidden', backgroundColor: "#fff" }]}
     >
       <Image style={profileStyles.pfpImage} source={VBALogo} />
-      <View style={{width: "100%", flexDirection: 'row', height: 30, justifyContent: "space-between"}}>
-        <Text style={[{color: "black", ...TYPESCALE.h6, marginLeft: 0, textAlign: 'center'}]}>{name}</Text>
-        <View style={{justifyContent: 'flex-start'}}>
-          <Text style={{...TYPESCALE.body1}}> Lvl 5 </Text>
-          <ProgressBar width={(0.95 * windowWidth) * 0.5} points={50} milestone={100}/>
+      <View style={{ width: "100%", flexDirection: 'row', height: 30, justifyContent: "space-between" }}>
+        <Text style={[{ color: "black", ...TYPESCALE.h6, marginLeft: 0, textAlign: 'center' }]}>{name}</Text>
+        <View style={{ justifyContent: 'flex-start' }}>
+          <Text style={{ ...TYPESCALE.body1 }}> Lvl 5 </Text>
+          <ProgressBar width={(0.95 * windowWidth) * 0.5} points={50} milestone={100} />
         </View>
       </View>
     </TouchableOpacity>
@@ -102,7 +88,7 @@ const PFP = ({navigation}) => {
  * // TODO This will need to be moved into its own file later
  * // TODO Check Styles for responsiveness --> this might not be good Right now
  */
-const ProfileCard = ({navigation}) => {
+const ProfileCard = ({ navigation }) => {
   const name = getCurrentUser().firstName + ' ' + getCurrentUser().lastName
   return (
     <View style={profileStyles.profileContainer}>
@@ -114,7 +100,7 @@ const ProfileCard = ({navigation}) => {
       <OutlinedButton
         width={'40%'}
         height={35}
-        buttonStyle={{marginBottom: 0, marginLeft: 0}}
+        buttonStyle={{ marginBottom: 0, marginLeft: 0 }}
         onPress={() => navigation.navigate('Profile')}
       >
         <View style={profileStyles.pfpBtnContents}>
@@ -122,7 +108,7 @@ const ProfileCard = ({navigation}) => {
           <Text
             style={[
               TYPESCALE.button,
-              {marginLeft: 20, textAlign: 'center', color: COLORS.primary},
+              { marginLeft: 20, textAlign: 'center', color: COLORS.primary },
             ]}
           >
             Profile
@@ -132,7 +118,7 @@ const ProfileCard = ({navigation}) => {
     </View>
   )
 }
-const Home = ({navigation}) => {
+const Home = ({ navigation }) => {
   const [items, setItems] = useState([])
   const [totalPoints, setTotalPoints] = useState(getCurrentUser().points)
 
@@ -159,7 +145,7 @@ const Home = ({navigation}) => {
     addPointsMemoized()
   }
   return (
-    <SafeAreaView style={{backgroundColor: '#F3F4F7', height: '100%'}}>
+    <SafeAreaView style={{ backgroundColor: '#F3F4F7', height: '100%' }}>
       <PFP navigation={navigation} />
       <Activities activities={items} activityCompleted={handlePointsUpdate} />
     </SafeAreaView>

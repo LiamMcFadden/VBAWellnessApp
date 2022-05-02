@@ -1,19 +1,16 @@
 //ofile Screen
-import React, {useState, useEffect, useContext} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
-  View,
-  Text,
   SafeAreaView,
-  StyleSheet,
-  useWindowDimensions,
+  StyleSheet, Text, useWindowDimensions, View
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {COLORS, TYPESCALE} from '../../globals/styles';
-import {VictoryPie, VictoryLabel} from 'victory-native';
-
-import {getUserPointsByCategory} from '_api/firebase-db';
-import {currentUser} from '_api/firebase-auth';
-import {UserContext} from '_components/Authentication/user';
+import {
+  VictoryLabel, VictoryPie
+} from 'victory-native';
+import { getCurrentUser, getUserById, getUserPointsByCategory } from '_api/firebase-db';
+import { UserContext } from '_components/Authentication/user';
+import { COLORS, TYPESCALE } from '../../globals/styles';
 import ProgressBar from './progressbar';
 
 const user = {
@@ -23,24 +20,16 @@ const user = {
   points: 79,
   milestone: 100,
   categoryOverview: [
-    {x: 'Occupational', y: 25},
-    {x: 'Intellectual', y: 12},
-    {x: 'Spritual', y: 19},
-    {x: 'Physical', y: 9},
-    {x: 'Emotional', y: 5},
-    {x: 'Social', y: 8},
+    { x: 'Occupational', y: 25 },
+    { x: 'Intellectual', y: 12 },
+    { x: 'Spritual', y: 19 },
+    { x: 'Physical', y: 9 },
+    { x: 'Emotional', y: 5 },
+    { x: 'Social', y: 8 },
   ],
 };
 
-const test = [
-  {x: 1, y: 2},
-  {x: 8, y: 3},
-  {x: 2, y: 5},
-  {x: 4, y: 1},
-  {x: 5, y: 8},
-];
-
-const BarChart = ({data, width}) => (
+const BarChart = ({ data, width }) => (
   <VictoryPie
     // animate={{easing: 'exp', duration: 5000}}
     colorScale={[
@@ -58,8 +47,8 @@ const BarChart = ({data, width}) => (
     labelComponent={
       <VictoryLabel
         size={6}
-        verticalAnchor={({text}) => (text.length > 1 ? 'start' : 'middle')}
-        textAnchor={({text}) => (text.length > 1 ? 'start' : 'middle')}
+        verticalAnchor={({ text }) => (text.length > 1 ? 'start' : 'middle')}
+        textAnchor={({ text }) => (text.length > 1 ? 'start' : 'middle')}
       />
     }
   />
@@ -72,39 +61,40 @@ const Background = () => (
   </View>
 );
 
-export default function Profile({navigation}) {
-  const {height: wheight, width: wwidth} = useWindowDimensions();
+export default function Profile(props) {
+  const { height: wheight, width: wwidth } = useWindowDimensions();
 
   const [chartData, setChartData] = useState([]);
-  const {state} = useContext(UserContext);
-  //TODO Replace with request or cached data?
-  const fetchChartData = userId => {
-    return getUserPointsByCategory(userId)
-      .then(data => {
-        let chartData = [];
+  const [user, setUser] = useState({});
+  const { state } = useContext(UserContext);
 
-        data.forEach(obj => {
-          chartData.push({x: obj.category, y: obj.total});
-        });
-        chartData = chartData.filter(obj => obj.y > 0);
+  const fetchChartData = (userId) => {
+    return getUserPointsByCategory(userId).then((data) => {
+      let chartData = [];
 
-        return chartData;
-      })
-      .catch(console.error);
-  };
+      data.forEach(obj => {
+        chartData.push({ x: obj.category, y: obj.total });
+      });
+      chartData = chartData.filter(obj => obj.y > 0);
+
+      return chartData;
+    }).catch(console.error);
+  }
+
   useEffect(() => {
-    fetchChartData(currentUser().uid).then(data => {
+    let id = props.route.params.userId;
+    fetchChartData(id).then((data) => {
       setChartData(data);
+      setUser(id == getCurrentUser().uid ? getCurrentUser() : getUserById(id));
     });
-
-    //setChartData(user.categoryOverview);
   }, []);
+
   return (
     <>
       <Background />
       <SafeAreaView style={styles.profileContainer}>
         <View style={styles.heading}>
-          <View style={{alignItems: 'center'}}>
+          <View style={{ alignItems: 'center' }}>
             <Ionicons
               name="person-circle-outline"
               size={100}
@@ -114,22 +104,20 @@ export default function Profile({navigation}) {
               style={{
                 ...TYPESCALE.h6,
                 textAlign: 'center',
-              }}>{`${state.firstName} ${state.lastName}`}</Text>
+              }}>{`${user.firstName} ${user.lastName}`}</Text>
             <Text
               style={{
                 ...TYPESCALE.subtitle,
                 margin: 5,
                 textAlign: 'center',
-              }}>{`${state.email}`}</Text>
+              }}>{`${user.email}`}</Text>
           </View>
 
-          <View style={{alignItems: 'center', marginTop: 15}}>
-            <Text style={[TYPESCALE.subtitle]}>
-              {state.points} pts{/*Level. 7*/}
-            </Text>
+          <View style={{ alignItems: 'center', marginTop: 15 }}>
+            <Text style={[TYPESCALE.subtitle]}>{user.points} pts{/*Level. 7*/}</Text>
             <ProgressBar
-              points={state.points}
-              milestone={state.points}
+              points={user.points}
+              milestone={user.points * 1.5}
               width={wwidth / 1.5}
             />
           </View>
