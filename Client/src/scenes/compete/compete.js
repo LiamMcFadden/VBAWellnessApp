@@ -1,5 +1,6 @@
 import React, {useContext, useState, useEffect} from 'react';
 import {
+  ActivityIndicator,
   SafeAreaView,
   RefreshControl,
   Dimensions,
@@ -125,8 +126,8 @@ const PointsorBadges = ({onChange}) => {
         style={styles.selector}
         options={options}
         initial={0}
-        // TODO: make dis do something
         onPress={value => onChange(value)}
+        on
         backgroundColor={'#A9A9A9'}
         buttonColor={'white'}
         textColor={'#0155A4'}
@@ -140,10 +141,10 @@ const PointsorBadges = ({onChange}) => {
  * Displays the pfp/icon for first place user
  */
 const First = ({props}) => {
-  let pfp = props.profileImage;
+  let pfp = props ? props.profileImage : null;
 
   // use default icon if no pfp is found
-  if (pfp === undefined) {
+  if (!props || pfp === undefined) {
     pfp = (
       <Ionicons
         style={styles.cardIcon}
@@ -162,7 +163,7 @@ const First = ({props}) => {
 };
 
 const FirstLabel = ({props}) => {
-  let name = props.firstName;
+  let name = props ? props.firstName : "";
   return <Text style={styles.pfpName}>{name}</Text>;
 };
 
@@ -170,10 +171,10 @@ const FirstLabel = ({props}) => {
  * Displays the pfp/icon for second and third place user
  */
 const SecondAndThird = ({props}) => {
-  let pfpSecond = props[0].profileImage;
+  let pfpSecond = props[0] ? props[0].profileImage : null;
 
   // use default icon if no pfp is found
-  if (pfpSecond === undefined) {
+  if (!props[0] || pfpSecond === undefined) {
     pfpSecond = (
       <Ionicons
         style={styles.cardIcon}
@@ -192,10 +193,10 @@ const SecondAndThird = ({props}) => {
     );
   }
 
-  let pfpThird = props[1].profileImage;
+  let pfpThird = props[1] ? props[1].profileImage : null;
 
   // use default icon if no pfp is found
-  if (pfpThird === undefined) {
+  if (!props[1] || pfpThird === undefined) {
     pfpThird = (
       <Ionicons
         style={styles.cardIcon}
@@ -223,8 +224,8 @@ const SecondAndThird = ({props}) => {
 };
 
 const SecondAndThirdLabels = ({props}) => {
-  let nameSecond = props[0].firstName;
-  let nameThird = props[1].firstName;
+  let nameSecond = props[0] ? props[0].firstName : "";
+  let nameThird = props[1] ? props[1].firstName : "";
   return (
     <View style={styles.secondandthird}>
       <Text style={styles.pfpName}>{nameSecond}</Text>
@@ -235,13 +236,13 @@ const SecondAndThirdLabels = ({props}) => {
 
 /**
  * Displays a users name, rank, pfp/icon, and score/badges
- *   TODO: add badges
  */
 const PlayerCard = ({props, sortType}) => {
   props = props ? props : {};
   let backgroundColor = 'white';
   let pfp = props.profileImage;
   let badges = props.badges ? props.badges : {bronze: 0, silver: 0, gold: 0};
+  let rank = sortType === 'points' ? props.rank : props.badgeRank;
 
   // use default icon if no pfp is found
   if (pfp === undefined) {
@@ -259,8 +260,8 @@ const PlayerCard = ({props, sortType}) => {
     );
   }
 
-  if (props.rank) {
-    switch (props.rank) {
+  if (rank) {
+    switch (rank) {
       case 1:
         backgroundColor = 'gold';
         break;
@@ -275,7 +276,7 @@ const PlayerCard = ({props, sortType}) => {
   // onPress={navigation.navigate('Profile', {userId: props.uid})}
   return (
     <View style={[styles.playerCard, {backgroundColor: backgroundColor}]}>
-      <Text style={styles.playerRank}> {props.rank} </Text>
+      <Text style={styles.playerRank}> {rank} </Text>
       {pfp}
       <Text style={styles.playerName}>{props.firstName}</Text>
       {sortType === 'points' ? (
@@ -296,23 +297,28 @@ const PlayerCard = ({props, sortType}) => {
 
 const Compete = () => {
   const [users, setUsers] = useState([]);
+  const [usersByPoints, setUsersByPoints] = useState([]);
+  const [usersByBadges, setUsersByBadges] = useState([]);
   const [currUser, setCurrUser] = useState([]);
   const [first, setFirst] = useState([]);
   const [second, setSecond] = useState([]);
   const [third, setThird] = useState([]);
+  const [badgesTop3, setBadgesTop3] = useState([]); // array of top 3 users by badges
+  const [pointsTop3, setPointsTop3] = useState([]); // array of top 3 users by points
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [sortType, setSort] = useState('points');
 
 
   // background refresh
   // rate is set to 15 secs by default
-  const REFRESH_INTERVAL = 15000;
-  useEffect(() => {
-    const interval = setInterval(() => {
-      getUsers();
-    }, REFRESH_INTERVAL);
-    return () => clearInterval(interval);
-  }, []);
+  //const REFRESH_INTERVAL = 15000;
+  //useEffect(() => {
+  //  const interval = setInterval(() => {
+  //    getUsers();
+  //  }, REFRESH_INTERVAL);
+  //  return () => clearInterval(interval);
+  //}, []);
 
   // used for pull to refresh functionality
   const onRefresh = React.useCallback(() => {
@@ -333,17 +339,33 @@ const Compete = () => {
 
       // get array of user data
       allUsers.docs.map(doc => {
-        doc.data().uid = doc.id;
+        let data = doc.data();
+        data.uid = doc.id;
 
         // ignore admins
-        if (!doc.data().admin) 
-          tempUsers.push(doc.data());
+        if (!data.admin) {
+          // set badgePoints
+          let badgePoints = 0;
+          if (data.badges) {
+            badgePoints += data.badges.bronze;
+            badgePoints += data.badges.silver * 2;
+            badgePoints += data.badges.gold * 3;
+          }
+          data.badgePoints = badgePoints;
+          tempUsers.push(data);
+        }
       });
 
-      // sort by points and assign ranks
-      tempUsers.sort((a, b) => (a.points < b.points ? 1 : -1));
-      let prev = tempUsers[0];
-      tempUsers.map((user, index) => {
+      let tempUsersByPoints = [...tempUsers];
+      let tempUsersByBadges = [...tempUsers];
+
+      /**
+       * Get list of users ordered by points from activites
+       */
+      tempUsersByPoints.sort((a, b) => (a.points < b.points ? 1 : -1));
+      let prev = tempUsersByPoints[0];
+      let top3 = [null, null, null]
+      tempUsersByPoints.map((user, index) => {
         // handle ties
         if (user.points === prev.points && prev.rank) {
           user.rank = prev.rank;
@@ -359,61 +381,129 @@ const Compete = () => {
          * I'm doing this so we don't have to pass the the entire array of users
          * as a prop
          */
-        switch (index) {
-          case 0:
-            setFirst(user);
-            break;
-          case 1:
-            setSecond(user);
-            break;
-          case 2:
-            setThird(user);
-            break;
-          default:
-            break;
+        if (index < 3) {
+          top3[index] = user;
         }
 
         if (user.uid === currentUser().uid) {
           tempCurrUser = user;
         }
       });
+      if (sortType === 'points') {
+        setFirst(top3[0]);
+        setSecond(top3[1]);
+        setThird(top3[2]);
+      }
+      setPointsTop3(top3);
+      setUsersByPoints(tempUsersByPoints);
 
-      setUsers(tempUsers);
-      setCurrUser(tempCurrUser);
+      /**
+       * Get list of users ordered by badges from activites
+       */
+      tempUsersByBadges.sort((a, b) => (a.badgePoints < b.badgePoints ? 1 : -1));
+      prev = tempUsersByBadges[0];
+      top3 = [null, null, null]
+      tempUsersByBadges.map((user, index) => {
+        // handle ties
+        if (user.badgePoints === prev.badgePoints && prev.badgeRank) {
+          user.badgeRank = prev.badgeRank;
+        } else if (user.badgePoints === prev.badgePoints && !prev.badgeRank) {
+          user.badgeRank = index + 1;
+        } else {
+          user.badgeRank = prev.badgeRank + 1;
+        }
+        prev = user;
+
+        /**
+         * set first, second, and third place users for use as props later on
+         * I'm doing this so we don't have to pass the the entire array of users
+         * as a prop
+         */
+        if (index < 3) {
+          top3[index] = user;
+        }
+
+        if (user.uid === currentUser().uid) {
+          tempCurrUser = user;
+        }
+      });
+      if (sortType === 'badges') {
+        setFirst(top3[0]);
+        setSecond(top3[1]);
+        setThird(top3[2]);
+      }
+      setBadgesTop3(top3);
+      setUsersByBadges(tempUsersByBadges);
+
+      if (sortType === 'points') 
+        setUsers(tempUsersByPoints);
+      else 
+        setUsers(tempUsersByPoints);
+
+        setCurrUser(tempCurrUser);
+        setLoading(false);
     });
   };
 
   useEffect(getUsers, []);
 
-
   const setOrder = (value) => {
+
+    if (value === 'points') {
+      setFirst(pointsTop3[0]);
+      setSecond(pointsTop3[1]);
+      setThird(pointsTop3[2]);
+      setUsers(usersByPoints);
+    } else {
+      setFirst(badgesTop3[0]);
+      setSecond(badgesTop3[1]);
+      setThird(badgesTop3[2]);
+      setUsers(usersByBadges);
+    }
+
     setSort(value);
   };
 
-  //<RefreshButton/> -- deleted for now
-  return (
-    <SafeAreaView style={{flex: 1}}>
-      <View style={{flex: 1}}>
-        { !getCurrentUser().admin && 
-        <PlayerCard props={currUser} sortType={sortType} />
-        }
-        <PointsorBadges onChange={setOrder} />
-        <First props={first} />
-        <FirstLabel props={first} />
-        <SecondAndThird props={[second, third]} />
-        <SecondAndThirdLabels props={[second, third]} />
-        <View style={{flex: 1}}>
-          <FlatList
-            data={users}
-            renderItem={({item}) => <PlayerCard props={item} sortType={sortType} />}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-          />
-        </View>
+  if (loading) {
+    return (
+      <View style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+        <ActivityIndicator size="large" color="#0000ff" />
       </View>
-    </SafeAreaView>
-  );
+    );
+  } else {
+    //<RefreshButton/> -- deleted for now
+    return (
+      <SafeAreaView style={{flex: 1}}>
+        <View style={{flex: 1}}>
+          { !getCurrentUser().admin && 
+          <PlayerCard props={currUser} sortType={sortType} />
+          }
+          <PointsorBadges onChange={setOrder} />
+          <First props={first} />
+          <FirstLabel props={first} />
+          <SecondAndThird props={[second, third]} />
+          <SecondAndThirdLabels props={[second, third]} />
+          <View style={{flex: 1}}>
+            <FlatList
+              data={users}
+              renderItem={({item}) => <PlayerCard props={item} sortType={sortType} />}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            />
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
 };
 
 export default Compete;
