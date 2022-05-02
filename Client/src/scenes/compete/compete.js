@@ -7,11 +7,12 @@ import {
   StyleSheet,
   Text,
   View,
+  Image,
 } from 'react-native';
 import SwitchSelector from 'react-native-switch-selector';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ProfilePicture from 'react-native-profile-picture';
-import {getAllUsers} from '../../api/firebase-db';
+import {getAllUsers, getCurrentUser} from '../../api/firebase-db';
 import { currentUser } from '_api/firebase-auth';
 
 const windowWidth = Dimensions.get('window').width;
@@ -87,13 +88,31 @@ const styles = StyleSheet.create({
     marginRight: 20,
     marginTop: 20,
   },
+  badge: {
+      alignSelf: 'center',
+      marginLeft: 'auto',
+      width: 20,
+      aspectRatio: 0.873,
+      resizeMode: 'contain',
+      marginRight: 5,
+  },
+  badgeContainer: {
+    alignSelf: 'center',
+    marginLeft: 'auto',
+    flexDirection: 'row',
+  },
+  badgeLabel: {
+    alignSelf: 'center',
+    marginRight: 3,
+    fontWeight: 'bold',
+  }
 });
 
 /*
  * Selector switch for displaying either points or badges
  * uses 'react-native-switch-selector'
  */
-const PointsorBadges = () => {
+const PointsorBadges = ({onChange}) => {
   const options = [
     {label: 'Points', value: 'points'},
     {label: 'Badges', value: 'badges'},
@@ -107,7 +126,7 @@ const PointsorBadges = () => {
         options={options}
         initial={0}
         // TODO: make dis do something
-        onPress={value => value}
+        onPress={value => onChange(value)}
         backgroundColor={'#A9A9A9'}
         buttonColor={'white'}
         textColor={'#0155A4'}
@@ -120,8 +139,8 @@ const PointsorBadges = () => {
 /*
  * Displays the pfp/icon for first place user
  */
-const First = (props) => {
-  let pfp = props.props.profileImage;
+const First = ({props}) => {
+  let pfp = props.profileImage;
 
   // use default icon if no pfp is found
   if (pfp === undefined) {
@@ -142,16 +161,16 @@ const First = (props) => {
   return <View style={styles.first}>{pfp}</View>;
 };
 
-const FirstLabel = props => {
-  let name = props.props.firstName;
+const FirstLabel = ({props}) => {
+  let name = props.firstName;
   return <Text style={styles.pfpName}>{name}</Text>;
 };
 
 /*
  * Displays the pfp/icon for second and third place user
  */
-const SecondAndThird = (props) => {
-  let pfpSecond = props.props[0].profileImage;
+const SecondAndThird = ({props}) => {
+  let pfpSecond = props[0].profileImage;
 
   // use default icon if no pfp is found
   if (pfpSecond === undefined) {
@@ -173,7 +192,7 @@ const SecondAndThird = (props) => {
     );
   }
 
-  let pfpThird = props.props[1].profileImage;
+  let pfpThird = props[1].profileImage;
 
   // use default icon if no pfp is found
   if (pfpThird === undefined) {
@@ -203,9 +222,9 @@ const SecondAndThird = (props) => {
   );
 };
 
-const SecondAndThirdLabels = props => {
-  let nameSecond = props.props[0].firstName;
-  let nameThird = props.props[1].firstName;
+const SecondAndThirdLabels = ({props}) => {
+  let nameSecond = props[0].firstName;
+  let nameThird = props[1].firstName;
   return (
     <View style={styles.secondandthird}>
       <Text style={styles.pfpName}>{nameSecond}</Text>
@@ -216,17 +235,14 @@ const SecondAndThirdLabels = props => {
 
 /**
  * Displays a users name, rank, pfp/icon, and score/badges
- *
- * TODO: * add some sort of refresh feature
- *          - (i.e. if user refreshes page, it will update the leaderboard)
- *       * pfp stuff
+ *   TODO: add badges
  */
-const PlayerCard = props => {
+const PlayerCard = ({props, sortType}) => {
   props = props ? props : {};
-
   let backgroundColor = 'white';
+  let pfp = props.profileImage;
+  let badges = props.badges ? props.badges : {bronze: 0, silver: 0, gold: 0};
 
-  let pfp = props.props.profileImage;
   // use default icon if no pfp is found
   if (pfp === undefined) {
     pfp = (
@@ -243,8 +259,8 @@ const PlayerCard = props => {
     );
   }
 
-  if (props.props.rank) {
-    switch (props.props.rank) {
+  if (props.rank) {
+    switch (props.rank) {
       case 1:
         backgroundColor = 'gold';
         break;
@@ -256,13 +272,24 @@ const PlayerCard = props => {
         break;
     }
   }
-  // onPress={navigation.navigate('Profile', {userId: props.props.uid})}
+  // onPress={navigation.navigate('Profile', {userId: props.uid})}
   return (
     <View style={[styles.playerCard, {backgroundColor: backgroundColor}]}>
-      <Text style={styles.playerRank}> {props.props.rank} </Text>
+      <Text style={styles.playerRank}> {props.rank} </Text>
       {pfp}
-      <Text style={styles.playerName}>{props.props.firstName}</Text>
-      <Text style={styles.playerPoints}>{props.props.points} pts</Text>
+      <Text style={styles.playerName}>{props.firstName}</Text>
+      {sortType === 'points' ? (
+        <Text style={styles.playerPoints}>{props.points} pts.</Text>
+      ) : (
+        <View style={styles.badgeContainer}>
+          <Text style={styles.badgeLabel}>{badges.bronze}</Text>
+          <Image source={require('_assets/images/BronzeBadgeIcon.png')} style={styles.badge}/>
+          <Text style={styles.badgeLabel}>{badges.silver}</Text>
+          <Image source={require('_assets/images/SilverBadgeIcon.png')} style={styles.badge}/>
+          <Text style={styles.badgeLabel}>{badges.gold}</Text>
+          <Image source={require('_assets/images/GoldBadgeIcon.png')} style={styles.badge}/>
+        </View>
+      )}
     </View>
   );
 };
@@ -274,10 +301,12 @@ const Compete = () => {
   const [second, setSecond] = useState([]);
   const [third, setThird] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [sortType, setSort] = useState('points');
+
 
   // background refresh
-  // rate is set to 3 secs by default
-  const REFRESH_INTERVAL = 3000;
+  // rate is set to 15 secs by default
+  const REFRESH_INTERVAL = 15000;
   useEffect(() => {
     const interval = setInterval(() => {
       getUsers();
@@ -292,6 +321,8 @@ const Compete = () => {
     setRefreshing(false);
   }, []);
 
+
+
   /**
    * Gets all users from the database, sorts them by points, and then sets the first, second, and third place users
    */
@@ -303,7 +334,10 @@ const Compete = () => {
       // get array of user data
       allUsers.docs.map(doc => {
         doc.data().uid = doc.id;
-        tempUsers.push(doc.data());
+
+        // ignore admins
+        if (!doc.data().admin) 
+          tempUsers.push(doc.data());
       });
 
       // sort by points and assign ranks
@@ -351,26 +385,19 @@ const Compete = () => {
 
   useEffect(getUsers, []);
 
-  // refresh button, refreshed with no indicator at the moment
-  const RefreshButton = () => {
-    return (
-      <View style={styles.refreshButton}>
-        <Ionicons
-          name="md-refresh"
-          size={30}
-          color="#0155A4"
-          onPress={() => onRefresh()}
-        />
-      </View>
-    );
+
+  const setOrder = (value) => {
+    setSort(value);
   };
 
   //<RefreshButton/> -- deleted for now
   return (
     <SafeAreaView style={{flex: 1}}>
       <View style={{flex: 1}}>
-        <PlayerCard props={currUser} />
-        <PointsorBadges />
+        { !getCurrentUser().admin && 
+        <PlayerCard props={currUser} sortType={sortType} />
+        }
+        <PointsorBadges onChange={setOrder} />
         <First props={first} />
         <FirstLabel props={first} />
         <SecondAndThird props={[second, third]} />
@@ -378,7 +405,7 @@ const Compete = () => {
         <View style={{flex: 1}}>
           <FlatList
             data={users}
-            renderItem={({item}) => <PlayerCard props={item} />}
+            renderItem={({item}) => <PlayerCard props={item} sortType={sortType} />}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
@@ -390,3 +417,17 @@ const Compete = () => {
 };
 
 export default Compete;
+
+  // refresh button, refreshed with no indicator at the moment
+  //const RefreshButton = () => {
+  //  return (
+  //    <View style={styles.refreshButton}>
+  //      <Ionicons
+  //        name="md-refresh"
+  //        size={30}
+  //        color="#0155A4"
+  //        onPress={() => onRefresh()}
+  //      />
+  //    </View>
+  //  );
+  //};
