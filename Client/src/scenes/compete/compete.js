@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   badge: {
       alignSelf: 'center',
       marginLeft: 'auto',
-      width: 25,
+      width: 20,
       aspectRatio: 0.873,
       resizeMode: 'contain',
       marginRight: 5,
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   },
   badgeLabel: {
     alignSelf: 'center',
-    marginRight: 5,
+    marginRight: 3,
     fontWeight: 'bold',
   }
 });
