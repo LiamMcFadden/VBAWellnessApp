@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import { useFocusEffect } from '@react-navigation/native'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useContext } from 'react'
 import {
   Dimensions, Image, StyleSheet,
   Text,
@@ -16,6 +16,7 @@ import { OutlinedButton, ProgressBar } from '../../globals/styledcomponents'
 import { COLORS, TYPESCALE } from '../../globals/styles'
 import Activities from './activityList'
 import VBALogo from './cartoon.jpg'
+import {UserContext} from '_components/Authentication/user'
 
 const windowWidth = Dimensions.get('window').width
 const windowHeight = Dimensions.get('window').height
@@ -68,7 +69,8 @@ const profileStyles = StyleSheet.create({
 })
 
 const PFP = ({ navigation }) => {
-  const name = getCurrentUser().firstName + ' ' + getCurrentUser().lastName
+  const name = getCurrentUser().firstName + ' ' + getCurrentUser().lastName;
+  const {state, completeActivity} = useContext(UserContext);
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate('Profile', {userId: getCurrentUser().uid})}
@@ -79,8 +81,8 @@ const PFP = ({ navigation }) => {
       <View style={{ width: "100%", flexDirection: 'row', height: 30, justifyContent: "space-between" }}>
         <Text style={[{ color: "black", ...TYPESCALE.h6, marginLeft: 0, textAlign: 'center' }]}>{name}</Text>
         <View style={{ justifyContent: 'flex-start' }}>
-          <Text style={{ ...TYPESCALE.body1 }}> Lvl 5 </Text>
-          <ProgressBar width={(0.95 * windowWidth) * 0.5} points={50} milestone={100} />
+          {/* <Text style={{ ...TYPESCALE.body1 }}> Lvl 5 </Text> */}
+          <ProgressBar textOrientation={'flex-start'} width={(0.95 * windowWidth) * 0.5} points={state.points}  />
         </View>
       </View>
     </TouchableOpacity>

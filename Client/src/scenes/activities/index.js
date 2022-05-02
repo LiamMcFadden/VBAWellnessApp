@@ -329,7 +329,7 @@ const ActivitiesScreen = () => {
       <View style={styles.header}>
         <Text style={styles.headerText}>{state.points}</Text>
         {/* <Text>Level 26</Text> */}
-        <ProgressBar milestone={100} points={50} width={windowWidth * 0.6} />
+        <ProgressBar points={state.points} width={windowWidth * 0.6} textOrientation={'center'} />
         {/* <Text>50 points to the next level</Text> */}
         <CategoryCarousel setItems={setItems} />
       </View>
