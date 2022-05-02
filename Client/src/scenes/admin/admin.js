@@ -77,6 +77,8 @@ const competitionStatus = () => {
 
 const CompetitionSettingsScreen = ({navigation}) => {
 
+    const [joinCode, setJoinCode] = useState(getCurrentCompetition().id);
+
     const [startDate, setStartDate] = useState(getCurrentCompetition()['startTime'])
     const [endDate, setEndDate] = useState(getCurrentCompetition()['endTime'])
 
@@ -121,6 +123,7 @@ const CompetitionSettingsScreen = ({navigation}) => {
                     text: 'Confirm',
                     onPress: () => {
                         startNewCompDb();
+                        setJoinCode(getCurrentCompetition().id);
                         //TODO: make this function start a new competition (generate new competition code and wipe all previous competition data from the database)
                     }
                 }
@@ -139,7 +142,7 @@ const CompetitionSettingsScreen = ({navigation}) => {
             <View style={{width: '100%', height: '100%', justifyContent: 'space-around', alignItems: 'center'}}>
                 <View style={{height: '20%', width: '90%', borderRadius: 20, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.8, shadowRadius: 2, elevation: 5}}>
                     <Text style={{fontSize: 20, color: '#0155A4'}}>Join Code</Text>
-                    <Text style={{fontSize: 40, color: 'dimgray'}}>{getCurrentCompetition().id}</Text>
+                    <Text style={{fontSize: 40, color: 'dimgray'}}>{joinCode}</Text>
                 </View>
                 <View style={{height: '70%', width: '90%', borderRadius: 20, backgroundColor: 'white', justifyContent: 'space-around', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.8, shadowRadius: 2, elevation: 5}}>
                     <TouchableOpacity onPress={() => navigation.navigate("Results")} style={{backgroundColor: '#2e8b57', width: '80%', alignItems: 'center', borderRadius: 50, paddingTop: 10, paddingBottom: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.8, shadowRadius: 2, elevation: 5}}>
