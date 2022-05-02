@@ -1,4 +1,5 @@
-import React, {useEffect} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
+import Modal from 'react-native-modal'
 import {
   StyleSheet,
   TouchableOpacity,
@@ -7,8 +8,64 @@ import {
   View,
   Text,
 } from 'react-native'
+import Activity from '../../components/atoms/activity/activity'
+import {UserContext} from '_components/Authentication/user'
 
 const windowWidth = Dimensions.get('window').width
+
+/**
+  * Activities list component for obtaining 
+  * the flatlast of activities with modal
+  * overlays
+  *
+  * @params
+  *    activities
+  *       List of Activities
+  *    activityCompleted
+  *       Function to complete when an activity is completed 
+  *       This can be used for rerenders
+  * */
+const Activities = ({activities, activityCompleted}) => {
+  const [isModalVisible, setModalVisible] = useState(false)
+  const [modalActivity, setModalActivity] = useState(null)
+
+  const {completeActivity} = useContext(UserContext)
+
+  const handleActivitiyCompletion = (activity) => {
+    completeActivity(activity)
+    activityCompleted() // Tells main state to update
+  }
+
+  const openModal = activity => {
+    setModalActivity(activity)
+    setModalVisible(true)
+  }
+
+  return (
+    <View style={{flex: 1}}>
+      <FlatList
+        contentContainerStyle={{paddingBottom: 20}}
+        data={activities}
+        renderItem={({item}) => { if (item.available) {
+            return <ListItem activity={item} openModal={openModal} />
+          }
+        }}
+      />
+      <Modal
+        isVisible={isModalVisible}
+        onBackdropPress={() => setModalVisible(false)}
+      >
+        <Activity
+          activity={modalActivity /* Activity Item? */}
+          action={
+            handleActivitiyCompletion /* Function to complete activity? */
+          }
+          toggleView={setModalVisible /* modal flag */}
+        />
+      </Modal>
+    </View>
+  )
+}
 
 const ActivityList = ({data, openModal}) => {
   return (
@@ -17,9 +74,7 @@ const ActivityList = ({data, openModal}) => {
         contentContainerStyle={{paddingBottom: 20}}
         data={data}
         renderItem={({item}) => {
-          if (item.available) {
-            return <ListItem activity={item} openModal={openModal} />
-          }
+          return <ListItem activity={item} openModal={openModal} />
         }}
       />
     </View>
@@ -215,4 +270,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default ActivityList
+export default Activities

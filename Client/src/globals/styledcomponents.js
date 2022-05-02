@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import {
   TouchableHighlight,
   TouchableOpacity
@@ -78,13 +78,9 @@ const ProgressBar = ({ milestone, points, width }) => {
   });
 
   return (
-    <TouchableOpacity
-      onPress={() => {
-        foregroundWidth.value = 100;
-      }}
-      style={progress_styles.background}>
+    <View style={progress_styles.background}>
       <Animated.View style={[progress_styles.foreground, animatedStyles]} />
-    </TouchableOpacity>
+    </View>
   );
 };
 

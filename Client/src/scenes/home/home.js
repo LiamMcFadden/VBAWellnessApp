@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {useFocusEffect} from '@react-navigation/native'
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useCallback, useEffect, useRef} from 'react'
 import {
   Dimensions,
   FlatList,
@@ -10,8 +10,10 @@ import {
   TouchableHighlight,
   View,
   ScrollView,
+  Image
 } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import warnOnce from 'react-native/Libraries/Utilities/warnOnce'
 import {SafeAreaView} from 'react-navigation'
 import {
   getCurrentUserActivityStats,
@@ -25,7 +27,9 @@ import {
 } from '_api/firebase-db'
 import {OutlinedButton} from '../../globals/styledcomponents'
 import {TYPESCALE, COLORS} from '../../globals/styles'
-import ActivityList from './activityList'
+import Activities from './activityList'
+import VBALogo from './cartoon.jpg'
+import {ProgressBar} from "../../globals/styledcomponents"
 
 const windowWidth = Dimensions.get('window').width
 const windowHeight = Dimensions.get('window').height
@@ -60,7 +64,37 @@ const profileStyles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
+  pfpImage : {
+    position: 'absolute',
+    width:0.95 * windowWidth,    
+    height: "80%",
+    top: 0,
+    marginLeft: 0,
+    padding: 0
+  }
+
 })
+
+const PFP = ({navigation}) => {
+  const name = getCurrentUser().firstName + ' ' + getCurrentUser().lastName
+  return (
+    <TouchableOpacity 
+      onPress={() => navigation.navigate('Profile')}      
+      style={[profileStyles.profileContainer,
+      {padding: 0, alignItems: 'flex-start', justifyContent: 'flex-end', overflow: 'hidden', backgroundColor: "#fff"}]}
+    >
+      <Image style={profileStyles.pfpImage} source={VBALogo} />
+      <View style={{width: "100%", flexDirection: 'row', height: 30, justifyContent: "space-between"}}>
+        <Text style={[{color: "black", ...TYPESCALE.h6, marginLeft: 0, textAlign: 'center'}]}>{name}</Text>
+        <View style={{justifyContent: 'flex-start'}}>
+          <Text style={{...TYPESCALE.body1}}> Lvl 5 </Text>
+          <ProgressBar width={(0.95 * windowWidth) * 0.5} points={50} milestone={100}/>
+        </View>
+      </View>
+    </TouchableOpacity>
+  )
+}
+
 /**
  * Shows the users profile with a button that will link to
  * the users full profile
@@ -77,48 +111,11 @@ const ProfileCard = ({navigation}) => {
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc molestie
         posuere congue.{' '}
       </Text>
-      {/* <OutlinedButton
+      <OutlinedButton
         width={'40%'}
         height={35}
         buttonStyle={{marginBottom: 0, marginLeft: 0}}
-        onPress={() => navigation.navigate('Profile')}>
-        <View style={profileStyles.pfpBtnContents}>
-          <Ionicons name="person-circle-outline" size={25} color={'#0155A4'} />
-          <Text
-            style={[
-              TYPESCALE.button,
-              {marginLeft: 20, textAlign: 'center', color: COLORS.primary},
-            ]}>
-            Profile
-          </Text>
-        </View>
-      </OutlinedButton> */}
-      <TouchableHighlight
-        underlayColor={COLORS.tintPrimary(0.2)}
         onPress={() => navigation.navigate('Profile')}
-        style={{
-          width: '40%',
-          height: 35,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#fefefe', //offwhiteish
-          borderWidth: 1,
-          borderColor: '#0155A4',
-          borderRadius: 4,
-          margin: 5,
-          shadowColor: '#000',
-          shadowOffset: {
-            width: 1, //might be better to use 2 and 1 for w and h
-            height: 0,
-          },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          elevation: 4,
-          paddingLeft: 16,
-          paddingRight: 16,
-          marginBottom: 0,
-          marginLeft: 0,
-        }}
       >
         <View style={profileStyles.pfpBtnContents}>
           <Ionicons name='person-circle-outline' size={25} color={'#0155A4'} />
@@ -131,58 +128,40 @@ const ProfileCard = ({navigation}) => {
             Profile
           </Text>
         </View>
-      </TouchableHighlight>
+      </OutlinedButton>
     </View>
   )
 }
 const Home = ({navigation}) => {
   const [items, setItems] = useState([])
   const [totalPoints, setTotalPoints] = useState(getCurrentUser().points)
-  // const [activities, setActivities] = useState(getActivitiesSortedByDate());
 
-  useFocusEffect(
-    React.useCallback(() => {
-      let isActive = false
-      let userActivitiyIDList = getActivitiesSortedByDate()
-      let i = 0
-      let recentActivities = []
-      for (; i < userActivitiyIDList, i < 5; i++) {
-        recentActivities.push(getActivityById(userActivitiyIDList[i][0]))
-      }
-      console.log(recentActivities)
-      setItems(recentActivities)
-      return () => (isActive = true)
-    }, []),
-  )
+  /**
+    * Could potentially require sever requests
+    * And often usage, best to memoize
+    * Also plays well with useFocus
+    * */
+  const addPointsMemoized = useCallback(() => {
+    let userActivitiyIDList = getActivitiesSortedByDate()
+    let i = 0
+    let recentActivities = []
+    for (; i < userActivitiyIDList, i < 5; i++) {
+      recentActivities.push(getActivityById(userActivitiyIDList[i][0]))
+    }
+    setItems(recentActivities)
+    return () => ({})
+  }, [])
 
-  // useEffect(() => {
-  //   let userActivitiyIDList = getActivitiesSortedByDate()
-  //   let i = 0
-  //   let recentActivities = []
-  //   for (; i < userActivitiyIDList, i < 5; i++) {
-  //     recentActivities.push(getActivityById(userActivitiyIDList[i][0]))
-  //   }
-  //   console.log(recentActivities)
-  //   setItems(recentActivities)
-  // }, [])
-  //
-  const addPoints = points => {
-    let newTotal = totalPoints + points
-    setTotalPoints(newTotal)
-    updateCurrentUserFields({points: newTotal}).catch(err => {
-      setTotalPoints(newTotal - points)
-      console.error(err)
-      //TODO: Alert connection error
-    })
+  useFocusEffect(addPointsMemoized)
+
+
+  const handlePointsUpdate = () => {
+    addPointsMemoized()
   }
-  const action = item => {
-    const newTotal = totalPoints + item.points
-  }
-
   return (
     <SafeAreaView style={{backgroundColor: '#F3F4F7', height: '100%'}}>
-      <ProfileCard navigation={navigation} />
-      <ActivityList data={items} openModal={null} />
+      <PFP navigation={navigation} />
+      <Activities activities={items} activityCompleted={handlePointsUpdate} />
     </SafeAreaView>
   )
 }

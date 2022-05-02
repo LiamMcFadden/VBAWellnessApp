@@ -6,6 +6,7 @@ import {
     getCurrentUserActivityStats,
 } from '_api/firebase-db';
 
+
 const Activity = ({activity, action, toggleView}) => {
 
     let stats = getCurrentUserActivityStats(activity.uid);

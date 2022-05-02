@@ -1,4 +1,4 @@
-/* eslint-disable react-native/no-inline-styles */
+//ofile Screen
 import React, {useState, useEffect, useContext} from 'react';
 import {
   View,
@@ -9,20 +9,11 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {COLORS, TYPESCALE} from '../../globals/styles';
-import {
-  VictoryPolarAxis,
-  VictoryChart,
-  VictoryPie,
-  VictoryTheme,
-  VictoryBar,
-  VictoryArea,
-  VictoryLabel,
-} from 'victory-native';
-import {OutlinedButton, ContainedButton} from '../../globals/styledcomponents';
-import SwitchSelector from 'react-native-switch-selector';
+import {VictoryPie, VictoryLabel} from 'victory-native';
+
 import {getUserPointsByCategory} from '_api/firebase-db';
-import {currentUser } from '_api/firebase-auth';
-import {UserContext} from '_components/Authentication/user'
+import {currentUser} from '_api/firebase-auth';
+import {UserContext} from '_components/Authentication/user';
 import ProgressBar from './progressbar';
 
 const user = {
@@ -83,24 +74,26 @@ const Background = () => (
 
 export default function Profile({navigation}) {
   const {height: wheight, width: wwidth} = useWindowDimensions();
-  const [showBar, setShowBar] = useState(true);
+
   const [chartData, setChartData] = useState([]);
   const {state} = useContext(UserContext);
   //TODO Replace with request or cached data?
-  const fetchChartData = (userId) => {
-    return getUserPointsByCategory(userId).then((data) => {
-      let chartData = [];
+  const fetchChartData = userId => {
+    return getUserPointsByCategory(userId)
+      .then(data => {
+        let chartData = [];
 
-      data.forEach((obj) => {
-        chartData.push({x: obj.category, y: obj.total});
+        data.forEach(obj => {
+          chartData.push({x: obj.category, y: obj.total});
+        });
+        chartData = chartData.filter(obj => obj.y > 0);
+
+        return chartData;
       })
-      chartData = chartData.filter(obj => obj.y > 0);
-
-      return chartData;
-    }).catch(console.error);
-  }
+      .catch(console.error);
+  };
   useEffect(() => {
-    fetchChartData(currentUser().uid).then((data) => {
+    fetchChartData(currentUser().uid).then(data => {
       setChartData(data);
     });
 
@@ -131,7 +124,9 @@ export default function Profile({navigation}) {
           </View>
 
           <View style={{alignItems: 'center', marginTop: 15}}>
-            <Text style={[TYPESCALE.subtitle]}>{state.points} pts{/*Level. 7*/}</Text>
+            <Text style={[TYPESCALE.subtitle]}>
+              {state.points} pts{/*Level. 7*/}
+            </Text>
             <ProgressBar
               points={state.points}
               milestone={state.points}
@@ -142,8 +137,6 @@ export default function Profile({navigation}) {
 
         <View
           style={{
-            
-            
             justifyContent: 'flex-start',
             alignItems: 'center',
             height: 0.5 * wheight,
@@ -155,7 +148,6 @@ export default function Profile({navigation}) {
               {
                 alignSelf: 'center',
                 marginBottom: 10,
-                
               },
             ]}>
             Your Top Categories
@@ -233,6 +225,6 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#f8f8f8'
+    backgroundColor: '#f8f8f8',
   },
 });

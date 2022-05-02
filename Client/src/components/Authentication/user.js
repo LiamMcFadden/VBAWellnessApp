@@ -26,6 +26,7 @@ export const UserProvider = ({children}) => {
   const value = {
     state,
     completeActivity: activity => {
+      console.log("Activity UID", activity)
       dispatch({type: actions.COMPLETE_ACTIVITY, payload: activity.uid});
     },
   };
