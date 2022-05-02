@@ -9,7 +9,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   VictoryLabel, VictoryPie
 } from 'victory-native';
-import { getCurrentUser, getUserById, getUserPointsByCategory } from '_api/firebase-db';
+import { getUserPfpById, getCurrentUser, getUserById, getUserPointsByCategory } from '_api/firebase-db';
 import ProfilePicture from 'react-native-profile-picture';
 import { UserContext } from '_components/Authentication/user';
 import { COLORS, TYPESCALE } from '../../globals/styles';
@@ -72,9 +72,10 @@ export default function Profile(props) {
   const [loading, setLoading] = useState(true);
   //const { state } = useContext(UserContext);
 
-  let pfp = user.profileImage;
+  let pfp = null;
+
   // use default icon if no pfp is found
-  if (pfp === undefined) {
+  if (!pfp || pfp === undefined) {
     pfp = (
       <Ionicons
         name="person-circle-outline"

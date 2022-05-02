@@ -470,7 +470,19 @@ const getActivitiesSortedByDate = () => {
   return sequentialStatsKeys.map(statID => [statID, userStats[statID]])
 }
 
+/**
+ * Gets a users pfp by id 
+ */
+const getUserPfpById = async uid => {
+  return firestore()
+    .collection(USERS_COLLECTION)
+    .doc(uid)
+    .get()
+    .then(doc => doc.data().profileImage);
+};
+
 export {
+  getUserPfpById,
   getCurrentUser,
   getCurrentCompetition,
   getUserById,
