@@ -100,6 +100,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginLeft: 'auto',
     flexDirection: 'row',
+  },
+  badgeLabel: {
+    alignSelf: 'center',
+    marginRight: 5,
+    fontWeight: 'bold',
   }
 });
 
@@ -277,8 +282,11 @@ const PlayerCard = ({props, sortType}) => {
         <Text style={styles.playerPoints}>{props.points} pts.</Text>
       ) : (
         <View style={styles.badgeContainer}>
+          <Text style={styles.badgeLabel}>{badges.bronze}</Text>
           <Image source={require('_assets/images/BronzeBadgeIcon.png')} style={styles.badge}/>
+          <Text style={styles.badgeLabel}>{badges.silver}</Text>
           <Image source={require('_assets/images/SilverBadgeIcon.png')} style={styles.badge}/>
+          <Text style={styles.badgeLabel}>{badges.gold}</Text>
           <Image source={require('_assets/images/GoldBadgeIcon.png')} style={styles.badge}/>
         </View>
       )}
