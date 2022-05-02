@@ -2,7 +2,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import {
   SafeAreaView,
-  StyleSheet, Text, useWindowDimensions, View
+  StyleSheet, Text, useWindowDimensions,
+  ActivityIndicator, View
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
@@ -66,7 +67,9 @@ export default function Profile(props) {
 
   const [chartData, setChartData] = useState([]);
   const [user, setUser] = useState({});
-  const { state } = useContext(UserContext);
+  
+  const [loading, setLoading] = useState(true);
+  //const { state } = useContext(UserContext);
 
   const fetchChartData = (userId) => {
     return getUserPointsByCategory(userId).then((data) => {
@@ -84,10 +87,32 @@ export default function Profile(props) {
     let id = props.route.params.userId;
     fetchChartData(id).then((data) => {
       setChartData(data);
-      setUser(id == getCurrentUser().uid ? getCurrentUser() : getUserById(id));
+      if(id == getCurrentUser().uid) {
+        setUser(getCurrentUser());
+        setLoading(false);
+      } else {
+        getUserById(id).then(otherUser => {
+          setUser(otherUser.data());
+          setLoading(false);
+        });
+      }
     });
   }, []);
-
+  if (loading) {
+    return (
+      <View style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  } else {
   return (
     <>
       <Background />
@@ -164,6 +189,7 @@ export default function Profile(props) {
       </SafeAreaView>
     </>
   );
+  }
 }
 
 const styles = StyleSheet.create({

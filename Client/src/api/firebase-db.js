@@ -115,40 +115,42 @@ const getRecentActivitiesAndStats = () => {
   return getActivitiesAndCurrentUserStats.sort((a, b) => a.lastCompleted.toDate() - b.lastCompleted.toDate());
 }
 
-const getActivitiesAndUserStats = async userId => {
-  let user = await firestore().collection(USERS_COLLECTION).doc(userId).get()
-  user = user.data()
-  let catList = []
-  activities.forEach(cat => {
-    catList.push({
-      category: cat.category,
-      activities: cat.activities.map(activity => {
-        let stats = user.activityStats[activity.uid]
-        return {
-          title: activity.title,
-          description: activity.description,
-          points: activity.points,
-          uid: activity.uid,
-          dailyLimit: activity.dailyLimit,
-          timesToday: stats == undefined ? 0 : stats.timesToday,
-          timesTotal: stats == undefined ? 0 : stats.timesTotal,
-          lastCompleted: stats == undefined ? new Date() : stats.lastCompleted,
-        }
-      }),
-    })
-  })
-  return catList
+const getActivitiesAndUserStats = userId => {
+  return firestore().collection(USERS_COLLECTION).doc(userId).get().then(res => {
+    let user = res.data();
+    let catList = [];
+    activities.forEach(cat => {
+      catList.push({
+        category: cat.category,
+        activities: cat.activities.map(activity => {
+          let stats = user.activityStats[activity.uid];
+          return {
+            title: activity.title,
+            description: activity.description,
+            points: activity.points,
+            uid: activity.uid,
+            dailyLimit: activity.dailyLimit,
+            timesToday: stats == undefined ? 0 : stats.timesToday,
+            timesTotal: stats == undefined ? 0 : stats.timesTotal,
+            lastCompleted: stats == undefined ? new Date() : stats.lastCompleted,
+          }
+        }),
+      });
+    });
+    return catList;
+  });
+  
 }
 
-const getUserById = async userId => {
-  await firestore().collection(USERS_COLLECTION).doc(userId).get()
+const getUserById = userId => {
+  return firestore().collection(USERS_COLLECTION).doc(userId).get();
 }
 const getUserPointsByCategory = async userId => {
   let userActs
   if (userId == curUser().uid) {
     userActs = getActivitiesAndCurrentUserStats()
   } else {
-    userActs = await getActivitiesAndUserStats()
+    userActs = await getActivitiesAndUserStats(userId);
   }
   let breakdown = [0, 0, 0, 0, 0, 0]
 
@@ -358,8 +360,12 @@ const generateUserDoc = (uid, email, firstName, lastName, competitionId) => {
       gold: 0,
     },
   }
-  return firestore().collection(USERS_COLLECTION).doc(uid).set(userObj)
+  return firestore().collection(USERS_COLLECTION).doc(uid).set(userObj);
 }
+
+// const submitCustomActivityRequest = (description) => {
+
+// }
 
 /*
  * Returns a promise from the firestore api

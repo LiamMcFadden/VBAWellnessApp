@@ -9,6 +9,7 @@ import {
   Text,
   View,
   Image,
+  TouchableOpacity
 } from 'react-native';
 import SwitchSelector from 'react-native-switch-selector';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -238,7 +239,7 @@ const SecondAndThirdLabels = ({props}) => {
 /**
  * Displays a users name, rank, pfp/icon, and score/badges
  */
-const PlayerCard = ({props, sortType}) => {
+const PlayerCard = ({navigation, props, sortType}) => {
   props = props ? props : {};
   let backgroundColor = 'white';
   let pfp = props.profileImage;
@@ -276,10 +277,10 @@ const PlayerCard = ({props, sortType}) => {
   }
   // onPress={navigation.navigate('Profile', {userId: props.uid})}
   return (
-    <View style={[styles.playerCard, {backgroundColor: backgroundColor}]}>
+    <TouchableOpacity style={[styles.playerCard, {backgroundColor: backgroundColor}]} onPress={() => {navigation.navigate('Profile', {userId: props.uid})}}>
       <Text style={styles.playerRank}> {rank} </Text>
       {pfp}
-      <Text style={styles.playerName}>{props.firstName}</Text>
+      <Text style={styles.playerName} >{props.firstName}</Text>
       {sortType === 'points' ? (
         <Text style={styles.playerPoints}>{props.points} pts.</Text>
       ) : (
@@ -292,11 +293,11 @@ const PlayerCard = ({props, sortType}) => {
           <Image source={require('_assets/images/GoldBadgeIcon.png')} style={styles.badge}/>
         </View>
       )}
-    </View>
+    </TouchableOpacity>
   );
 };
 
-const Compete = () => {
+const Compete = ({navigation}) => {
   const [users, setUsers] = useState([]);
   const [usersByPoints, setUsersByPoints] = useState([]);
   const [usersByBadges, setUsersByBadges] = useState([]);
@@ -485,13 +486,13 @@ const Compete = () => {
       <SafeAreaView style={{flex: 1}}>
         <View style={{flex: 1}}>
           { !getCurrentUser().admin && 
-          <PlayerCard props={currUser} sortType={sortType} />
+          <PlayerCard navigation={navigation} props={currUser} sortType={sortType} />
           }
           <PointsorBadges onChange={setOrder} />
           <View style={{flex: 1}}>
             <FlatList
               data={users}
-              renderItem={({item}) => <PlayerCard props={item} sortType={sortType} />}
+              renderItem={({item}) => <PlayerCard navigation={navigation} props={item} sortType={sortType} />}
               ListHeaderComponent={
                 <>
                   <First props={first} />
