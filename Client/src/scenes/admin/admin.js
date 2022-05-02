@@ -15,6 +15,8 @@ import {
     addActivity,
     updateActivity,
     getAllUsers,
+    setCompetitionDates,
+    startNewCompetition as startNewCompDb
   } from '_api/firebase-db';
 
 if (Platform.OS === 'android') {
@@ -96,6 +98,7 @@ const CompetitionSettingsScreen = ({navigation}) => {
             );
         }
         else {
+            setCompetitionDates(startDate, endDate);
             //TODO: make this save the start and end dates into the database, overwriting the old ones (so the admin can change the dates of the current competition)
         }
     };
@@ -117,6 +120,7 @@ const CompetitionSettingsScreen = ({navigation}) => {
                 {
                     text: 'Confirm',
                     onPress: () => {
+                        startNewCompDb();
                         //TODO: make this function start a new competition (generate new competition code and wipe all previous competition data from the database)
                     }
                 }

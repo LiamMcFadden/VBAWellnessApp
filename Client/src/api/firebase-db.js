@@ -201,6 +201,34 @@ const updateCurrentUserFields = fields => {
     .doc(curUser().uid)
     .update(fields);
 };
+const generateCompetitionId = () => {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789";
+  let id = '';
+
+  for (let i = 0; i < 5; i++)
+    id += chars.charAt(Math.floor(Math.random() * chars.length));
+
+  return id;
+}
+const startNewCompetition = () => {
+  let today = Date.now();
+  let sevenDays = 7 * 24 * 60 * 60 * 1000;
+  let competitionId = generateCompetitionId();
+  let newCompetition = {
+    startTime: new Date(today + sevenDays),
+    endTime: new Date(startTime + sevenDays),
+  }
+  competition = newCompetition;
+  return firestore().collection(COMPETITIONS_COLLECTION).doc(competitionId).set(newCompetition);
+
+}
+
+const setCompetitionDates = (startTime, endTime) => {
+  competition.startTime = startTime;
+  competition.endTime = endTime;
+  let updateObject = {startTime, endTime};
+  return firestore().collection(COMPETITIONS_COLLECTION).doc(competition.id).update(updateObject);
+}
 
 const completeActivityForCurrentUser = activityUid => {
   let activity = getActivityById(activityUid);
@@ -392,5 +420,7 @@ export {
   updateActivity,
   addActivity,
   deleteActivity,
+  setCompetitionDates,
+  startNewCompetition
 };
 export {fetch, clear};
