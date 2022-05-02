@@ -1,4 +1,6 @@
-import React, {useState, useRef} from 'react';
+/* eslint-disable react-native/no-inline-styles */
+import {useFocusEffect} from '@react-navigation/native'
+import React, {useState, useEffect, useRef} from 'react'
 import {
   Dimensions,
   FlatList,
@@ -8,22 +10,25 @@ import {
   TouchableHighlight,
   View,
   ScrollView,
-} from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import {SafeAreaView} from 'react-navigation';
+} from 'react-native'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import {SafeAreaView} from 'react-navigation'
 import {
+  getCurrentUserActivityStats,
   getActivitiesByCategory,
   getCurrentUser,
   updateCurrentUserFields,
   completeActivityForCurrentUser,
-} from '_api/firebase-db';
-import {Header, ListItem} from '_atoms';
-import Card from './card';
-import {OutlinedButton} from '../../globals/styledcomponents';
-import {TYPESCALE, COLORS} from '../../globals/styles';
+  getActivitiesAndCurrentUserStats,
+  getActivitiesSortedByDate,
+  getActivityById,
+} from '_api/firebase-db'
+import {OutlinedButton} from '../../globals/styledcomponents'
+import {TYPESCALE, COLORS} from '../../globals/styles'
+import ActivityList from './activityList'
 
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
+const windowWidth = Dimensions.get('window').width
+const windowHeight = Dimensions.get('window').height
 
 const profileStyles = StyleSheet.create({
   profileContainer: {
@@ -55,7 +60,7 @@ const profileStyles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
-});
+})
 /**
  * Shows the users profile with a button that will link to
  * the users full profile
@@ -64,7 +69,7 @@ const profileStyles = StyleSheet.create({
  * // TODO Check Styles for responsiveness --> this might not be good Right now
  */
 const ProfileCard = ({navigation}) => {
-  const name = getCurrentUser().firstName + ' ' + getCurrentUser().lastName;
+  const name = getCurrentUser().firstName + ' ' + getCurrentUser().lastName
   return (
     <View style={profileStyles.profileContainer}>
       <Text style={profileStyles.profileUsername}>{name}</Text>
@@ -88,78 +93,98 @@ const ProfileCard = ({navigation}) => {
           </Text>
         </View>
       </OutlinedButton> */}
-      <TouchableHighlight 
-      underlayColor={COLORS.tintPrimary(0.2)}
-      onPress={() => navigation.navigate("Profile")}
-      style={{
-        width: '40%',
-        height: 35,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#fefefe', //offwhiteish
-        borderWidth: 1,
-        borderColor: '#0155A4',
-        borderRadius: 4,
-        margin: 5,
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 1, //might be better to use 2 and 1 for w and h
-          height: 0,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 4,
-        paddingLeft: 16,
-        paddingRight: 16,
-        marginBottom: 0,
-        marginLeft: 0,
-      }}>
+      <TouchableHighlight
+        underlayColor={COLORS.tintPrimary(0.2)}
+        onPress={() => navigation.navigate('Profile')}
+        style={{
+          width: '40%',
+          height: 35,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#fefefe', //offwhiteish
+          borderWidth: 1,
+          borderColor: '#0155A4',
+          borderRadius: 4,
+          margin: 5,
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 1, //might be better to use 2 and 1 for w and h
+            height: 0,
+          },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+          elevation: 4,
+          paddingLeft: 16,
+          paddingRight: 16,
+          marginBottom: 0,
+          marginLeft: 0,
+        }}
+      >
         <View style={profileStyles.pfpBtnContents}>
-          <Ionicons name="person-circle-outline" size={25} color={'#0155A4'} />
+          <Ionicons name='person-circle-outline' size={25} color={'#0155A4'} />
           <Text
             style={[
               TYPESCALE.button,
               {marginLeft: 20, textAlign: 'center', color: COLORS.primary},
-            ]}>
+            ]}
+          >
             Profile
           </Text>
         </View>
       </TouchableHighlight>
     </View>
-  );
-};
+  )
+}
 const Home = ({navigation}) => {
-  const [items, setItems] = useState(getActivitiesByCategory('Physical'));
+  const [items, setItems] = useState([])
+  const [totalPoints, setTotalPoints] = useState(getCurrentUser().points)
+  // const [activities, setActivities] = useState(getActivitiesSortedByDate());
 
-  const [totalPoints, setTotalPoints] = useState(getCurrentUser().points);
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = false
+      let userActivitiyIDList = getActivitiesSortedByDate()
+      let i = 0
+      let recentActivities = []
+      for (; i < userActivitiyIDList, i < 5; i++) {
+        recentActivities.push(getActivityById(userActivitiyIDList[i][0]))
+      }
+      console.log(recentActivities)
+      setItems(recentActivities)
+      return () => (isActive = true)
+    }, []),
+  )
 
-  const scrollRef = useRef();
-  const scrollUp = index => {
-    scrollRef.current?.scrollTo({
-      y: index * 85,
-      x: 0,
-      animated: true,
-    });
-  };
-
+  // useEffect(() => {
+  //   let userActivitiyIDList = getActivitiesSortedByDate()
+  //   let i = 0
+  //   let recentActivities = []
+  //   for (; i < userActivitiyIDList, i < 5; i++) {
+  //     recentActivities.push(getActivityById(userActivitiyIDList[i][0]))
+  //   }
+  //   console.log(recentActivities)
+  //   setItems(recentActivities)
+  // }, [])
+  //
   const addPoints = points => {
-    let newTotal = totalPoints + points;
-    setTotalPoints(newTotal);
+    let newTotal = totalPoints + points
+    setTotalPoints(newTotal)
     updateCurrentUserFields({points: newTotal}).catch(err => {
-      setTotalPoints(newTotal - points);
-      console.error(err);
+      setTotalPoints(newTotal - points)
+      console.error(err)
       //TODO: Alert connection error
-    });
-  };
+    })
+  }
   const action = item => {
-    const newTotal = totalPoints + item.points;
-  };
+    const newTotal = totalPoints + item.points
+  }
 
   return (
     <SafeAreaView style={{backgroundColor: '#F3F4F7', height: '100%'}}>
       <ProfileCard navigation={navigation} />
+      <ActivityList data={items} openModal={null} />
     </SafeAreaView>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home
