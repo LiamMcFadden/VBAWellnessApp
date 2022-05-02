@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {Button, Text, View, TouchableOpacity, StyleSheet} from 'react-native';
 //import { AuthContext } from "_components/Authentication/auth";
 import {signOut} from '_api/firebase-auth';
-import {getCurrentUser} from '_api/firebase-db';
+import {updateCurrentUserFields} from '_api/firebase-db';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Admin from '_scenes/admin/admin';
 import storage from '@react-native-firebase/storage';
@@ -78,12 +78,13 @@ const SettingsScreen = ({navigation}) => {
         .ref('users/' + currentUser().uid + '/profile.jpg')
         .getDownloadURL()
         .then(url => {
-          firestore()
-            .collection('Users')
-            .doc(currentUser().uid)
-            .update({
-              profileImage: url
-            });
+          updateCurrentUserFields({profileImage: url});
+          // firestore()
+          //   .collection('Users')
+          //   .doc(currentUser().uid)
+          //   .update({
+          //     profileImage: url
+          //   });
         });
 
     };
