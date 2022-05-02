@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
  * Selector switch for displaying either points or badges
  * uses 'react-native-switch-selector'
  */
-const PointsorBadges = () => {
+const PointsorBadges = ({onChange}) => {
   const options = [
     {label: 'Points', value: 'points'},
     {label: 'Badges', value: 'badges'},
@@ -107,7 +107,7 @@ const PointsorBadges = () => {
         options={options}
         initial={0}
         // TODO: make dis do something
-        onPress={value => value}
+        onPress={value => onChange(value)}
         backgroundColor={'#A9A9A9'}
         buttonColor={'white'}
         textColor={'#0155A4'}
@@ -216,17 +216,14 @@ const SecondAndThirdLabels = props => {
 
 /**
  * Displays a users name, rank, pfp/icon, and score/badges
- *
- * TODO: * add some sort of refresh feature
- *          - (i.e. if user refreshes page, it will update the leaderboard)
- *       * pfp stuff
+ *   TODO: add badges
  */
-const PlayerCard = props => {
+const PlayerCard = ({props, sortType}) => {
   props = props ? props : {};
 
   let backgroundColor = 'white';
 
-  let pfp = props.props.profileImage;
+  let pfp = props.profileImage;
   // use default icon if no pfp is found
   if (pfp === undefined) {
     pfp = (
@@ -243,8 +240,8 @@ const PlayerCard = props => {
     );
   }
 
-  if (props.props.rank) {
-    switch (props.props.rank) {
+  if (props.rank) {
+    switch (props.rank) {
       case 1:
         backgroundColor = 'gold';
         break;
@@ -259,10 +256,10 @@ const PlayerCard = props => {
   // onPress={navigation.navigate('Profile', {userId: props.props.uid})}
   return (
     <View style={[styles.playerCard, {backgroundColor: backgroundColor}]}>
-      <Text style={styles.playerRank}> {props.props.rank} </Text>
+      <Text style={styles.playerRank}> {props.rank} </Text>
       {pfp}
-      <Text style={styles.playerName}>{props.props.firstName}</Text>
-      <Text style={styles.playerPoints}>{props.props.points} pts</Text>
+      <Text style={styles.playerName}>{props.firstName}</Text>
+      <Text style={styles.playerPoints}>{props.points} pts</Text>
     </View>
   );
 };
@@ -274,10 +271,12 @@ const Compete = () => {
   const [second, setSecond] = useState([]);
   const [third, setThird] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [sortType, setSort] = useState('points');
+
 
   // background refresh
-  // rate is set to 3 secs by default
-  const REFRESH_INTERVAL = 3000;
+  // rate is set to 15 secs by default
+  const REFRESH_INTERVAL = 15000;
   useEffect(() => {
     const interval = setInterval(() => {
       getUsers();
@@ -291,6 +290,8 @@ const Compete = () => {
     getUsers();
     setRefreshing(false);
   }, []);
+
+
 
   /**
    * Gets all users from the database, sorts them by points, and then sets the first, second, and third place users
@@ -368,14 +369,19 @@ const Compete = () => {
     );
   };
 
+  const setOrder = (value) => {
+    setSort(value);
+  };
+
+
   //<RefreshButton/> -- deleted for now
   return (
     <SafeAreaView style={{flex: 1}}>
       <View style={{flex: 1}}>
         { !getCurrentUser().admin && 
-        <PlayerCard props={currUser} />
+        <PlayerCard props={currUser} sortType={sortType} />
         }
-        <PointsorBadges />
+        <PointsorBadges onChange={setOrder} />
         <First props={first} />
         <FirstLabel props={first} />
         <SecondAndThird props={[second, third]} />
@@ -383,7 +389,7 @@ const Compete = () => {
         <View style={{flex: 1}}>
           <FlatList
             data={users}
-            renderItem={({item}) => <PlayerCard props={item} />}
+            renderItem={({item}) => <PlayerCard props={item} sortType={sortType} />}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
