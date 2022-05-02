@@ -9,60 +9,65 @@ import {
 
 const windowWidth = Dimensions.get('window').width;
 
-const ListItem = ({item, action}) => (
-  <TouchableOpacity
-    style={styles.listItem}
-    onPress={() => action(item)}>
-    <View style={styles.listItemView}>
-      <View
-        style={{
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-        }}>
-        <Text style={styles.listItemTitleText}>{item.title ?? 'Activity'}</Text>
-        {/* <Text style={styles.listItemText}>{item.description}</Text> */}
-      </View>
+const ListItem = ({activity, openModal}) => {
 
-      <View style={styles.iconView}>
-        <Text style={{color: '#0155A4'}}>{item.points} pts</Text>
+  return (
+      <TouchableOpacity
+      style={styles.listItem}
+      onPress={() => openModal(activity)}>
+      <View style={styles.listItemView}>
+          <View
+          style={{
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+          }}>
+              <Text style={styles.listItemTitleText}>{activity.title ?? 'Activity'}</Text>
+              {/* <Text style={styles.listItemText}>{activity.description}</Text> */}
+          </View>
+  
+          <View style={styles.iconView}>
+              <Text style={{color: '#0155A4'}}>{activity.points} pts</Text>
+          </View>
       </View>
-    </View>
-  </TouchableOpacity>
-);
+      </TouchableOpacity>
+)};
 
 const styles = StyleSheet.create({
   listItem: {
     padding: 15,
-    backgroundColor: '#f8f8f8',
-    borderBottomWidth: 1,
+    //backgroundColor: '#f8f8f8',
+    backgroundColor: 'white',
+    marginTop: 5,
     borderColor: '#eee',
+    borderRadius: 50,
+
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,  
+    elevation: 5
   },
   listItemView: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'stretch',
-    alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'stretch',
+      alignItems: 'center',
   },
 
   listItemTextContainer: {
-    height: '100%',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
+      height: '100%',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
   },
   listItemTitleText: {
-    fontSize: 18,
-    maxWidth: windowWidth / 1.5,
-    color: '#0155A4',
+      fontSize: 18,
+      maxWidth: windowWidth / 1.5,
+      color: '#0155A4',
   },
   listItemText: {
-    fontSize: 12,
-    maxWidth: windowWidth / 1.5,
-    color: '#0155A4',
-  },
-  iconView: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    width: 70,
+      fontSize: 12,
+      maxWidth: windowWidth / 1.5,
+      color: '#0155A4',
   },
 });
 
