@@ -16,6 +16,7 @@ import {
     updateActivity,
     getAllUsers,
   } from '_api/firebase-db';
+import { UserContext } from "_components";
 
 if (Platform.OS === 'android') {
     if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -439,42 +440,38 @@ const AdminMainScreen = ({navigation}) => {
     const startDate = getCurrentCompetition()['startTime'].toDate();
     const endDate = getCurrentCompetition()['endTime'].toDate();
     return (
-        <SafeAreaView style={{backgroundColor: '#0155A4', flex: 1, alignItems: "center"}}>
+        <SafeAreaView style={{flex: 1, alignItems: "center"}}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
                 <TouchableOpacity style={{borderRadius: 5, margin: 15, alignSelf: 'flex-start', width: 75}} onPress={() => signOut()}>
-                    <Text style={{color: 'white', fontWeight: '600', fontSize: 18}}>Sign Out</Text>
+                    <Text style={{color: '#0155A4', fontWeight: '600', fontSize: 18}}>Sign Out</Text>
                 </TouchableOpacity>
-                <Text style={{fontSize: 30, fontWeight: "800", padding: 5, paddingRight: 125, color: 'white'}}>Admin Page</Text>
+                <Text style={{fontSize: 30, fontWeight: "bold", padding: 5, color: '#0155A4'}}>Admin</Text>
+                <View style={{paddingRight: 105}}/>
             </View>
-            <View style={styles.compPage}>
-                {competitionStatus()}
-            </View>
-            <View style={{padding: 10}} />
-            <View style={styles.btnPage}>
-                    <View style={{padding: 5, width: "80%"}}>
-                        <View style={{flexDirection: 'row', justifyContent: 'space-between', padding: 5}}>
-                            <Text>Start Date: {startDate != null ? startDate.toLocaleDateString() : 'No date set'}</Text>
-                            <Text>End Date: {endDate != null ? endDate.toLocaleDateString() : 'No date set'}</Text>
+            <View style={{width: '100%', flex: 1, justifyContent: 'space-around', alignItems: 'center'}}>
+                <View style={styles.compPage}>
+                    {competitionStatus()}
+                </View>
+                <View style={styles.btnPage}>
+                        <View style={styles.btnContainer}>
+                            {/* <View style={{flexDirection: 'row', justifyContent: 'space-between', padding: 5}}>
+                                <Text>Start Date: {startDate != null ? startDate.toLocaleDateString() : 'No date set'}</Text>
+                                <Text>End Date: {endDate != null ? endDate.toLocaleDateString() : 'No date set'}</Text>
+                            </View> */}
+                            <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Competition Settings')}>
+                                <Text style={styles.btnFont}>Competition Settings</Text>
+                            </TouchableOpacity>
+                            {/* <TouchableOpacity style={styles.btn}>
+                                <Text style={styles.btnFont}>Edit Users</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.btn}>
+                                <Text style={styles.btnFont}>Edit Milestones</Text>
+                            </TouchableOpacity> */}
+                            <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Edit Activities')}>
+                                <Text style={styles.btnFont}>Edit Activities</Text>
+                            </TouchableOpacity>
                         </View>
-                        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Competition Settings')}>
-                            <Text style={styles.btnFont}>Competition Settings</Text>
-                        </TouchableOpacity>
-                    </View>
-                    {/* <View style={{padding: 5, width: "80%"}}>
-                        <TouchableOpacity style={styles.btn}>
-                            <Text style={styles.btnFont}>Edit Users</Text>
-                        </TouchableOpacity>
-                    </View> */}
-                    {/* <View style={{padding: 5, width: "80%"}}>
-                        <TouchableOpacity style={styles.btn}>
-                            <Text style={styles.btnFont}>Edit Milestones</Text>
-                        </TouchableOpacity>
-                    </View> */}
-                    <View style={{padding: 5, width: "80%"}}>
-                        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Edit Activities')}>
-                            <Text style={styles.btnFont}>Edit Activities</Text>
-                        </TouchableOpacity>
-                    </View>
+                </View>
             </View>
             <View style={{padding: 5}}/>
         </SafeAreaView>
@@ -519,29 +516,53 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     btnPage:{
-        flex: 6,
+        height: '50%',
         width: "90%",
         backgroundColor: 'white',
-        borderRadius: 10,
+        borderRadius: 20,
         alignItems: 'center', 
         justifyContent: 'space-around',
+
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,  
+        elevation: 5,
+    },
+    btnContainer: {
+        padding: 5, 
+        width: "80%",
+        justifyContent: 'space-around',
+        height: '100%'
     },
     compPage:{
-        flex: 1,
+        height: '20%',
         width: "90%",
         backgroundColor: 'white',
-        borderRadius: 10,
+        borderRadius: 20,
         alignItems: "center",
-        justifyContent: 'center'
+        justifyContent: 'center',
+
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,  
+        elevation: 5,
     },
     btn:{
-        backgroundColor: '#0155A4',
-        width: "100%",
-        height: 35,
-        borderRadius: 5,
-        justifyContent: 'center',
+        padding: 15,
+        width: '100%',
+        backgroundColor: 'white',
+        marginTop: 5,
+        borderColor: '#eee',
+        borderRadius: 50,
         alignItems: 'center',
-        alignSelf: 'center',
+
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,  
+        elevation: 5,
     },
     resultsBtn:{
         backgroundColor: 'green',
@@ -553,18 +574,14 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     btnFont:{
-        color: '#fff',
-        textAlign: 'center',
-        alignItems: 'center',
-        fontWeight: '600', // i.e semi-bold
-        fontSize: 18
+        fontSize: 18,
+        color: '#0155A4',
     },
     font:{
-        height: 35,
-        textAlign: 'center',
-        alignItems: 'center',
-        fontWeight: '600', // i.e semi-bold
-        fontSize: 18
+        fontSize: 18,
+        color: 'dimgray',
+        fontWeight: 'bold',
+        textAlign: 'center'
     },
     activityItemView: {
         padding: 15,
