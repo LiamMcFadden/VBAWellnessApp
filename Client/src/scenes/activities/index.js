@@ -344,7 +344,7 @@ const ActivitiesScreen = () => {
             }
           }}
         />
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.customAct}
           onPress={() => setCustomModalVisible(true)}
         >
@@ -354,7 +354,7 @@ const ActivitiesScreen = () => {
             </Text>
             <Text style={styles.customActText}>Click here!</Text>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       <Modal
         isVisible={isModalVisible}
@@ -366,12 +366,12 @@ const ActivitiesScreen = () => {
           toggleView={setModalVisible}
         />
       </Modal>
-      <Modal
+      {/* <Modal
         isVisible={customModalVisible}
         onBackdropPress={() => setCustomModalVisible(false)}
       >
         <CustomActPrompt toggleView={setCustomModalVisible} />
-      </Modal>
+      </Modal> */}
     </SafeAreaView>
   )
 }
