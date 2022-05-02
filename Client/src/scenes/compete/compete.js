@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   View,
+  Image,
 } from 'react-native';
 import SwitchSelector from 'react-native-switch-selector';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -87,6 +88,19 @@ const styles = StyleSheet.create({
     marginRight: 20,
     marginTop: 20,
   },
+  badge: {
+      alignSelf: 'center',
+      marginLeft: 'auto',
+      width: 25,
+      aspectRatio: 0.873,
+      resizeMode: 'contain',
+      marginRight: 5,
+  },
+  badgeContainer: {
+    alignSelf: 'center',
+    marginLeft: 'auto',
+    flexDirection: 'row',
+  }
 });
 
 /*
@@ -120,8 +134,8 @@ const PointsorBadges = ({onChange}) => {
 /*
  * Displays the pfp/icon for first place user
  */
-const First = (props) => {
-  let pfp = props.props.profileImage;
+const First = ({props}) => {
+  let pfp = props.profileImage;
 
   // use default icon if no pfp is found
   if (pfp === undefined) {
@@ -142,16 +156,16 @@ const First = (props) => {
   return <View style={styles.first}>{pfp}</View>;
 };
 
-const FirstLabel = props => {
-  let name = props.props.firstName;
+const FirstLabel = ({props}) => {
+  let name = props.firstName;
   return <Text style={styles.pfpName}>{name}</Text>;
 };
 
 /*
  * Displays the pfp/icon for second and third place user
  */
-const SecondAndThird = (props) => {
-  let pfpSecond = props.props[0].profileImage;
+const SecondAndThird = ({props}) => {
+  let pfpSecond = props[0].profileImage;
 
   // use default icon if no pfp is found
   if (pfpSecond === undefined) {
@@ -173,7 +187,7 @@ const SecondAndThird = (props) => {
     );
   }
 
-  let pfpThird = props.props[1].profileImage;
+  let pfpThird = props[1].profileImage;
 
   // use default icon if no pfp is found
   if (pfpThird === undefined) {
@@ -203,9 +217,9 @@ const SecondAndThird = (props) => {
   );
 };
 
-const SecondAndThirdLabels = props => {
-  let nameSecond = props.props[0].firstName;
-  let nameThird = props.props[1].firstName;
+const SecondAndThirdLabels = ({props}) => {
+  let nameSecond = props[0].firstName;
+  let nameThird = props[1].firstName;
   return (
     <View style={styles.secondandthird}>
       <Text style={styles.pfpName}>{nameSecond}</Text>
@@ -220,10 +234,10 @@ const SecondAndThirdLabels = props => {
  */
 const PlayerCard = ({props, sortType}) => {
   props = props ? props : {};
-
   let backgroundColor = 'white';
-
   let pfp = props.profileImage;
+  let badges = props.badges ? props.badges : {bronze: 0, silver: 0, gold: 0};
+
   // use default icon if no pfp is found
   if (pfp === undefined) {
     pfp = (
@@ -253,13 +267,21 @@ const PlayerCard = ({props, sortType}) => {
         break;
     }
   }
-  // onPress={navigation.navigate('Profile', {userId: props.props.uid})}
+  // onPress={navigation.navigate('Profile', {userId: props.uid})}
   return (
     <View style={[styles.playerCard, {backgroundColor: backgroundColor}]}>
       <Text style={styles.playerRank}> {props.rank} </Text>
       {pfp}
       <Text style={styles.playerName}>{props.firstName}</Text>
-      <Text style={styles.playerPoints}>{props.points} pts</Text>
+      {sortType === 'points' ? (
+        <Text style={styles.playerPoints}>{props.points} pts.</Text>
+      ) : (
+        <View style={styles.badgeContainer}>
+          <Image source={require('_assets/images/BronzeBadgeIcon.png')} style={styles.badge}/>
+          <Image source={require('_assets/images/SilverBadgeIcon.png')} style={styles.badge}/>
+          <Image source={require('_assets/images/GoldBadgeIcon.png')} style={styles.badge}/>
+        </View>
+      )}
     </View>
   );
 };
@@ -355,24 +377,10 @@ const Compete = () => {
 
   useEffect(getUsers, []);
 
-  // refresh button, refreshed with no indicator at the moment
-  const RefreshButton = () => {
-    return (
-      <View style={styles.refreshButton}>
-        <Ionicons
-          name="md-refresh"
-          size={30}
-          color="#0155A4"
-          onPress={() => onRefresh()}
-        />
-      </View>
-    );
-  };
 
   const setOrder = (value) => {
     setSort(value);
   };
-
 
   //<RefreshButton/> -- deleted for now
   return (
@@ -401,3 +409,17 @@ const Compete = () => {
 };
 
 export default Compete;
+
+  // refresh button, refreshed with no indicator at the moment
+  //const RefreshButton = () => {
+  //  return (
+  //    <View style={styles.refreshButton}>
+  //      <Ionicons
+  //        name="md-refresh"
+  //        size={30}
+  //        color="#0155A4"
+  //        onPress={() => onRefresh()}
+  //      />
+  //    </View>
+  //  );
+  //};
