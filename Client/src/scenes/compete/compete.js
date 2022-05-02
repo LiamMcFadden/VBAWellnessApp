@@ -439,7 +439,7 @@ const Compete = () => {
       if (sortType === 'points') 
         setUsers(tempUsersByPoints);
       else 
-        setUsers(tempUsersByPoints);
+        setUsers(tempUsersByBadges);
 
         setCurrUser(tempCurrUser);
         setLoading(false);
