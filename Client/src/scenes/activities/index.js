@@ -336,7 +336,7 @@ const ActivitiesScreen = () => {
 
       <View style={{flex: 1}}>
         <FlatList
-          contentContainerStyle={{paddingBottom: 20}}
+          contentContainerStyle={{paddingBottom: 20, width: 0.95 * windowWidth, alignSelf: 'center'}}
           data={items}
           renderItem={({item}) => {
             if (item.available) {

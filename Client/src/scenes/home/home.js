@@ -27,13 +27,19 @@ const profileStyles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: '#0155A4',
     borderRadius: 10,
-    marginTop: 30,
+    marginTop: 15,
     marginBottom: 10,
     paddingTop: 5,
     justifyContent: 'space-evenly',
     paddingLeft: '2.5%',
     paddingRight: '2.5%',
     paddingBottom: 7,
+
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
   },
   profileUsername: {
     ...TYPESCALE.h5,
@@ -65,7 +71,7 @@ const PFP = ({ navigation }) => {
   const name = getCurrentUser().firstName + ' ' + getCurrentUser().lastName
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate('Profile')}
+      onPress={() => navigation.navigate('Profile', {userId: getCurrentUser().uid})}
       style={[profileStyles.profileContainer,
       { padding: 0, alignItems: 'flex-start', justifyContent: 'flex-end', overflow: 'hidden', backgroundColor: "#fff" }]}
     >
@@ -131,7 +137,11 @@ const Home = ({ navigation }) => {
     let userActivitiyIDList = getActivitiesSortedByDate()
     let i = 0
     let recentActivities = []
-    for (; i < userActivitiyIDList, i < 5; i++) {
+    let iterator = userActivitiyIDList.length;
+    if(userActivitiyIDList.length > 5) {
+      iterator = 5;
+    }
+    for (; i < userActivitiyIDList, i < iterator; i++) {
       recentActivities.push(getActivityById(userActivitiyIDList[i][0]))
     }
     setItems(recentActivities)

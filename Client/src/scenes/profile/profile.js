@@ -80,7 +80,6 @@ export default function Profile(props) {
       return chartData;
     }).catch(console.error);
   }
-
   useEffect(() => {
     let id = props.route.params.userId;
     fetchChartData(id).then((data) => {

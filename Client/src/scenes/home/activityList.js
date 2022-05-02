@@ -42,7 +42,7 @@ const Activities = ({activities, activityCompleted}) => {
   }
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{ width: 0.95 * windowWidth, alignSelf: 'center'}}>
       <FlatList
         contentContainerStyle={{paddingBottom: 20}}
         data={activities}
