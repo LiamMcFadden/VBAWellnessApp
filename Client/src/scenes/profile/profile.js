@@ -11,7 +11,7 @@ import {
 import { getCurrentUser, getUserById, getUserPointsByCategory } from '_api/firebase-db';
 import { UserContext } from '_components/Authentication/user';
 import { COLORS, TYPESCALE } from '../../globals/styles';
-import ProgressBar from './progressbar';
+import { ProgressBar } from '../../globals/styledcomponents'
 
 const user = {
   firstname: 'John',
@@ -103,6 +103,7 @@ export default function Profile(props) {
               style={{
                 ...TYPESCALE.h6,
                 textAlign: 'center',
+                color: COLORS.primary
               }}>{`${user.firstName} ${user.lastName}`}</Text>
             <Text
               style={{
@@ -113,11 +114,11 @@ export default function Profile(props) {
           </View>
 
           <View style={{ alignItems: 'center', marginTop: 15 }}>
-            <Text style={[TYPESCALE.subtitle]}>{user.points} pts{/*Level. 7*/}</Text>
+            <Text style={[TYPESCALE.h6, {color: COLORS.primary}]}>{user.points} pts</Text>
             <ProgressBar
               points={user.points}
-              milestone={user.points * 1.5}
               width={wwidth / 1.5}
+              textOrientation={'center'}
             />
           </View>
         </View>
@@ -204,14 +205,25 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 25,
   },
   heading: {
     height: 'auto',
     width: '100%',
-    paddingBottom: 10,
+    paddingBottom: 20,
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#f8f8f8',
+
+    shadowOffset: {
+      width: 1,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 0,
+    marginBottom: 20,
   },
 });

@@ -29,7 +29,8 @@ const styles = StyleSheet.create({
   },
   selector: {
     width: windowWidth * 0.75,
-    marginLeft: (windowWidth * 0.25) / 2,
+    alignSelf: 'center',
+    marginBottom: 10
   },
   secondandthird: {
     alignItems: 'center',
@@ -487,14 +488,18 @@ const Compete = () => {
           <PlayerCard props={currUser} sortType={sortType} />
           }
           <PointsorBadges onChange={setOrder} />
-          <First props={first} />
-          <FirstLabel props={first} />
-          <SecondAndThird props={[second, third]} />
-          <SecondAndThirdLabels props={[second, third]} />
           <View style={{flex: 1}}>
             <FlatList
               data={users}
               renderItem={({item}) => <PlayerCard props={item} sortType={sortType} />}
+              ListHeaderComponent={
+                <>
+                  <First props={first} />
+                  <FirstLabel props={first} />
+                  <SecondAndThird props={[second, third]} />
+                  <SecondAndThirdLabels props={[second, third]} />
+                </>
+              }
               refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
               }
