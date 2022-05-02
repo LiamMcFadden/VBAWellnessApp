@@ -11,7 +11,7 @@ import {
 import SwitchSelector from 'react-native-switch-selector';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ProfilePicture from 'react-native-profile-picture';
-import {getAllUsers} from '../../api/firebase-db';
+import {getAllUsers, getCurrentUser} from '../../api/firebase-db';
 import { currentUser } from '_api/firebase-auth';
 
 const windowWidth = Dimensions.get('window').width;
@@ -372,7 +372,7 @@ const Compete = () => {
   return (
     <SafeAreaView style={{flex: 1}}>
       <View style={{flex: 1}}>
-        { currUser === [] && 
+        { !getCurrentUser().admin && 
         <PlayerCard props={currUser} />
         }
         <PointsorBadges />
