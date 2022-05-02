@@ -323,11 +323,11 @@ const Compete = ({navigation}) => {
   //}, []);
 
   // used for pull to refresh functionality
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = () => {
     setRefreshing(true);
     getUsers();
     setRefreshing(false);
-  }, []);
+  }
 
 
 
@@ -439,24 +439,23 @@ const Compete = ({navigation}) => {
 
       if (sortType === 'points') 
         setUsers(tempUsersByPoints);
-      else 
+      else if (sortType === 'badges')
         setUsers(tempUsersByBadges);
 
-        setCurrUser(tempCurrUser);
-        setLoading(false);
+      setCurrUser(tempCurrUser);
+      setLoading(false);
     });
   };
 
   useEffect(getUsers, []);
 
   const setOrder = (value) => {
-
     if (value === 'points') {
       setFirst(pointsTop3[0]);
       setSecond(pointsTop3[1]);
       setThird(pointsTop3[2]);
       setUsers(usersByPoints);
-    } else {
+    } else if (value === 'badges') {
       setFirst(badgesTop3[0]);
       setSecond(badgesTop3[1]);
       setThird(badgesTop3[2]);
