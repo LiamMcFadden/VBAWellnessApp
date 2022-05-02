@@ -10,6 +10,7 @@ import {
   VictoryLabel, VictoryPie
 } from 'victory-native';
 import { getCurrentUser, getUserById, getUserPointsByCategory } from '_api/firebase-db';
+import ProfilePicture from 'react-native-profile-picture';
 import { UserContext } from '_components/Authentication/user';
 import { COLORS, TYPESCALE } from '../../globals/styles';
 import { ProgressBar } from '../../globals/styledcomponents'
@@ -71,6 +72,22 @@ export default function Profile(props) {
   const [loading, setLoading] = useState(true);
   //const { state } = useContext(UserContext);
 
+  let pfp = user.profileImage;
+  // use default icon if no pfp is found
+  if (pfp === undefined) {
+    pfp = (
+      <Ionicons
+        name="person-circle-outline"
+        size={100}
+        color={COLORS.tintPrimary(0.1)}
+      />
+    );
+  } else {
+    pfp = (
+      <ProfilePicture width={100} height={100} isPicture={true} URLPicture={pfp} shape="circle" />
+    );
+  }
+
   const fetchChartData = (userId) => {
     return getUserPointsByCategory(userId).then((data) => {
       let chartData = [];
@@ -119,11 +136,12 @@ export default function Profile(props) {
       <SafeAreaView style={styles.profileContainer}>
         <View style={styles.heading}>
           <View style={{ alignItems: 'center' }}>
-            <Ionicons
+            {/*<Ionicons
               name="person-circle-outline"
               size={100}
               color={COLORS.tintPrimary(0.1)}
-            />
+            />*/}
+            {pfp}
             <Text
               style={{
                 ...TYPESCALE.h6,
