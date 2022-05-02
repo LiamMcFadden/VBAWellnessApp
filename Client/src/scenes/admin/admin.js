@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 import { Text, View, TextInput, KeyboardAvoidingView, StatusBar, Alert, UIManager, SafeAreaView, LayoutAnimation, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import Modal from "react-native-modal";
 import DatePicker from 'react-native-date-picker'
@@ -18,7 +18,7 @@ import {
     setCompetitionDates,
     startNewCompetition as startNewCompDb
   } from '_api/firebase-db';
-import { UserContext } from "_components";
+import { UserContext } from "_components/Authentication/user";
 
 if (Platform.OS === 'android') {
     if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -30,14 +30,13 @@ const Stack = createNativeStackNavigator();
 
 const competitionStatus = () => {
     const [isModalVisible, setModalVisible] = useState(false);
-
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
 
     const date = new Date();
-    let startDate = getCurrentCompetition()['startTime'].toDate();
-    let endDate = getCurrentCompetition()['endTime'].toDate();
+    let startDate = getCurrentCompetition()['startTime']
+    let endDate = getCurrentCompetition()['endTime']
     let exists = (startDate != null && endDate != null);
     let compText;
     let compButton = null;
@@ -78,8 +77,8 @@ const competitionStatus = () => {
 
 const CompetitionSettingsScreen = ({navigation}) => {
 
-    const [startDate, setStartDate] = useState(getCurrentCompetition()['startTime'].toDate())
-    const [endDate, setEndDate] = useState(getCurrentCompetition()['endTime'].toDate())
+    const [startDate, setStartDate] = useState(getCurrentCompetition()['startTime'])
+    const [endDate, setEndDate] = useState(getCurrentCompetition()['endTime'])
 
     const [datesChanged, setDatesChanged] = useState(false);
 
@@ -100,13 +99,13 @@ const CompetitionSettingsScreen = ({navigation}) => {
         }
         else {
             setCompetitionDates(startDate, endDate);
-            //TODO: make this save the start and end dates into the database, overwriting the old ones (so the admin can change the dates of the current competition)
+            setDatesChanged(false);
         }
     };
 
     const discardDates = () => {
-        setStartDate(getCurrentCompetition()['startTime'].toDate());
-        setEndDate(getCurrentCompetition()['endTime'].toDate());
+        setStartDate(getCurrentCompetition()['startTime']);
+        setEndDate(getCurrentCompetition()['endTime']);
         setDatesChanged(false);
     }
 
@@ -441,8 +440,6 @@ const ActivityItem = ({
 };
 
 const AdminMainScreen = ({navigation}) => {
-    const startDate = getCurrentCompetition()['startTime'].toDate();
-    const endDate = getCurrentCompetition()['endTime'].toDate();
     return (
         <SafeAreaView style={{flex: 1, alignItems: "center"}}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>

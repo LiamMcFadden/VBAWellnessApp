@@ -40,6 +40,8 @@ const fetch = async userId => {
             if (res.data()) {
               competition = res.data()
               competition.id = currentUser.competition
+              competition.startTime = competition.startTime.toDate();
+              competition.endTime = competition.endTime.toDate();
             }
           })
       }
@@ -177,8 +179,8 @@ const isCompetitionValid = () => {
     return -1
   }
   const date = new Date()
-  let startDate = competition.startTime.toDate()
-  let endDate = competition.endTime.toDate()
+  let startDate = competition.startTime
+  let endDate = competition.endTime
   if (!(startDate != null && endDate != null)) {
     return -1 //Missing
   } else if (date > startDate && date < endDate) {
@@ -224,9 +226,11 @@ const startNewCompetition = () => {
   let competitionId = generateCompetitionId();
   let newCompetition = {
     startTime: new Date(today + sevenDays),
-    endTime: new Date(startTime + sevenDays),
+    endTime: new Date(today + (sevenDays * 2)),
+    id: competitionId
   }
   competition = newCompetition;
+  updateCurrentUserFields({competition: competitionId});
   return firestore().collection(COMPETITIONS_COLLECTION).doc(competitionId).set(newCompetition);
 
 }

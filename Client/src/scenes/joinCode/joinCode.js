@@ -51,7 +51,7 @@ const MissingCodeScreen = ({authCallback}) => {
     setLoading(true);
     getCompetitionById(competitionCode).then(competition => {
       competition = competition.data();
-      if (!competition || competition.endTime.toDate() < Date.now()) {
+      if (!competition || competition.endTime < Date.now()) {
         alert(
           'Invalid Competition Code',
           'The code you entered does not match any competition.',
@@ -97,8 +97,8 @@ const MissingCodeScreen = ({authCallback}) => {
 const StartingSoonScreen = () => { //FIXME: Needs styling
   return (
     <View>
-      <Text>{getCurrentCompetition().name} Starting Soon!</Text>
-      <Text>{getCurrentCompetition().startTime.toDate().toLocaleString()}</Text>
+      <Text>Your Competition is Starting Soon!</Text>
+      <Text>{getCurrentCompetition().startTime.toLocaleString()}</Text>
     </View>
   );
 };
@@ -111,7 +111,7 @@ const EndedScreen = ({navigation}) => {
   };
   return (
     <View>
-      <Text>{getCurrentCompetition().name} ended</Text>
+      <Text>Your Competition has ended</Text>
       <TouchableOpacity style={styles.signInBtn} onPress={viewResults}>
         <Text style={styles.signInBtnText}>View Results</Text>
       </TouchableOpacity>
