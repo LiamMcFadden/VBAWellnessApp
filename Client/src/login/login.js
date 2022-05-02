@@ -164,9 +164,9 @@ const LoginScreen = ({navigation}) => {
     <>
       <Background />
       <View style={styles.abs}>
-        <View style={{backgroundColor: 'white', borderRadius: 100, paddingLeft: 30, paddingRight: 30, justifyContent: 'center', alignItems: 'center'}}>
-          <Image source={require('./VBA-Logo.png')} style={{width: 200, resizeMode: 'contain'}}/>
-          <Text style={{fontSize: 20, color: 'dimgray', fontWeight: '600', fontStyle: 'italic', bottom: 20}}>Wellness Challenge</Text>
+        <View style={{backgroundColor: 'white', borderRadius: 100, paddingLeft: 30, paddingRight: 30, height: 100, justifyContent: 'center', alignItems: 'center'}}>
+          <Image source={require('./VBA-Logo.png')} style={{width: 150, resizeMode: 'contain'}}/>
+          <Text style={{fontSize: 15, color: 'dimgray', fontWeight: '600', fontStyle: 'italic', bottom: 40}}>Wellness Challenge</Text>
         </View>
         <Text style={styles.heading}>Sign In</Text>
         <View style={styles.form}>
