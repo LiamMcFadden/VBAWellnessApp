@@ -72,7 +72,7 @@ export default function Profile(props) {
   const [loading, setLoading] = useState(true);
   //const { state } = useContext(UserContext);
 
-  let pfp = null;
+  let pfp = user.profileImage;
 
   // use default icon if no pfp is found
   if (!pfp || pfp === undefined) {
