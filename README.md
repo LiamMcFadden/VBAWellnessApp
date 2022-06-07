@@ -30,3 +30,11 @@ _The Android instructions assume you have an Android Virtual Device installed an
 2. Navigate to `Client` directory and run `npm install`
 3. Then run `npx react-native run-android` to start the Metro bundler, and build the app
 4. The emulator will then open in a new window and load the app
+
+### Sample Screens
+![](./img/login.png)
+![](./img/activities.png)
+![](./img/completeactivity.png)
+![](./img/leaderboard.png)
+![](./img/startcomp.png)
+![](./img/admin.png)
